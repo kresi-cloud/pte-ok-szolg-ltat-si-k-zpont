@@ -1,0 +1,85 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { STATUS_LABELS, STATUS_ORDER } from "@/lib/types";
+
+export const Route = createFileRoute("/segitseg")({
+  head: () => ({
+    meta: [
+      { title: "Segítség – ÁOK Digitális Szolgáltatási Portál" },
+      {
+        name: "description",
+        content: "Hogyan működik az igénylés, mit jelentenek az állapotok és kihez fordulhat.",
+      },
+      { property: "og:title", content: "Segítség – ÁOK Digitális Szolgáltatási Portál" },
+      { property: "og:description", content: "Útmutató a portál használatához." },
+    ],
+  }),
+  component: Help,
+});
+
+function Help() {
+  return (
+    <div className="mx-auto max-w-3xl space-y-8">
+      <div>
+        <h1 className="font-display text-2xl font-semibold">Segítség</h1>
+        <p className="mt-1.5 text-muted-foreground">
+          A portál célja, hogy egyetlen helyen lehessen digitális és informatikai igényt indítani.
+          Nem kell tudnia, melyik egység illetékes – a rendszer belül irányítja az igényt.
+        </p>
+      </div>
+
+      <Accordion type="single" collapsible className="card-surface px-5">
+        <AccordionItem value="a">
+          <AccordionTrigger>Hogyan indítok új igényt?</AccordionTrigger>
+          <AccordionContent>
+            Válassza az <Link to="/uj-igeny" className="text-primary underline">Új igény</Link>{" "}
+            menüpontot, majd a négy szolgáltatási terület egyikét. Ezután írja le saját szavaival,
+            mit szeretne elérni – technikai megoldást nem kell megadnia.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="b">
+          <AccordionTrigger>Mit jelentenek az állapotok?</AccordionTrigger>
+          <AccordionContent>
+            <ul className="space-y-1">
+              {STATUS_ORDER.map((s) => (
+                <li key={s}>
+                  <strong>{STATUS_LABELS[s]}</strong> – az igény ebben a szakaszban van; nem minden
+                  igény jár végig minden állapoton.
+                </li>
+              ))}
+            </ul>
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="c">
+          <AccordionTrigger>Ki hagyja jóvá az igényemet?</AccordionTrigger>
+          <AccordionContent>
+            Alapesetben a szervezeti egység vezetője. Költséggel járó vagy nagyobb fejlesztési
+            igényeknél a költségkeret-gazda, a szolgáltatásgazda, illetve a Dékáni Hivatal is
+            bekapcsolódik. A jóváhagyási utat az igény adatlapján követheti.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="d">
+          <AccordionTrigger>Hogyan használjuk a mesterséges intelligenciát?</AccordionTrigger>
+          <AccordionContent>
+            Az AI segít pontosítani a leírást, javaslatot tesz a besorolásra, jelzi a lehetséges
+            duplikációkat és összefoglalókat készít. Minden javaslat ajánlás: döntést kizárólag
+            munkatárs hoz, és minden javaslat visszanézhető.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="e">
+          <AccordionTrigger>Adatkezelés</AccordionTrigger>
+          <AccordionContent>
+            A portál szerepkör alapú hozzáférést alkalmaz: mindenki csak a feladatához szükséges
+            adatokat látja. A belső megjegyzések nem jelennek meg az igénylőnél, a listanézetek pedig
+            nem tartalmaznak szükségtelen személyes adatot.
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  );
+}
