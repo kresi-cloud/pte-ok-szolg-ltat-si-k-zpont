@@ -10,33 +10,80 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FejlesztesekRouteImport } from './routes/fejlesztesek'
+import { Route as IgenyeimRouteImport } from './routes/igenyeim'
+import { Route as SzolgaltatasokRouteImport } from './routes/szolgaltatasok'
+import { Route as UjIgenyRouteImport } from './routes/uj-igeny'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FejlesztesekRoute = FejlesztesekRouteImport.update({
+  id: '/fejlesztesek',
+  path: '/fejlesztesek',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IgenyeimRoute = IgenyeimRouteImport.update({
+  id: '/igenyeim',
+  path: '/igenyeim',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SzolgaltatasokRoute = SzolgaltatasokRouteImport.update({
+  id: '/szolgaltatasok',
+  path: '/szolgaltatasok',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UjIgenyRoute = UjIgenyRouteImport.update({
+  id: '/uj-igeny',
+  path: '/uj-igeny',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/fejlesztesek': typeof FejlesztesekRoute
+  '/igenyeim': typeof IgenyeimRoute
+  '/szolgaltatasok': typeof SzolgaltatasokRoute
+  '/uj-igeny': typeof UjIgenyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/fejlesztesek': typeof FejlesztesekRoute
+  '/igenyeim': typeof IgenyeimRoute
+  '/szolgaltatasok': typeof SzolgaltatasokRoute
+  '/uj-igeny': typeof UjIgenyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/fejlesztesek': typeof FejlesztesekRoute
+  '/igenyeim': typeof IgenyeimRoute
+  '/szolgaltatasok': typeof SzolgaltatasokRoute
+  '/uj-igeny': typeof UjIgenyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/fejlesztesek' | '/igenyeim' | '/szolgaltatasok' | '/uj-igeny'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/fejlesztesek' | '/igenyeim' | '/szolgaltatasok' | '/uj-igeny'
+  id:
+    | '__root__'
+    | '/'
+    | '/fejlesztesek'
+    | '/igenyeim'
+    | '/szolgaltatasok'
+    | '/uj-igeny'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FejlesztesekRoute: typeof FejlesztesekRoute
+  IgenyeimRoute: typeof IgenyeimRoute
+  SzolgaltatasokRoute: typeof SzolgaltatasokRoute
+  UjIgenyRoute: typeof UjIgenyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +95,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fejlesztesek': {
+      id: '/fejlesztesek'
+      path: '/fejlesztesek'
+      fullPath: '/fejlesztesek'
+      preLoaderRoute: typeof FejlesztesekRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/igenyeim': {
+      id: '/igenyeim'
+      path: '/igenyeim'
+      fullPath: '/igenyeim'
+      preLoaderRoute: typeof IgenyeimRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/szolgaltatasok': {
+      id: '/szolgaltatasok'
+      path: '/szolgaltatasok'
+      fullPath: '/szolgaltatasok'
+      preLoaderRoute: typeof SzolgaltatasokRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/uj-igeny': {
+      id: '/uj-igeny'
+      path: '/uj-igeny'
+      fullPath: '/uj-igeny'
+      preLoaderRoute: typeof UjIgenyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FejlesztesekRoute: FejlesztesekRoute,
+  IgenyeimRoute: IgenyeimRoute,
+  SzolgaltatasokRoute: SzolgaltatasokRoute,
+  UjIgenyRoute: UjIgenyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
