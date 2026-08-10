@@ -10,13 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminisztracioRouteImport } from './routes/adminisztracio'
 import { Route as FejlesztesekRouteImport } from './routes/fejlesztesek'
+import { Route as FelelossegekRouteImport } from './routes/felelossegek'
 import { Route as IgenyeimRouteImport } from './routes/igenyeim'
 import { Route as MunkaterRouteImport } from './routes/munkater'
+import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as ProfilRouteImport } from './routes/profil'
 import { Route as SegitsegRouteImport } from './routes/segitseg'
 import { Route as SzolgaltatasokRouteImport } from './routes/szolgaltatasok'
 import { Route as UjIgenyRouteImport } from './routes/uj-igeny'
+import { Route as VezetoiAttekintesRouteImport } from './routes/vezetoi-attekintes'
 import { Route as IgenyIdRouteImport } from './routes/igeny.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -24,9 +28,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminisztracioRoute = AdminisztracioRouteImport.update({
+  id: '/adminisztracio',
+  path: '/adminisztracio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FejlesztesekRoute = FejlesztesekRouteImport.update({
   id: '/fejlesztesek',
   path: '/fejlesztesek',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FelelossegekRoute = FelelossegekRouteImport.update({
+  id: '/felelossegek',
+  path: '/felelossegek',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IgenyeimRoute = IgenyeimRouteImport.update({
@@ -37,6 +51,11 @@ const IgenyeimRoute = IgenyeimRouteImport.update({
 const MunkaterRoute = MunkaterRouteImport.update({
   id: '/munkater',
   path: '/munkater',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortfolioRoute = PortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfilRoute = ProfilRouteImport.update({
@@ -59,6 +78,11 @@ const UjIgenyRoute = UjIgenyRouteImport.update({
   path: '/uj-igeny',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VezetoiAttekintesRoute = VezetoiAttekintesRouteImport.update({
+  id: '/vezetoi-attekintes',
+  path: '/vezetoi-attekintes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IgenyIdRoute = IgenyIdRouteImport.update({
   id: '/igeny/$id',
   path: '/igeny/$id',
@@ -67,83 +91,111 @@ const IgenyIdRoute = IgenyIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/adminisztracio': typeof AdminisztracioRoute
   '/fejlesztesek': typeof FejlesztesekRoute
+  '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
   '/munkater': typeof MunkaterRoute
+  '/portfolio': typeof PortfolioRoute
   '/profil': typeof ProfilRoute
   '/segitseg': typeof SegitsegRoute
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
+  '/vezetoi-attekintes': typeof VezetoiAttekintesRoute
   '/igeny/$id': typeof IgenyIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/adminisztracio': typeof AdminisztracioRoute
   '/fejlesztesek': typeof FejlesztesekRoute
+  '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
   '/munkater': typeof MunkaterRoute
+  '/portfolio': typeof PortfolioRoute
   '/profil': typeof ProfilRoute
   '/segitseg': typeof SegitsegRoute
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
+  '/vezetoi-attekintes': typeof VezetoiAttekintesRoute
   '/igeny/$id': typeof IgenyIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/adminisztracio': typeof AdminisztracioRoute
   '/fejlesztesek': typeof FejlesztesekRoute
+  '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
   '/munkater': typeof MunkaterRoute
+  '/portfolio': typeof PortfolioRoute
   '/profil': typeof ProfilRoute
   '/segitseg': typeof SegitsegRoute
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
+  '/vezetoi-attekintes': typeof VezetoiAttekintesRoute
   '/igeny/$id': typeof IgenyIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/adminisztracio'
     | '/fejlesztesek'
+    | '/felelossegek'
     | '/igenyeim'
     | '/munkater'
+    | '/portfolio'
     | '/profil'
     | '/segitseg'
     | '/szolgaltatasok'
     | '/uj-igeny'
+    | '/vezetoi-attekintes'
     | '/igeny/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/adminisztracio'
     | '/fejlesztesek'
+    | '/felelossegek'
     | '/igenyeim'
     | '/munkater'
+    | '/portfolio'
     | '/profil'
     | '/segitseg'
     | '/szolgaltatasok'
     | '/uj-igeny'
+    | '/vezetoi-attekintes'
     | '/igeny/$id'
   id:
     | '__root__'
     | '/'
+    | '/adminisztracio'
     | '/fejlesztesek'
+    | '/felelossegek'
     | '/igenyeim'
     | '/munkater'
+    | '/portfolio'
     | '/profil'
     | '/segitseg'
     | '/szolgaltatasok'
     | '/uj-igeny'
+    | '/vezetoi-attekintes'
     | '/igeny/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminisztracioRoute: typeof AdminisztracioRoute
   FejlesztesekRoute: typeof FejlesztesekRoute
+  FelelossegekRoute: typeof FelelossegekRoute
   IgenyeimRoute: typeof IgenyeimRoute
   MunkaterRoute: typeof MunkaterRoute
+  PortfolioRoute: typeof PortfolioRoute
   ProfilRoute: typeof ProfilRoute
   SegitsegRoute: typeof SegitsegRoute
   SzolgaltatasokRoute: typeof SzolgaltatasokRoute
   UjIgenyRoute: typeof UjIgenyRoute
+  VezetoiAttekintesRoute: typeof VezetoiAttekintesRoute
   IgenyIdRoute: typeof IgenyIdRoute
 }
 
@@ -156,11 +208,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/adminisztracio': {
+      id: '/adminisztracio'
+      path: '/adminisztracio'
+      fullPath: '/adminisztracio'
+      preLoaderRoute: typeof AdminisztracioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/fejlesztesek': {
       id: '/fejlesztesek'
       path: '/fejlesztesek'
       fullPath: '/fejlesztesek'
       preLoaderRoute: typeof FejlesztesekRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/felelossegek': {
+      id: '/felelossegek'
+      path: '/felelossegek'
+      fullPath: '/felelossegek'
+      preLoaderRoute: typeof FelelossegekRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/igenyeim': {
@@ -175,6 +241,13 @@ declare module '@tanstack/react-router' {
       path: '/munkater'
       fullPath: '/munkater'
       preLoaderRoute: typeof MunkaterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portfolio': {
+      id: '/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof PortfolioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profil': {
@@ -205,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UjIgenyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vezetoi-attekintes': {
+      id: '/vezetoi-attekintes'
+      path: '/vezetoi-attekintes'
+      fullPath: '/vezetoi-attekintes'
+      preLoaderRoute: typeof VezetoiAttekintesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/igeny/$id': {
       id: '/igeny/$id'
       path: '/igeny/$id'
@@ -217,13 +297,17 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminisztracioRoute: AdminisztracioRoute,
   FejlesztesekRoute: FejlesztesekRoute,
+  FelelossegekRoute: FelelossegekRoute,
   IgenyeimRoute: IgenyeimRoute,
   MunkaterRoute: MunkaterRoute,
+  PortfolioRoute: PortfolioRoute,
   ProfilRoute: ProfilRoute,
   SegitsegRoute: SegitsegRoute,
   SzolgaltatasokRoute: SzolgaltatasokRoute,
   UjIgenyRoute: UjIgenyRoute,
+  VezetoiAttekintesRoute: VezetoiAttekintesRoute,
   IgenyIdRoute: IgenyIdRoute,
 }
 export const routeTree = rootRouteImport
