@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FejlesztesekRouteImport } from './routes/fejlesztesek'
 import { Route as IgenyeimRouteImport } from './routes/igenyeim'
+import { Route as ProfilRouteImport } from './routes/profil'
 import { Route as SegitsegRouteImport } from './routes/segitseg'
 import { Route as SzolgaltatasokRouteImport } from './routes/szolgaltatasok'
 import { Route as UjIgenyRouteImport } from './routes/uj-igeny'
@@ -29,6 +30,11 @@ const FejlesztesekRoute = FejlesztesekRouteImport.update({
 const IgenyeimRoute = IgenyeimRouteImport.update({
   id: '/igenyeim',
   path: '/igenyeim',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfilRoute = ProfilRouteImport.update({
+  id: '/profil',
+  path: '/profil',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SegitsegRoute = SegitsegRouteImport.update({
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/igenyeim': typeof IgenyeimRoute
+  '/profil': typeof ProfilRoute
   '/segitseg': typeof SegitsegRoute
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/igenyeim': typeof IgenyeimRoute
+  '/profil': typeof ProfilRoute
   '/segitseg': typeof SegitsegRoute
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
@@ -68,6 +76,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/igenyeim': typeof IgenyeimRoute
+  '/profil': typeof ProfilRoute
   '/segitseg': typeof SegitsegRoute
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
@@ -78,6 +87,7 @@ export interface FileRouteTypes {
     | '/'
     | '/fejlesztesek'
     | '/igenyeim'
+    | '/profil'
     | '/segitseg'
     | '/szolgaltatasok'
     | '/uj-igeny'
@@ -86,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/fejlesztesek'
     | '/igenyeim'
+    | '/profil'
     | '/segitseg'
     | '/szolgaltatasok'
     | '/uj-igeny'
@@ -94,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/fejlesztesek'
     | '/igenyeim'
+    | '/profil'
     | '/segitseg'
     | '/szolgaltatasok'
     | '/uj-igeny'
@@ -103,6 +115,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FejlesztesekRoute: typeof FejlesztesekRoute
   IgenyeimRoute: typeof IgenyeimRoute
+  ProfilRoute: typeof ProfilRoute
   SegitsegRoute: typeof SegitsegRoute
   SzolgaltatasokRoute: typeof SzolgaltatasokRoute
   UjIgenyRoute: typeof UjIgenyRoute
@@ -129,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/igenyeim'
       fullPath: '/igenyeim'
       preLoaderRoute: typeof IgenyeimRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profil': {
+      id: '/profil'
+      path: '/profil'
+      fullPath: '/profil'
+      preLoaderRoute: typeof ProfilRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/segitseg': {
@@ -159,6 +179,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FejlesztesekRoute: FejlesztesekRoute,
   IgenyeimRoute: IgenyeimRoute,
+  ProfilRoute: ProfilRoute,
   SegitsegRoute: SegitsegRoute,
   SzolgaltatasokRoute: SzolgaltatasokRoute,
   UjIgenyRoute: UjIgenyRoute,
@@ -166,13 +187,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
