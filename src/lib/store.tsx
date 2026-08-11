@@ -643,6 +643,41 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       window.localStorage.removeItem(STORAGE_KEY);
       setState({ ...initialState, loggedIn: true });
     },
+    setUserRoles: (userId, roles, reason) =>
+      setState((s) => {
+        const base = USERS.find((u) => u.id === userId);
+        if (!base) return s;
+        const prev = s.roleOverrides[userId] ?? base.roles;
+        const added = roles.filter((r) => !prev.includes(r));
+        const removed = prev.filter((r) => !roles.includes(r));
+        if (added.length === 0 && removed.length === 0) return s;
+        const stamp = Date.now();
+        const events: RoleAuditEvent[] = [
+          ...added.map((role, i) => ({
+            id: `ra-${stamp}-a${i}`,
+            at: today(),
+            actorId: s.currentUserId,
+            targetUserId: userId,
+            action: "megadva" as const,
+            role,
+            reason,
+          })),
+          ...removed.map((role, i) => ({
+            id: `ra-${stamp}-r${i}`,
+            at: today(),
+            actorId: s.currentUserId,
+            targetUserId: userId,
+            action: "visszavonva" as const,
+            role,
+            reason,
+          })),
+        ];
+        return {
+          ...s,
+          roleOverrides: { ...s.roleOverrides, [userId]: roles },
+          roleAudit: [...events, ...s.roleAudit],
+        };
+      }),
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
