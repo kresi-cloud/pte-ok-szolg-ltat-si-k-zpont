@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
@@ -13,7 +15,9 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CATALOG, ORG_UNITS, TEAMS, USERS, lookup, useStore } from "@/lib/store";
-import { ROLE_LABELS } from "@/lib/types";
+import { INVENTORY_STATUS_LABELS, ROLE_LABELS } from "@/lib/types";
+import { HARDWARE_MODELS } from "@/lib/inventory-data";
+import { SpecGrid } from "@/routes/leltar";
 
 export const Route = createFileRoute("/adminisztracio")({
   head: () => ({
@@ -31,7 +35,10 @@ export const Route = createFileRoute("/adminisztracio")({
 });
 
 function Admin() {
-  const { resetDemo } = useStore();
+  const { resetDemo, inventory, decideInventoryItem } = useStore();
+  const [comments, setComments] = useState<Record<string, string>>({});
+  const pending = inventory.filter((i) => i.status === "jovahagyasra_var");
+  const decided = inventory.filter((i) => i.status !== "jovahagyasra_var");
   return (
     <div className="space-y-6">
       <div>
@@ -46,6 +53,9 @@ function Admin() {
           <TabsTrigger value="felhasznalok">Felhasználók</TabsTrigger>
           <TabsTrigger value="egysegek">Szervezeti egységek</TabsTrigger>
           <TabsTrigger value="katalogus">Katalógus</TabsTrigger>
+          <TabsTrigger value="leltar">
+            Leltár jóváhagyás{pending.length > 0 ? ` (${pending.length})` : ""}
+          </TabsTrigger>
           <TabsTrigger value="ai">AI-beállítások</TabsTrigger>
         </TabsList>
 

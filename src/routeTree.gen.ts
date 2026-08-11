@@ -14,6 +14,7 @@ import { Route as AdminisztracioRouteImport } from './routes/adminisztracio'
 import { Route as FejlesztesekRouteImport } from './routes/fejlesztesek'
 import { Route as FelelossegekRouteImport } from './routes/felelossegek'
 import { Route as IgenyeimRouteImport } from './routes/igenyeim'
+import { Route as LeltarRouteImport } from './routes/leltar'
 import { Route as MunkaterRouteImport } from './routes/munkater'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as ProfilRouteImport } from './routes/profil'
@@ -46,6 +47,11 @@ const FelelossegekRoute = FelelossegekRouteImport.update({
 const IgenyeimRoute = IgenyeimRouteImport.update({
   id: '/igenyeim',
   path: '/igenyeim',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeltarRoute = LeltarRouteImport.update({
+  id: '/leltar',
+  path: '/leltar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MunkaterRoute = MunkaterRouteImport.update({
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
+  '/leltar': typeof LeltarRoute
   '/munkater': typeof MunkaterRoute
   '/portfolio': typeof PortfolioRoute
   '/profil': typeof ProfilRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
+  '/leltar': typeof LeltarRoute
   '/munkater': typeof MunkaterRoute
   '/portfolio': typeof PortfolioRoute
   '/profil': typeof ProfilRoute
@@ -126,6 +134,7 @@ export interface FileRoutesById {
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
+  '/leltar': typeof LeltarRoute
   '/munkater': typeof MunkaterRoute
   '/portfolio': typeof PortfolioRoute
   '/profil': typeof ProfilRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/fejlesztesek'
     | '/felelossegek'
     | '/igenyeim'
+    | '/leltar'
     | '/munkater'
     | '/portfolio'
     | '/profil'
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/fejlesztesek'
     | '/felelossegek'
     | '/igenyeim'
+    | '/leltar'
     | '/munkater'
     | '/portfolio'
     | '/profil'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/fejlesztesek'
     | '/felelossegek'
     | '/igenyeim'
+    | '/leltar'
     | '/munkater'
     | '/portfolio'
     | '/profil'
@@ -189,6 +201,7 @@ export interface RootRouteChildren {
   FejlesztesekRoute: typeof FejlesztesekRoute
   FelelossegekRoute: typeof FelelossegekRoute
   IgenyeimRoute: typeof IgenyeimRoute
+  LeltarRoute: typeof LeltarRoute
   MunkaterRoute: typeof MunkaterRoute
   PortfolioRoute: typeof PortfolioRoute
   ProfilRoute: typeof ProfilRoute
@@ -234,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: '/igenyeim'
       fullPath: '/igenyeim'
       preLoaderRoute: typeof IgenyeimRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leltar': {
+      id: '/leltar'
+      path: '/leltar'
+      fullPath: '/leltar'
+      preLoaderRoute: typeof LeltarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/munkater': {
@@ -301,6 +321,7 @@ const rootRouteChildren: RootRouteChildren = {
   FejlesztesekRoute: FejlesztesekRoute,
   FelelossegekRoute: FelelossegekRoute,
   IgenyeimRoute: IgenyeimRoute,
+  LeltarRoute: LeltarRoute,
   MunkaterRoute: MunkaterRoute,
   PortfolioRoute: PortfolioRoute,
   ProfilRoute: ProfilRoute,
@@ -313,13 +334,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
