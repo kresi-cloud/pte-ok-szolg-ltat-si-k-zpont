@@ -89,11 +89,11 @@ function Wizard() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const { createRequest, currentUser } = useStore();
-  const preset = CATALOG.find((c) => c.id === search.service);
-  const [step, setStep] = useState(search.domain ? 1 : 0);
+  const preset = CATALOG.find((c) => c.id === search['service']);
+  const [step, setStep] = useState(search['domain'] ? 1 : 0);
   const [form, setForm] = useState<FormState>({
     ...empty,
-    domain: (search.domain as DomainKey) || (preset?.domain ?? ""),
+    domain: (search['domain'] as DomainKey) || (preset?.domain ?? ""),
     catalogItemId: preset?.id ?? "",
     title: preset?.name ?? "",
   });

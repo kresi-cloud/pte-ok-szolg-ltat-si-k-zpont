@@ -31,7 +31,7 @@ export default defineTool({
       .map((c) => ({
         id: c.id,
         name: c.name,
-        domain: DOMAINS.find((d) => d.key === c.domain)?.label ?? c.domain,
+        domain: DOMAINS.find((d) => d.key === c.domain)?.name ?? c.domain,
         description: c.description,
         whoCanRequest: c.whoCanRequest,
         deliveryTime: c.deliveryTime,
