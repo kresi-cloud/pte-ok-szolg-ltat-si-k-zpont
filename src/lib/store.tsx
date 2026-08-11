@@ -154,11 +154,9 @@ function applyProcurementLink(
     notifications: [
       {
         id: `n-${Date.now()}`,
-        userId: request.requesterId,
         requestId: request.id,
-        createdAt: today(),
-        title: "Beszerzési tervbe került",
-        body: `A(z) „${request.title}” igény jóváhagyás után bekerült a ${item.planYear}. évi beszerzési tervbe (${item.quarter}), gazdasági jóváhagyásra vár.`,
+        at: today(),
+        text: `A(z) „${request.title}” igény jóváhagyás után bekerült a ${item.planYear}. évi beszerzési tervbe (${item.quarter}), gazdasági jóváhagyásra vár.`,
         read: false,
       },
       ...s.notifications,
