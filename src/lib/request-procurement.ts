@@ -16,10 +16,9 @@ const RULES: Rule[] = [
   { words: ["workstation", "munkaállomás", "gpu", "szimuláció", "hpc"], standardKey: "std-research-workstation" },
   { words: ["notebook", "laptop", "hordozható"], standardKey: "std-office-notebook" },
   { words: ["macbook", "videovágás", "rendering", "emelt teljesítmény"], standardKey: "std-power-notebook" },
-  { words: ["monitor", "kijelző"], standardKey: "std-monitor" },
+  { words: ["monitor", "kijelző"], standardKey: "std-monitor-base" },
   { words: ["tablet", "ipad"], standardKey: "std-tablet" },
   { words: ["dokkoló", "dokkolo", "dock"], standardKey: "std-dock" },
-  { words: ["nyomtató", "nyomtato", "mfp", "szkenner"], standardKey: "std-printer" },
   { words: ["asztali", "pc", "desktop", "számítógép", "szamitogep"], standardKey: "std-office-desktop" },
 ];
 
@@ -84,7 +83,7 @@ export function planItemFromRequest(r: ServiceRequest): Omit<ProcurementPlanItem
     contingencyPct: 10,
     quantityDiscountPct: 0,
     inflationPct: 3,
-    priority: r.priority === "kritikus" || r.priority === "magas" ? "magas" : "kozepes",
+    priority: r.priority === "kritikus" ? "kritikus" : r.priority === "magas" ? "magas" : "kozepes",
     fundingSourceId: "fs-kari",
     status: "jovahagyasra_var",
     comment: "Automatikusan generálva jóváhagyott szolgáltatási igényből; gazdasági felülvizsgálat szükséges.",
