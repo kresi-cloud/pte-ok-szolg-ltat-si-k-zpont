@@ -193,9 +193,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [state, hydrated]);
 
+  const effectiveUsers = useMemo(
+    () =>
+      USERS.map((u) =>
+        state.roleOverrides[u.id] ? { ...u, roles: state.roleOverrides[u.id]! } : u,
+      ),
+    [state.roleOverrides],
+  );
+
   const currentUser = useMemo(
-    () => USERS.find((u) => u.id === state.currentUserId) ?? USERS[0]!,
-    [state.currentUserId],
+    () => effectiveUsers.find((u) => u.id === state.currentUserId) ?? effectiveUsers[0]!,
+    [effectiveUsers, state.currentUserId],
   );
 
   const patchRequest = useCallback(
@@ -210,19 +218,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const value: StoreValue = {
     ...state,
-    users: USERS,
+    users: effectiveUsers,
     projects: PROJECTS,
     currentUser,
     login: (userId) =>
       setState((s) => {
-        const u = USERS.find((x) => x.id === userId) ?? USERS[0]!;
+        const u = effectiveUsers.find((x) => x.id === userId) ?? effectiveUsers[0]!;
         return { ...s, loggedIn: true, currentUserId: u.id, activeRole: u.roles[0]! };
       }),
     logout: () => setState((s) => ({ ...s, loggedIn: false })),
     setActiveRole: (role) => setState((s) => ({ ...s, activeRole: role })),
     switchUser: (userId) =>
       setState((s) => {
-        const u = USERS.find((x) => x.id === userId) ?? USERS[0]!;
+        const u = effectiveUsers.find((x) => x.id === userId) ?? effectiveUsers[0]!;
         return { ...s, currentUserId: u.id, activeRole: u.roles[0]! };
       }),
     createRequest: (input) => {
