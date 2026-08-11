@@ -132,6 +132,40 @@ const StoreContext = createContext<StoreValue | null>(null);
 
 const today = () => new Date().toISOString().slice(0, 10);
 
+/**
+ * Jóváhagyott igény bekötése a beszerzési tervbe: ha az igény beszerzést
+ * igényel és még nincs hozzá tervsor, javaslatot hoz létre értesítéssel.
+ */
+function applyProcurementLink(
+  s: PersistedState,
+  requests: ServiceRequest[],
+  request: ServiceRequest,
+): PersistedState {
+  const already = s.planItems.some((p) => p.sourceRequestId === request.id);
+  if (already || !needsProcurement(request)) return { ...s, requests };
+  const item: ProcurementPlanItem = {
+    ...planItemFromRequest(request),
+    id: `pp-req-${request.id}-${Date.now()}`,
+  };
+  return {
+    ...s,
+    requests,
+    planItems: [item, ...s.planItems],
+    notifications: [
+      {
+        id: `n-${Date.now()}`,
+        userId: request.requesterId,
+        requestId: request.id,
+        createdAt: today(),
+        title: "Beszerzési tervbe került",
+        body: `A(z) „${request.title}” igény jóváhagyás után bekerült a ${item.planYear}. évi beszerzési tervbe (${item.quarter}), gazdasági jóváhagyásra vár.`,
+        read: false,
+      },
+      ...s.notifications,
+    ],
+  };
+}
+
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<PersistedState>(initialState);
   const [hydrated, setHydrated] = useState(false);
