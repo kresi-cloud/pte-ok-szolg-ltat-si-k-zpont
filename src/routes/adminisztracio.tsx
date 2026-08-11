@@ -151,6 +151,98 @@ function Admin() {
           </div>
         </TabsContent>
 
+        <TabsContent value="leltar" className="space-y-4">
+          <section className="card-surface p-5">
+            <h2 className="font-display text-base font-semibold">
+              Jóváhagyásra váró leltártételek
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              A felhasználók által feltöltött személyi hardver- és szoftvertételek. Hardver esetén a
+              műszaki adatok automatikusan felismertek – jóváhagyás előtt ellenőrizze őket.
+            </p>
+            {pending.length === 0 ? (
+              <p className="mt-4 text-sm text-muted-foreground">Nincs függőben lévő tétel.</p>
+            ) : (
+              <ul className="mt-4 space-y-4">
+                {pending.map((i) => (
+                  <li key={i.id} className="rounded-md border border-border p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="font-medium">{i.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {lookup.userName(i.ownerId)} · {lookup.unit(lookup.user(i.ownerId)?.orgUnitId)} ·{" "}
+                          {i.kind === "hardver"
+                            ? (HARDWARE_MODELS.find((m) => m.key === i.modelKey)?.label ?? "Egyedi eszköz")
+                            : [i.version && `verzió ${i.version}`, i.licenseType].filter(Boolean).join(" · ")}
+                        </p>
+                      </div>
+                      <span className="text-xs text-muted-foreground">beküldve: {i.createdAt}</span>
+                    </div>
+                    {i.kind === "hardver" && <SpecGrid item={i} />}
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <Input
+                        className="max-w-sm"
+                        placeholder="Megjegyzés a döntéshez (opcionális)"
+                        value={comments[i.id] ?? ""}
+                        onChange={(e) => setComments({ ...comments, [i.id]: e.target.value })}
+                        aria-label={`Megjegyzés – ${i.name}`}
+                      />
+                      <Button
+                        onClick={() => {
+                          decideInventoryItem(i.id, "jovahagyva", comments[i.id] || undefined);
+                          toast.success("Leltártétel jóváhagyva.");
+                        }}
+                      >
+                        Jóváhagyás
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          decideInventoryItem(i.id, "elutasitva", comments[i.id] || undefined);
+                          toast.message("Leltártétel elutasítva.");
+                        }}
+                      >
+                        Elutasítás
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <div className="card-surface overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Tétel</TableHead>
+                  <TableHead>Típus</TableHead>
+                  <TableHead>Tulajdonos</TableHead>
+                  <TableHead>Operációs rendszer</TableHead>
+                  <TableHead>Processzor</TableHead>
+                  <TableHead>Memória</TableHead>
+                  <TableHead>Állapot</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {decided.map((i) => (
+                  <TableRow key={i.id}>
+                    <TableCell className="font-medium">{i.name}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {i.kind === "hardver" ? "Hardver" : "Szoftver"}
+                    </TableCell>
+                    <TableCell>{lookup.userName(i.ownerId)}</TableCell>
+                    <TableCell>{i.spec ? `${i.spec.os} ${i.spec.osVersion}` : "—"}</TableCell>
+                    <TableCell>{i.spec?.cpu ?? "—"}</TableCell>
+                    <TableCell>{i.spec?.ram ?? "—"}</TableCell>
+                    <TableCell>{INVENTORY_STATUS_LABELS[i.status]}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </TabsContent>
+
         <TabsContent value="ai">
           <section className="card-surface space-y-5 p-5">
             {/* AI beállítások */}
