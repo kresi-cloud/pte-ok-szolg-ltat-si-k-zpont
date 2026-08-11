@@ -169,6 +169,16 @@ function RequestDetail() {
           {request.nextStep}
         </p>
 
+        {planItem && (
+          <p className="mt-4 rounded-md border border-accent/30 bg-accent/10 px-4 py-3 text-sm">
+            <span className="font-medium">Beszerzési terv: </span>
+            az igény bekerült a {planItem.planYear}. évi tervbe ({planItem.quarter}, {planItem.quantity} db).{" "}
+            <Link to="/beszerzesi-terv" className="underline">
+              Beszerzési terv megnyitása
+            </Link>
+          </p>
+        )}
+
         {pendingApproval && (
           <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-info/30 bg-info/5 p-4">
             <p className="text-sm">
