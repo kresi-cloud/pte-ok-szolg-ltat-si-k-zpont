@@ -82,6 +82,7 @@ function RequestDetail() {
 
   const staff = ["ugyintezo", "szolgaltatasgazda", "admin"].includes(store.activeRole);
   const isRequester = request.requesterId === store.currentUser.id;
+  const planItem = store.planItems.find((p) => p.sourceRequestId === request.id);
   const pendingApproval = request.approvals.find(
     (a) => a.decision === "fuggoben" && a.approverId === store.currentUser.id,
   );
