@@ -222,8 +222,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             </DropdownMenu>
           </div>
         </div>
+        </div>
 
-        <nav aria-label="Fő navigáció" className="border-t border-border bg-card">
+        <nav aria-label="Fő navigáció" className="border-b border-border bg-card">
           <div className="mx-auto flex max-w-[1400px] gap-1 overflow-x-auto px-2 lg:px-6">
             {items.map((item) => {
               const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
@@ -232,10 +233,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                   key={item.to}
                   to={item.to as "/"}
                   className={cn(
-                    "flex items-center gap-2 border-b-2 px-3 py-3 text-sm whitespace-nowrap transition-colors",
+                    "flex items-center gap-2 border-b-[3px] px-3 py-3.5 text-[13px] font-medium tracking-wide whitespace-nowrap uppercase transition-colors",
                     active
-                      ? "border-primary font-semibold text-primary"
-                      : "border-transparent text-muted-foreground hover:text-foreground",
+                      ? "border-accent font-semibold text-primary"
+                      : "border-transparent text-muted-foreground hover:border-accent/40 hover:text-primary",
                   )}
                   aria-current={active ? "page" : undefined}
                 >
@@ -252,10 +253,16 @@ export function AppShell({ children }: { children: ReactNode }) {
         {children}
       </main>
 
-      <footer className="border-t border-border bg-card">
-        <div className="mx-auto max-w-[1400px] px-4 py-6 text-xs text-muted-foreground lg:px-8">
-          PTE ÁOK · Digitális Szolgáltatási Portál – belső prototípus. Egy belépési pont a digitális
-          igényeknek. Átlátható folyamatok, világos felelősségek, mérhető szolgáltatásminőség.
+      <footer className="pte-band mt-8">
+        <div className="mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-10 lg:px-8">
+          <span className="pte-wordmark text-lg font-bold">Pécsi Tudományegyetem</span>
+          <span className="text-sm opacity-85">
+            Általános Orvostudományi Kar · Digitális Szolgáltatási Portál – belső prototípus
+          </span>
+          <span className="max-w-3xl text-xs opacity-70">
+            Egy belépési pont a digitális igényeknek. Átlátható folyamatok, világos felelősségek,
+            mérhető szolgáltatásminőség.
+          </span>
         </div>
       </footer>
 
