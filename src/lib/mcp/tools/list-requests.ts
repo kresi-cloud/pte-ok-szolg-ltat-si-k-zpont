@@ -1,6 +1,7 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { DOMAINS, ORG_UNITS, REQUESTS, STATUS_LABELS } from "@/lib/seed";
+import { DOMAINS, ORG_UNITS, REQUESTS } from "@/lib/seed";
+import { STATUS_LABELS } from "@/lib/types";
 
 export default defineTool({
   name: "list_requests",
