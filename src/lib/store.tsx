@@ -54,6 +54,7 @@ import {
   INITIAL_REPLACEMENT_DECISIONS,
   PERSONAL_LICENCES,
 } from "./asset-data";
+import { needsProcurement, planItemFromRequest } from "./request-procurement";
 
 const STORAGE_KEY = "aok-portal-state-v2";
 
@@ -308,21 +309,31 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           : r.audit,
       })),
     setStatus: (id, status) =>
-      patchRequest(id, (r) => ({
-        ...r,
-        status,
-        updatedAt: today(),
-        audit: [
-          ...r.audit,
-          {
-            id: `a-${Date.now()}`,
-            at: today(),
-            actorId: currentUser.id,
-            action: "Státuszváltás",
-            detail: status,
-          },
-        ],
-      })),
+      setState((s) => {
+        const requests = s.requests.map((r) =>
+          r.id === id
+            ? {
+                ...r,
+                status,
+                updatedAt: today(),
+                audit: [
+                  ...r.audit,
+                  {
+                    id: `a-${Date.now()}`,
+                    at: today(),
+                    actorId: currentUser.id,
+                    action: "Státuszváltás",
+                    detail: status,
+                  },
+                ],
+              }
+            : r,
+        );
+        const updated = requests.find((r) => r.id === id);
+        return status === "elfogadva" && updated
+          ? applyProcurementLink(s, requests, updated)
+          : { ...s, requests };
+      }),
     addMessage: (id, body, internal) => {
       const message: RequestMessage = {
         id: `m-${Date.now()}`,
@@ -348,33 +359,42 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }));
     },
     decideApproval: (id, approvalId, decision, comment) =>
-      patchRequest(id, (r) => {
-        const approvals = r.approvals.map((a) =>
-          a.id === approvalId ? { ...a, decision, decidedAt: today(), comment } : a,
-        );
-        const rejected = decision === "elutasitva";
-        const allDone = approvals.every((a) => a.decision === "jovahagyva");
-        return {
-          ...r,
-          approvals,
-          status: rejected ? "elutasitva" : allDone ? "elfogadva" : r.status,
-          nextStep: rejected
-            ? "Elutasítva."
-            : allDone
-              ? "Jóváhagyva, végrehajtás tervezése következik."
-              : "További jóváhagyásra vár.",
-          updatedAt: today(),
-          audit: [
-            ...r.audit,
-            {
-              id: `a-${Date.now()}`,
-              at: today(),
-              actorId: currentUser.id,
-              action: rejected ? "Elutasítás" : "Jóváhagyás",
-              detail: comment ?? "",
-            },
-          ],
-        };
+      setState((s) => {
+        let approvedNow = false;
+        const requests = s.requests.map((r) => {
+          if (r.id !== id) return r;
+          const approvals = r.approvals.map((a) =>
+            a.id === approvalId ? { ...a, decision, decidedAt: today(), comment } : a,
+          );
+          const rejected = decision === "elutasitva";
+          const allDone = approvals.every((a) => a.decision === "jovahagyva");
+          approvedNow = !rejected && allDone;
+          return {
+            ...r,
+            approvals,
+            status: (rejected ? "elutasitva" : allDone ? "elfogadva" : r.status) as StatusKey,
+            nextStep: rejected
+              ? "Elutasítva."
+              : allDone
+                ? "Jóváhagyva, végrehajtás tervezése következik."
+                : "További jóváhagyásra vár.",
+            updatedAt: today(),
+            audit: [
+              ...r.audit,
+              {
+                id: `a-${Date.now()}`,
+                at: today(),
+                actorId: currentUser.id,
+                action: rejected ? "Elutasítás" : "Jóváhagyás",
+                detail: comment ?? "",
+              },
+            ],
+          };
+        });
+        const updated = requests.find((r) => r.id === id);
+        return approvedNow && updated
+          ? applyProcurementLink(s, requests, updated)
+          : { ...s, requests };
       }),
     markNotificationsRead: () =>
       setState((s) => ({
