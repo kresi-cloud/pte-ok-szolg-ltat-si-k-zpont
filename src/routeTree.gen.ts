@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminisztracioRouteImport } from './routes/adminisztracio'
+import { Route as EszkozkataszterRouteImport } from './routes/eszkozkataszter'
 import { Route as FejlesztesekRouteImport } from './routes/fejlesztesek'
 import { Route as FelelossegekRouteImport } from './routes/felelossegek'
 import { Route as IgenyeimRouteImport } from './routes/igenyeim'
@@ -32,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminisztracioRoute = AdminisztracioRouteImport.update({
   id: '/adminisztracio',
   path: '/adminisztracio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EszkozkataszterRoute = EszkozkataszterRouteImport.update({
+  id: '/eszkozkataszter',
+  path: '/eszkozkataszter',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FejlesztesekRoute = FejlesztesekRouteImport.update({
@@ -98,6 +104,7 @@ const IgenyIdRoute = IgenyIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
+  '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
+  '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
+  '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/adminisztracio'
+    | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
     | '/igenyeim'
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/adminisztracio'
+    | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
     | '/igenyeim'
@@ -181,6 +192,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/adminisztracio'
+    | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
     | '/igenyeim'
@@ -198,6 +210,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminisztracioRoute: typeof AdminisztracioRoute
+  EszkozkataszterRoute: typeof EszkozkataszterRoute
   FejlesztesekRoute: typeof FejlesztesekRoute
   FelelossegekRoute: typeof FelelossegekRoute
   IgenyeimRoute: typeof IgenyeimRoute
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/adminisztracio'
       fullPath: '/adminisztracio'
       preLoaderRoute: typeof AdminisztracioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eszkozkataszter': {
+      id: '/eszkozkataszter'
+      path: '/eszkozkataszter'
+      fullPath: '/eszkozkataszter'
+      preLoaderRoute: typeof EszkozkataszterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fejlesztesek': {
@@ -318,6 +338,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminisztracioRoute: AdminisztracioRoute,
+  EszkozkataszterRoute: EszkozkataszterRoute,
   FejlesztesekRoute: FejlesztesekRoute,
   FelelossegekRoute: FelelossegekRoute,
   IgenyeimRoute: IgenyeimRoute,
@@ -334,13 +355,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
