@@ -170,7 +170,8 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.015em;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
 
   :focus-visible {
@@ -184,4 +185,51 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
+}
+
+/* PTE ÁOK arculati elemek */
+@utility pte-topbar {
+  background: linear-gradient(
+    100deg,
+    oklch(0.251 0.078 264.2) 0%,
+    oklch(0.298 0.095 265.6) 55%,
+    oklch(0.359 0.105 261.3) 100%
+  );
+  color: oklch(0.99 0.004 250);
+}
+
+@utility pte-band {
+  background: linear-gradient(
+    100deg,
+    oklch(0.251 0.078 264.2) 0%,
+    oklch(0.298 0.095 265.6) 60%,
+    oklch(0.359 0.105 261.3) 100%
+  );
+  color: oklch(0.99 0.004 250);
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0 -12% 0 auto;
+    width: 38%;
+    background:
+      linear-gradient(135deg, transparent 48%, oklch(1 0 0 / 0.06) 48% 52%, transparent 52%),
+      linear-gradient(135deg, transparent 62%, oklch(0.689 0.122 184.4 / 0.18) 62% 66%, transparent 66%);
+    pointer-events: none;
+  }
+}
+
+@utility pte-cta {
+  background-color: var(--color-accent);
+  color: oklch(0.16 0.04 200);
+  font-weight: 600;
+  &:hover {
+    background-color: oklch(0.732 0.128 183.1);
+  }
+}
+
+@utility pte-wordmark {
+  font-family: var(--font-wordmark);
+  letter-spacing: 0.01em;
 }
