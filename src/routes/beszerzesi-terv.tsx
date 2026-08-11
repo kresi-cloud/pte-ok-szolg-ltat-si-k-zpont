@@ -266,6 +266,16 @@ function PlanItemCard({ item }: { item: ProcurementPlanItem }) {
           <p className="text-sm text-muted-foreground">
             {lookup.unit(item.orgUnitId)} · {item.reason}
           </p>
+          {item.sourceRequestId ? (
+            <p className="mt-1 text-xs">
+              <span className="mr-2 rounded-sm bg-accent/15 px-2 py-0.5 font-medium text-accent-foreground">
+                Jóváhagyott igényből
+              </span>
+              <Link to="/igeny/$id" params={{ id: item.sourceRequestId }} className="underline">
+                {item.sourceRequestId}
+              </Link>
+            </p>
+          ) : null}
           <p className="mt-1 text-xs text-muted-foreground">
             Egységár: {huf(cost.unitNet)} nettó · ár forrása: {cost.source}
             {price ? ` (${price.priceDate})` : ""}
