@@ -60,6 +60,10 @@ function Admin() {
         </TabsList>
 
         <TabsContent value="felhasznalok">
+          <p className="mb-3 rounded-md border border-border bg-secondary/50 px-4 py-3 text-sm text-muted-foreground">
+            A szerepkörök itt csak megtekinthetők. Jogosultságot kiosztani vagy visszavonni
+            kizárólag a superuser jogosultságkezelő tud, a Jogosultságkezelés felületen.
+          </p>
           <div className="card-surface overflow-x-auto">
             <Table>
               <TableHeader>
