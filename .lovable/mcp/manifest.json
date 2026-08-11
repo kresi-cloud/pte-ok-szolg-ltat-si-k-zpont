@@ -1,0 +1,254 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.2",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "pte-aok-szolgaltatasi-kozpont",
+      "version": "0.1.0",
+      "title": "PTE ÁOK Szolgáltatási Központ"
+    },
+    "tools": [
+      {
+        "name": "search_catalog",
+        "title": "Szolgáltatáskatalógus keresés",
+        "description": "Keresés a PTE ÁOK IT szolgáltatáskatalógusában (szoftver, hardver, web, digitalizáció). Visszaadja a szolgáltatás nevét, leírását, igénylési feltételeit, jóváhagyási lépcsőit és SLA-ját.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "description": "Keresőkifejezés a névben, leírásban vagy kulcsszavakban.",
+              "type": "string"
+            },
+            "domain": {
+              "description": "Szolgáltatási domain szűrő.",
+              "type": "string",
+              "enum": [
+                "szoftver",
+                "hardver",
+                "web",
+                "digitalizacio"
+              ]
+            },
+            "limit": {
+              "description": "Maximális találatszám (alapértelmezés: 20).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_requests",
+        "title": "Szolgáltatási igények listázása",
+        "description": "A demó szolgáltatási igények listázása és szűrése domain, státusz, prioritás vagy szabadszavas keresés alapján. Összefoglaló adatokat ad vissza (cím, cél, státusz, határidő, szervezeti egység).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "description": "Szabadszavas keresés a címben és a célban.",
+              "type": "string"
+            },
+            "domain": {
+              "type": "string",
+              "enum": [
+                "szoftver",
+                "hardver",
+                "web",
+                "digitalizacio"
+              ]
+            },
+            "status": {
+              "description": "Státuszkulcs, pl. bekuldve, elfogadva, lezarva.",
+              "type": "string"
+            },
+            "priority": {
+              "type": "string",
+              "enum": [
+                "alacsony",
+                "normal",
+                "magas",
+                "kritikus"
+              ]
+            },
+            "limit": {
+              "description": "Maximális találatszám (alapértelmezés: 25).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_request",
+        "title": "Igény részletei",
+        "description": "Egy szolgáltatási igény részletes adatai azonosító alapján: cél, státusz, jóváhagyási lépések, részfeladatok és audit napló.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Az igény azonosítója, pl. SW-2026-0012."
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "search_assets",
+        "title": "Eszközkataszter keresés",
+        "description": "Keresés az intézményi eszközkataszterben leltári szám, eszközazonosító, modell vagy szervezeti egység alapján, életciklus-státusz és csereprioritás szűréssel.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "description": "Leltári szám, hostname, sorozatszám vagy modellnév töredéke.",
+              "type": "string"
+            },
+            "categoryKey": {
+              "description": "Eszközkategória kulcsa, pl. notebook, monitor, munkaallomas.",
+              "type": "string"
+            },
+            "orgUnitId": {
+              "description": "Szervezeti egység azonosítója.",
+              "type": "string"
+            },
+            "lifecycle": {
+              "description": "Életciklus-státusz kulcs, pl. cserere_erett, tervezendo.",
+              "type": "string"
+            },
+            "limit": {
+              "description": "Maximális találatszám (alapértelmezés: 25).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_asset",
+        "title": "Eszköz adatlap",
+        "description": "Egy eszköz teljes adatlapja leltári szám, eszközazonosító vagy belső id alapján: műszaki specifikáció, életciklus-számítás, standardmegfelelés és pénzügyi adatok.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Leltári szám, eszközazonosító vagy belső azonosító."
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "procurement_plan",
+        "title": "Beszerzési terv",
+        "description": "A következő pénzügyi év beszerzési tervének tételei negyedéves bontásban, becsült nettó/bruttó költséggel és összesítéssel. Szűrhető évre, negyedévre és szervezeti egységre.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "planYear": {
+              "description": "Tervezési év (alapértelmezés: 2027).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "quarter": {
+              "type": "string",
+              "enum": [
+                "Q1",
+                "Q2",
+                "Q3",
+                "Q4"
+              ]
+            },
+            "orgUnitId": {
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "lifecycle_forecast",
+        "title": "Életciklus-előrejelzés",
+        "description": "Többéves eszközcsere-előrejelzés: évente hány eszköz életciklusa jár le, becsült költséggel és kategóriabontással, valamint az aktuális korfa.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "fromYear": {
+              "description": "Kezdő év (alapértelmezés: 2027).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "years": {
+              "description": "Hány évre előre (1–10, alapértelmezés: 5).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
