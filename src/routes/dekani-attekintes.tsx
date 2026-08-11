@@ -103,7 +103,7 @@ function DeanView() {
   const risky = requests.filter((r) => r.slaRisk && OPEN.includes(r.status));
   const waitingApproval = requests.filter((r) => r.status === "jovahagyasra_var");
   const totalCost = requests.reduce((s, r) => s + (r.estimatedCost ?? 0), 0);
-  const plannedCost = planItems.reduce((s, p) => s + itemCost(p).total, 0);
+  const plannedCost = planItems.reduce((s, p) => s + itemCost(p).withContingency, 0);
 
   const groups = useMemo(() => {
     const map = new Map<string, ServiceRequest[]>();
