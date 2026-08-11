@@ -44,7 +44,7 @@ function pickQuantity(text: string): number {
 
 function quarterFor(priority: ServiceRequest["priority"]): Quarter {
   if (priority === "kritikus" || priority === "magas") return "Q1";
-  if (priority === "normal") return "Q2";
+  if (priority === "kozepes") return "Q2";
   return "Q3";
 }
 
