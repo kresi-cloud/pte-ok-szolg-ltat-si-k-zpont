@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { itemCost } from "@/lib/asset-logic";
 import { DOMAINS, ORG_UNITS, PROJECTS, TEAMS, lookup, useStore } from "@/lib/store";
 import { STATUS_LABELS, type ServiceRequest, type StatusKey } from "@/lib/types";
 
@@ -102,7 +103,7 @@ function DeanView() {
   const risky = requests.filter((r) => r.slaRisk && OPEN.includes(r.status));
   const waitingApproval = requests.filter((r) => r.status === "jovahagyasra_var");
   const totalCost = requests.reduce((s, r) => s + (r.estimatedCost ?? 0), 0);
-  const plannedCost = planItems.reduce((s, p) => s + (p.estimatedCost ?? 0), 0);
+  const plannedCost = planItems.reduce((s, p) => s + itemCost(p).total, 0);
 
   const groups = useMemo(() => {
     const map = new Map<string, ServiceRequest[]>();
@@ -190,9 +191,9 @@ function DeanView() {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={[...new Set(PROJECTS.map((p) => p.status))].map((s) => ({
+                  data={[...new Set(PROJECTS.map((p) => p.stage))].map((s) => ({
                     name: s,
-                    value: PROJECTS.filter((p) => p.status === s).length,
+                    value: PROJECTS.filter((p) => p.stage === s).length,
                   }))}
                   dataKey="value"
                   nameKey="name"
