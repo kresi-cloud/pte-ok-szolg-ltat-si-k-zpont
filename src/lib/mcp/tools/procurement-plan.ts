@@ -40,8 +40,9 @@ export default defineTool({
         cost,
       };
     });
-    const totalGross = rows.reduce((s, r) => s + (r.cost.gross ?? 0), 0);
-    const result = { planYear: year, items: rows, totalItems: rows.length, totalGross };
+    const totalGross = rows.reduce((s, r) => s + r.cost.grossTotal, 0);
+    const totalWithContingency = rows.reduce((s, r) => s + r.cost.withContingency, 0);
+    const result = { planYear: year, items: rows, totalItems: rows.length, totalGross, totalWithContingency };
     return {
       content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
       structuredContent: result,
