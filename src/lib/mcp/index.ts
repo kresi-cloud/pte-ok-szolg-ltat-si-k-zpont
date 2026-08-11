@@ -1,5 +1,4 @@
 import { defineMcp } from "@lovable.dev/mcp-js";
-import type { AnyToolDefinition } from "@lovable.dev/mcp-js";
 import searchCatalog from "./tools/search-catalog";
 import listRequests from "./tools/list-requests";
 import getRequest from "./tools/get-request";
@@ -22,5 +21,5 @@ export default defineMcp({
     getAsset,
     procurementPlan,
     lifecycleForecast,
-  ] as unknown as AnyToolDefinition[],
+  ] as unknown as Parameters<typeof defineMcp>[0]["tools"],
 });
