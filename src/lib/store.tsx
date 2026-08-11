@@ -24,6 +24,7 @@ import type {
   Project,
   RequestMessage,
   RoleKey,
+  RoleAuditEvent,
   ServiceRequest,
   StatusKey,
   User,
@@ -73,6 +74,8 @@ interface PersistedState {
   currentUserId: string;
   activeRole: RoleKey;
   loggedIn: boolean;
+  roleOverrides: Record<string, RoleKey[]>;
+  roleAudit: RoleAuditEvent[];
 }
 
 const initialState: PersistedState = {
@@ -90,6 +93,8 @@ const initialState: PersistedState = {
   currentUserId: "u-kovacs",
   activeRole: "igenylo",
   loggedIn: false,
+  roleOverrides: {},
+  roleAudit: [],
 };
 
 interface StoreValue extends PersistedState {
@@ -125,6 +130,7 @@ interface StoreValue extends PersistedState {
   addPlanItem: (item: Omit<ProcurementPlanItem, "id">) => string;
   updatePlanItem: (id: string, patch: Partial<ProcurementPlanItem>) => void;
   removePlanItem: (id: string) => void;
+  setUserRoles: (userId: string, roles: RoleKey[], reason: string) => void;
   resetDemo: () => void;
 }
 
