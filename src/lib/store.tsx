@@ -20,6 +20,7 @@ import {
 } from "./seed";
 import type {
   AppNotification,
+  InventoryItem,
   Project,
   RequestMessage,
   RoleKey,
@@ -27,12 +28,14 @@ import type {
   StatusKey,
   User,
 } from "./types";
+import { INVENTORY, specForModel } from "./inventory-data";
 
 const STORAGE_KEY = "aok-portal-state-v1";
 
 interface PersistedState {
   requests: ServiceRequest[];
   notifications: AppNotification[];
+  inventory: InventoryItem[];
   currentUserId: string;
   activeRole: RoleKey;
   loggedIn: boolean;
@@ -41,6 +44,7 @@ interface PersistedState {
 const initialState: PersistedState = {
   requests: REQUESTS,
   notifications: NOTIFICATIONS,
+  inventory: INVENTORY,
   currentUserId: "u-kovacs",
   activeRole: "igenylo",
   loggedIn: false,
@@ -61,6 +65,9 @@ interface StoreValue extends PersistedState {
   decideApproval: (id: string, approvalId: string, decision: "jovahagyva" | "elutasitva", comment?: string) => void;
   markNotificationsRead: () => void;
   rateRequest: (id: string, rating: number) => void;
+  addInventoryItem: (input: Omit<InventoryItem, "id" | "ownerId" | "status" | "createdAt" | "spec">) => string;
+  removeInventoryItem: (id: string) => void;
+  decideInventoryItem: (id: string, decision: "jovahagyva" | "elutasitva", comment?: string) => void;
   resetDemo: () => void;
 }
 
