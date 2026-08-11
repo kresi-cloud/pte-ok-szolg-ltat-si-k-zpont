@@ -86,18 +86,19 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         Ugrás a tartalomhoz
       </a>
-      <header className="sticky top-0 z-40 border-b border-border bg-card">
-        <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-4 px-4 lg:px-8">
+      <header className="sticky top-0 z-40 shadow-sm">
+        <div className="pte-topbar">
+        <div className="mx-auto flex h-20 max-w-[1400px] items-center gap-4 px-4 lg:px-8">
           <Link to="/" className="flex items-center gap-3">
-            <span className="grid size-9 place-items-center rounded-md bg-primary font-display text-sm font-bold text-primary-foreground">
+            <span className="grid size-11 place-items-center rounded-sm border border-white/25 bg-white/10 pte-wordmark text-sm font-bold">
               ÁOK
             </span>
             <span className="hidden leading-tight sm:block">
-              <span className="block font-display text-sm font-semibold">
-                ÁOK Digitális Szolgáltatási Portál
+              <span className="pte-wordmark block text-base font-bold">
+                Pécsi Tudományegyetem
               </span>
-              <span className="block text-xs text-muted-foreground">
-                Digitális és informatikai igények egy helyen
+              <span className="block text-xs tracking-wide opacity-80">
+                Általános Orvostudományi Kar · Digitális Szolgáltatási Portál
               </span>
             </span>
           </Link>
@@ -106,7 +107,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="hidden w-72 items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-secondary lg:flex"
+              className="hidden w-72 items-center gap-2 rounded-sm border border-white/25 bg-white/10 px-3 py-2 text-left text-sm text-white/75 transition-colors hover:bg-white/20 lg:flex"
             >
               <Search className="size-4" aria-hidden="true" />
               <span className="truncate">Keresés szolgáltatások, igények és projektek között…</span>
@@ -114,16 +115,23 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
+              className="text-white hover:bg-white/15 hover:text-white lg:hidden"
               aria-label="Keresés"
               onClick={() => setSearchOpen(true)}
             >
               <Search className="size-5" />
             </Button>
 
+            <Link
+              to="/uj-igeny"
+              className="pte-cta hidden items-center gap-2 rounded-sm px-4 py-2.5 text-sm transition-colors md:inline-flex"
+            >
+              <Plus className="size-4" aria-hidden="true" /> Új igény
+            </Link>
+
             <Popover onOpenChange={(o) => o && store.markNotificationsRead()}>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative" aria-label={`Értesítések (${unread} olvasatlan)`}>
+                <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/15 hover:text-white" aria-label={`Értesítések (${unread} olvasatlan)`}>
                   <Bell className="size-5" />
                   {unread > 0 && (
                     <span className="absolute top-1.5 right-1.5 grid size-4 place-items-center rounded-full bg-destructive text-[10px] font-semibold text-destructive-foreground">
@@ -153,13 +161,13 @@ export function AppShell({ children }: { children: ReactNode }) {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 rounded-md border border-border px-2 py-1.5 text-left hover:bg-secondary">
+                <button className="flex items-center gap-2 rounded-sm border border-white/25 px-2 py-1.5 text-left text-white hover:bg-white/15">
                   <span className="grid size-7 place-items-center rounded-full bg-accent text-xs font-semibold text-accent-foreground">
                     {user.initials}
                   </span>
                   <span className="hidden leading-tight md:block">
                     <span className="block text-xs font-medium">{user.name}</span>
-                    <span className="block text-[11px] text-muted-foreground">
+                    <span className="block text-[11px] text-white/70">
                       {ROLE_LABELS[store.activeRole]}
                     </span>
                   </span>
@@ -214,8 +222,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             </DropdownMenu>
           </div>
         </div>
+        </div>
 
-        <nav aria-label="Fő navigáció" className="border-t border-border bg-card">
+        <nav aria-label="Fő navigáció" className="border-b border-border bg-card">
           <div className="mx-auto flex max-w-[1400px] gap-1 overflow-x-auto px-2 lg:px-6">
             {items.map((item) => {
               const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
@@ -224,10 +233,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                   key={item.to}
                   to={item.to as "/"}
                   className={cn(
-                    "flex items-center gap-2 border-b-2 px-3 py-3 text-sm whitespace-nowrap transition-colors",
+                    "flex items-center gap-2 border-b-[3px] px-3 py-3.5 text-[13px] font-medium tracking-wide whitespace-nowrap uppercase transition-colors",
                     active
-                      ? "border-primary font-semibold text-primary"
-                      : "border-transparent text-muted-foreground hover:text-foreground",
+                      ? "border-accent font-semibold text-primary"
+                      : "border-transparent text-muted-foreground hover:border-accent/40 hover:text-primary",
                   )}
                   aria-current={active ? "page" : undefined}
                 >
@@ -244,10 +253,16 @@ export function AppShell({ children }: { children: ReactNode }) {
         {children}
       </main>
 
-      <footer className="border-t border-border bg-card">
-        <div className="mx-auto max-w-[1400px] px-4 py-6 text-xs text-muted-foreground lg:px-8">
-          PTE ÁOK · Digitális Szolgáltatási Portál – belső prototípus. Egy belépési pont a digitális
-          igényeknek. Átlátható folyamatok, világos felelősségek, mérhető szolgáltatásminőség.
+      <footer className="pte-band mt-8">
+        <div className="mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-10 lg:px-8">
+          <span className="pte-wordmark text-lg font-bold">Pécsi Tudományegyetem</span>
+          <span className="text-sm opacity-85">
+            Általános Orvostudományi Kar · Digitális Szolgáltatási Portál – belső prototípus
+          </span>
+          <span className="max-w-3xl text-xs opacity-70">
+            Egy belépési pont a digitális igényeknek. Átlátható folyamatok, világos felelősségek,
+            mérhető szolgáltatásminőség.
+          </span>
         </div>
       </footer>
 
