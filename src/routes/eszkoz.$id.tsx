@@ -217,7 +217,11 @@ function AssetDetail() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  store.updateAsset(asset.id, { lifecycleStatusOverride: "tovabb" in asset ? undefined : "normal" }, "Életciklus-státusz felülírása (tovább használható)");
+                  store.updateAsset(
+                    asset.id,
+                    { lifecycleStatusOverride: "normal" },
+                    "Életciklus-státusz felülírása (tovább használható)",
+                  );
                   toast.success("Az eszköz státusza felülírva: normál használat.");
                 }}
               >

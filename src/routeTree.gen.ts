@@ -23,6 +23,7 @@ import { Route as SegitsegRouteImport } from './routes/segitseg'
 import { Route as SzolgaltatasokRouteImport } from './routes/szolgaltatasok'
 import { Route as UjIgenyRouteImport } from './routes/uj-igeny'
 import { Route as VezetoiAttekintesRouteImport } from './routes/vezetoi-attekintes'
+import { Route as EszkozIdRouteImport } from './routes/eszkoz.$id'
 import { Route as IgenyIdRouteImport } from './routes/igeny.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -95,6 +96,11 @@ const VezetoiAttekintesRoute = VezetoiAttekintesRouteImport.update({
   path: '/vezetoi-attekintes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EszkozIdRoute = EszkozIdRouteImport.update({
+  id: '/eszkoz/$id',
+  path: '/eszkoz/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IgenyIdRoute = IgenyIdRouteImport.update({
   id: '/igeny/$id',
   path: '/igeny/$id',
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
   '/vezetoi-attekintes': typeof VezetoiAttekintesRoute
+  '/eszkoz/$id': typeof EszkozIdRoute
   '/igeny/$id': typeof IgenyIdRoute
 }
 export interface FileRoutesByTo {
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
   '/vezetoi-attekintes': typeof VezetoiAttekintesRoute
+  '/eszkoz/$id': typeof EszkozIdRoute
   '/igeny/$id': typeof IgenyIdRoute
 }
 export interface FileRoutesById {
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
   '/vezetoi-attekintes': typeof VezetoiAttekintesRoute
+  '/eszkoz/$id': typeof EszkozIdRoute
   '/igeny/$id': typeof IgenyIdRoute
 }
 export interface FileRouteTypes {
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/szolgaltatasok'
     | '/uj-igeny'
     | '/vezetoi-attekintes'
+    | '/eszkoz/$id'
     | '/igeny/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/szolgaltatasok'
     | '/uj-igeny'
     | '/vezetoi-attekintes'
+    | '/eszkoz/$id'
     | '/igeny/$id'
   id:
     | '__root__'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/szolgaltatasok'
     | '/uj-igeny'
     | '/vezetoi-attekintes'
+    | '/eszkoz/$id'
     | '/igeny/$id'
   fileRoutesById: FileRoutesById
 }
@@ -222,6 +234,7 @@ export interface RootRouteChildren {
   SzolgaltatasokRoute: typeof SzolgaltatasokRoute
   UjIgenyRoute: typeof UjIgenyRoute
   VezetoiAttekintesRoute: typeof VezetoiAttekintesRoute
+  EszkozIdRoute: typeof EszkozIdRoute
   IgenyIdRoute: typeof IgenyIdRoute
 }
 
@@ -325,6 +338,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VezetoiAttekintesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/eszkoz/$id': {
+      id: '/eszkoz/$id'
+      path: '/eszkoz/$id'
+      fullPath: '/eszkoz/$id'
+      preLoaderRoute: typeof EszkozIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/igeny/$id': {
       id: '/igeny/$id'
       path: '/igeny/$id'
@@ -350,6 +370,7 @@ const rootRouteChildren: RootRouteChildren = {
   SzolgaltatasokRoute: SzolgaltatasokRoute,
   UjIgenyRoute: UjIgenyRoute,
   VezetoiAttekintesRoute: VezetoiAttekintesRoute,
+  EszkozIdRoute: EszkozIdRoute,
   IgenyIdRoute: IgenyIdRoute,
 }
 export const routeTree = rootRouteImport
