@@ -12,11 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminisztracioRouteImport } from './routes/adminisztracio'
 import { Route as BeszerzesiTervRouteImport } from './routes/beszerzesi-terv'
+import { Route as DekaniAttekintesRouteImport } from './routes/dekani-attekintes'
 import { Route as EletciklusElorejelzesRouteImport } from './routes/eletciklus-elorejelzes'
 import { Route as EszkozkataszterRouteImport } from './routes/eszkozkataszter'
 import { Route as FejlesztesekRouteImport } from './routes/fejlesztesek'
 import { Route as FelelossegekRouteImport } from './routes/felelossegek'
 import { Route as IgenyeimRouteImport } from './routes/igenyeim'
+import { Route as JogosultsagokRouteImport } from './routes/jogosultsagok'
 import { Route as LeltarRouteImport } from './routes/leltar'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MunkaterRouteImport } from './routes/munkater'
@@ -47,6 +49,11 @@ const BeszerzesiTervRoute = BeszerzesiTervRouteImport.update({
   path: '/beszerzesi-terv',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DekaniAttekintesRoute = DekaniAttekintesRouteImport.update({
+  id: '/dekani-attekintes',
+  path: '/dekani-attekintes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EletciklusElorejelzesRoute = EletciklusElorejelzesRouteImport.update({
   id: '/eletciklus-elorejelzes',
   path: '/eletciklus-elorejelzes',
@@ -70,6 +77,11 @@ const FelelossegekRoute = FelelossegekRouteImport.update({
 const IgenyeimRoute = IgenyeimRouteImport.update({
   id: '/igenyeim',
   path: '/igenyeim',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JogosultsagokRoute = JogosultsagokRouteImport.update({
+  id: '/jogosultsagok',
+  path: '/jogosultsagok',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeltarRoute = LeltarRouteImport.update({
@@ -150,11 +162,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
   '/beszerzesi-terv': typeof BeszerzesiTervRoute
+  '/dekani-attekintes': typeof DekaniAttekintesRoute
   '/eletciklus-elorejelzes': typeof EletciklusElorejelzesRoute
   '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
+  '/jogosultsagok': typeof JogosultsagokRoute
   '/leltar': typeof LeltarRoute
   '/mcp': typeof McpRoute
   '/munkater': typeof MunkaterRoute
@@ -174,11 +188,13 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
   '/beszerzesi-terv': typeof BeszerzesiTervRoute
+  '/dekani-attekintes': typeof DekaniAttekintesRoute
   '/eletciklus-elorejelzes': typeof EletciklusElorejelzesRoute
   '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
+  '/jogosultsagok': typeof JogosultsagokRoute
   '/leltar': typeof LeltarRoute
   '/mcp': typeof McpRoute
   '/munkater': typeof MunkaterRoute
@@ -199,11 +215,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
   '/beszerzesi-terv': typeof BeszerzesiTervRoute
+  '/dekani-attekintes': typeof DekaniAttekintesRoute
   '/eletciklus-elorejelzes': typeof EletciklusElorejelzesRoute
   '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
+  '/jogosultsagok': typeof JogosultsagokRoute
   '/leltar': typeof LeltarRoute
   '/mcp': typeof McpRoute
   '/munkater': typeof MunkaterRoute
@@ -225,11 +243,13 @@ export interface FileRouteTypes {
     | '/'
     | '/adminisztracio'
     | '/beszerzesi-terv'
+    | '/dekani-attekintes'
     | '/eletciklus-elorejelzes'
     | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
     | '/igenyeim'
+    | '/jogosultsagok'
     | '/leltar'
     | '/mcp'
     | '/munkater'
@@ -249,11 +269,13 @@ export interface FileRouteTypes {
     | '/'
     | '/adminisztracio'
     | '/beszerzesi-terv'
+    | '/dekani-attekintes'
     | '/eletciklus-elorejelzes'
     | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
     | '/igenyeim'
+    | '/jogosultsagok'
     | '/leltar'
     | '/mcp'
     | '/munkater'
@@ -273,11 +295,13 @@ export interface FileRouteTypes {
     | '/'
     | '/adminisztracio'
     | '/beszerzesi-terv'
+    | '/dekani-attekintes'
     | '/eletciklus-elorejelzes'
     | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
     | '/igenyeim'
+    | '/jogosultsagok'
     | '/leltar'
     | '/mcp'
     | '/munkater'
@@ -298,11 +322,13 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminisztracioRoute: typeof AdminisztracioRoute
   BeszerzesiTervRoute: typeof BeszerzesiTervRoute
+  DekaniAttekintesRoute: typeof DekaniAttekintesRoute
   EletciklusElorejelzesRoute: typeof EletciklusElorejelzesRoute
   EszkozkataszterRoute: typeof EszkozkataszterRoute
   FejlesztesekRoute: typeof FejlesztesekRoute
   FelelossegekRoute: typeof FelelossegekRoute
   IgenyeimRoute: typeof IgenyeimRoute
+  JogosultsagokRoute: typeof JogosultsagokRoute
   LeltarRoute: typeof LeltarRoute
   McpRoute: typeof McpRoute
   MunkaterRoute: typeof MunkaterRoute
@@ -342,6 +368,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BeszerzesiTervRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dekani-attekintes': {
+      id: '/dekani-attekintes'
+      path: '/dekani-attekintes'
+      fullPath: '/dekani-attekintes'
+      preLoaderRoute: typeof DekaniAttekintesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/eletciklus-elorejelzes': {
       id: '/eletciklus-elorejelzes'
       path: '/eletciklus-elorejelzes'
@@ -375,6 +408,13 @@ declare module '@tanstack/react-router' {
       path: '/igenyeim'
       fullPath: '/igenyeim'
       preLoaderRoute: typeof IgenyeimRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jogosultsagok': {
+      id: '/jogosultsagok'
+      path: '/jogosultsagok'
+      fullPath: '/jogosultsagok'
+      preLoaderRoute: typeof JogosultsagokRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leltar': {
@@ -482,11 +522,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminisztracioRoute: AdminisztracioRoute,
   BeszerzesiTervRoute: BeszerzesiTervRoute,
+  DekaniAttekintesRoute: DekaniAttekintesRoute,
   EletciklusElorejelzesRoute: EletciklusElorejelzesRoute,
   EszkozkataszterRoute: EszkozkataszterRoute,
   FejlesztesekRoute: FejlesztesekRoute,
   FelelossegekRoute: FelelossegekRoute,
   IgenyeimRoute: IgenyeimRoute,
+  JogosultsagokRoute: JogosultsagokRoute,
   LeltarRoute: LeltarRoute,
   McpRoute: McpRoute,
   MunkaterRoute: MunkaterRoute,

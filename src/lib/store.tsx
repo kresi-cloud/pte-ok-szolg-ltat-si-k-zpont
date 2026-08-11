@@ -24,6 +24,7 @@ import type {
   Project,
   RequestMessage,
   RoleKey,
+  RoleAuditEvent,
   ServiceRequest,
   StatusKey,
   User,
@@ -73,6 +74,8 @@ interface PersistedState {
   currentUserId: string;
   activeRole: RoleKey;
   loggedIn: boolean;
+  roleOverrides: Record<string, RoleKey[]>;
+  roleAudit: RoleAuditEvent[];
 }
 
 const initialState: PersistedState = {
@@ -90,6 +93,8 @@ const initialState: PersistedState = {
   currentUserId: "u-kovacs",
   activeRole: "igenylo",
   loggedIn: false,
+  roleOverrides: {},
+  roleAudit: [],
 };
 
 interface StoreValue extends PersistedState {
@@ -125,6 +130,7 @@ interface StoreValue extends PersistedState {
   addPlanItem: (item: Omit<ProcurementPlanItem, "id">) => string;
   updatePlanItem: (id: string, patch: Partial<ProcurementPlanItem>) => void;
   removePlanItem: (id: string) => void;
+  setUserRoles: (userId: string, roles: RoleKey[], reason: string) => void;
   resetDemo: () => void;
 }
 
@@ -187,9 +193,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [state, hydrated]);
 
+  const effectiveUsers = useMemo(
+    () =>
+      USERS.map((u) =>
+        state.roleOverrides[u.id] ? { ...u, roles: state.roleOverrides[u.id]! } : u,
+      ),
+    [state.roleOverrides],
+  );
+
   const currentUser = useMemo(
-    () => USERS.find((u) => u.id === state.currentUserId) ?? USERS[0]!,
-    [state.currentUserId],
+    () => effectiveUsers.find((u) => u.id === state.currentUserId) ?? effectiveUsers[0]!,
+    [effectiveUsers, state.currentUserId],
   );
 
   const patchRequest = useCallback(
@@ -204,19 +218,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const value: StoreValue = {
     ...state,
-    users: USERS,
+    users: effectiveUsers,
     projects: PROJECTS,
     currentUser,
     login: (userId) =>
       setState((s) => {
-        const u = USERS.find((x) => x.id === userId) ?? USERS[0]!;
+        const u = effectiveUsers.find((x) => x.id === userId) ?? effectiveUsers[0]!;
         return { ...s, loggedIn: true, currentUserId: u.id, activeRole: u.roles[0]! };
       }),
     logout: () => setState((s) => ({ ...s, loggedIn: false })),
     setActiveRole: (role) => setState((s) => ({ ...s, activeRole: role })),
     switchUser: (userId) =>
       setState((s) => {
-        const u = USERS.find((x) => x.id === userId) ?? USERS[0]!;
+        const u = effectiveUsers.find((x) => x.id === userId) ?? effectiveUsers[0]!;
         return { ...s, currentUserId: u.id, activeRole: u.roles[0]! };
       }),
     createRequest: (input) => {
@@ -629,6 +643,41 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       window.localStorage.removeItem(STORAGE_KEY);
       setState({ ...initialState, loggedIn: true });
     },
+    setUserRoles: (userId, roles, reason) =>
+      setState((s) => {
+        const base = USERS.find((u) => u.id === userId);
+        if (!base) return s;
+        const prev = s.roleOverrides[userId] ?? base.roles;
+        const added = roles.filter((r) => !prev.includes(r));
+        const removed = prev.filter((r) => !roles.includes(r));
+        if (added.length === 0 && removed.length === 0) return s;
+        const stamp = Date.now();
+        const events: RoleAuditEvent[] = [
+          ...added.map((role, i) => ({
+            id: `ra-${stamp}-a${i}`,
+            at: today(),
+            actorId: s.currentUserId,
+            targetUserId: userId,
+            action: "megadva" as const,
+            role,
+            reason,
+          })),
+          ...removed.map((role, i) => ({
+            id: `ra-${stamp}-r${i}`,
+            at: today(),
+            actorId: s.currentUserId,
+            targetUserId: userId,
+            action: "visszavonva" as const,
+            role,
+            reason,
+          })),
+        ];
+        return {
+          ...s,
+          roleOverrides: { ...s.roleOverrides, [userId]: roles },
+          roleAudit: [...events, ...s.roleAudit],
+        };
+      }),
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

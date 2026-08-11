@@ -272,6 +272,27 @@ export const USERS: User[] = [
     teamId: "t-hw",
     initials: "KÁ",
   },
+  {
+    id: "u-dekan",
+    name: "Prof. Dr. Bogár Ádám",
+    title: "dékán",
+    email: "dekan@aok.pte.hu",
+    employeeId: "PTE-100001",
+    orgUnitId: "ou-dekani",
+    roles: ["dekan", "vezeto"],
+    initials: "BÁ",
+  },
+  {
+    id: "u-superuser",
+    name: "Takács Réka",
+    title: "jogosultságkezelő superuser",
+    email: "takacs.reka@aok.pte.hu",
+    employeeId: "PTE-100000",
+    orgUnitId: "ou-dekani",
+    roles: ["superuser"],
+    teamId: "t-it",
+    initials: "TR",
+  },
 ];
 
 export const TEAMS: ServiceTeam[] = [

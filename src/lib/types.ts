@@ -4,7 +4,9 @@ export type RoleKey =
   | "ugyintezo"
   | "szolgaltatasgazda"
   | "vezeto"
-  | "admin";
+  | "dekan"
+  | "admin"
+  | "superuser";
 
 export const ROLE_LABELS: Record<RoleKey, string> = {
   igenylo: "Igénylő",
@@ -12,8 +14,32 @@ export const ROLE_LABELS: Record<RoleKey, string> = {
   ugyintezo: "Szolgáltatási ügyintéző",
   szolgaltatasgazda: "Szolgáltatásgazda",
   vezeto: "Kari vezető",
+  dekan: "Dékán",
   admin: "Rendszeradminisztrátor",
+  superuser: "Superuser (jogosultságkezelő)",
 };
+
+export const ROLE_DESCRIPTIONS: Record<RoleKey, string> = {
+  igenylo: "Igényeket nyújt be, követi a saját ügyeit és leltárát.",
+  jovahagyo: "Szervezeti egység nevében hagy jóvá igényeket.",
+  ugyintezo: "Igényeket dolgoz fel a szolgáltatási munkatérben.",
+  szolgaltatasgazda: "Szolgáltatás- és portfóliófelelős, kapacitás és SLA.",
+  vezeto: "Kari szintű mutatókat és portfóliót lát.",
+  dekan: "Teljes kari rálátás, bármely ügy eset szintre bontható.",
+  admin: "Rendszerbeállítások, katalógus, leltárjóváhagyás.",
+  superuser: "Kizárólagos jog a felhasználói jogosultságok kiosztására.",
+};
+
+/** Jogosultság-kiosztási naplóbejegyzés (ki, kinek, mit, mikor, miért). */
+export interface RoleAuditEvent {
+  id: string;
+  at: string;
+  actorId: string;
+  targetUserId: string;
+  action: "megadva" | "visszavonva";
+  role: RoleKey;
+  reason: string;
+}
 
 export type DomainKey = "szoftver" | "hardver" | "web" | "digitalizacio";
 
