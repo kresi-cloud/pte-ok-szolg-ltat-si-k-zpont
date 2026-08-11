@@ -372,6 +372,8 @@ export interface ProcurementPlanItem {
   comment?: string | undefined;
   /** új kapacitás vagy csere */
   kind: "csere" | "uj_kapacitas";
+  /** ha jóváhagyott szolgáltatási igényből keletkezett */
+  sourceRequestId?: string | undefined;
 }
 
 /** AssetInventoryChecks / AssetInventoryDiscrepancies */
