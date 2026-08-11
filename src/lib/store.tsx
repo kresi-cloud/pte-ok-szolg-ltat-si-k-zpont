@@ -20,6 +20,7 @@ import {
 } from "./seed";
 import type {
   AppNotification,
+  InventoryItem,
   Project,
   RequestMessage,
   RoleKey,
@@ -27,12 +28,14 @@ import type {
   StatusKey,
   User,
 } from "./types";
+import { INVENTORY, specForModel } from "./inventory-data";
 
 const STORAGE_KEY = "aok-portal-state-v1";
 
 interface PersistedState {
   requests: ServiceRequest[];
   notifications: AppNotification[];
+  inventory: InventoryItem[];
   currentUserId: string;
   activeRole: RoleKey;
   loggedIn: boolean;
@@ -41,6 +44,7 @@ interface PersistedState {
 const initialState: PersistedState = {
   requests: REQUESTS,
   notifications: NOTIFICATIONS,
+  inventory: INVENTORY,
   currentUserId: "u-kovacs",
   activeRole: "igenylo",
   loggedIn: false,
@@ -61,6 +65,9 @@ interface StoreValue extends PersistedState {
   decideApproval: (id: string, approvalId: string, decision: "jovahagyva" | "elutasitva", comment?: string) => void;
   markNotificationsRead: () => void;
   rateRequest: (id: string, rating: number) => void;
+  addInventoryItem: (input: Omit<InventoryItem, "id" | "ownerId" | "status" | "createdAt" | "spec">) => string;
+  removeInventoryItem: (id: string) => void;
+  decideInventoryItem: (id: string, decision: "jovahagyva" | "elutasitva", comment?: string) => void;
   resetDemo: () => void;
 }
 
@@ -319,6 +326,42 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         notifications: s.notifications.map((n) => ({ ...n, read: true })),
       })),
     rateRequest: (id, rating) => patchRequest(id, (r) => ({ ...r, rating })),
+    addInventoryItem: (input) => {
+      const id = `inv-${Date.now()}`;
+      const item: InventoryItem = {
+        ...input,
+        id,
+        ownerId: currentUser.id,
+        status: "jovahagyasra_var",
+        createdAt: today(),
+        spec: input.kind === "hardver" ? specForModel(input.modelKey) : undefined,
+      };
+      setState((s) => ({
+        ...s,
+        inventory: [item, ...s.inventory],
+        notifications: [
+          {
+            id: `n-${Date.now()}`,
+            text: `${item.name} felvéve a személyi leltárba – rendszergazdai jóváhagyásra vár`,
+            at: today(),
+            read: false,
+          },
+          ...s.notifications,
+        ],
+      }));
+      return id;
+    },
+    removeInventoryItem: (id) =>
+      setState((s) => ({ ...s, inventory: s.inventory.filter((i) => i.id !== id) })),
+    decideInventoryItem: (id, decision, comment) =>
+      setState((s) => ({
+        ...s,
+        inventory: s.inventory.map((i) =>
+          i.id === id
+            ? { ...i, status: decision, decidedAt: today(), decidedBy: currentUser.id, decisionComment: comment }
+            : i,
+        ),
+      })),
     resetDemo: () => {
       window.localStorage.removeItem(STORAGE_KEY);
       setState({ ...initialState, loggedIn: true });
