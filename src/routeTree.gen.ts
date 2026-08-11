@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminisztracioRouteImport } from './routes/adminisztracio'
+import { Route as BeszerzesiTervRouteImport } from './routes/beszerzesi-terv'
+import { Route as EletciklusElorejelzesRouteImport } from './routes/eletciklus-elorejelzes'
+import { Route as EszkozkataszterRouteImport } from './routes/eszkozkataszter'
 import { Route as FejlesztesekRouteImport } from './routes/fejlesztesek'
 import { Route as FelelossegekRouteImport } from './routes/felelossegek'
 import { Route as IgenyeimRouteImport } from './routes/igenyeim'
@@ -22,6 +25,7 @@ import { Route as SegitsegRouteImport } from './routes/segitseg'
 import { Route as SzolgaltatasokRouteImport } from './routes/szolgaltatasok'
 import { Route as UjIgenyRouteImport } from './routes/uj-igeny'
 import { Route as VezetoiAttekintesRouteImport } from './routes/vezetoi-attekintes'
+import { Route as EszkozIdRouteImport } from './routes/eszkoz.$id'
 import { Route as IgenyIdRouteImport } from './routes/igeny.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -32,6 +36,21 @@ const IndexRoute = IndexRouteImport.update({
 const AdminisztracioRoute = AdminisztracioRouteImport.update({
   id: '/adminisztracio',
   path: '/adminisztracio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BeszerzesiTervRoute = BeszerzesiTervRouteImport.update({
+  id: '/beszerzesi-terv',
+  path: '/beszerzesi-terv',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EletciklusElorejelzesRoute = EletciklusElorejelzesRouteImport.update({
+  id: '/eletciklus-elorejelzes',
+  path: '/eletciklus-elorejelzes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EszkozkataszterRoute = EszkozkataszterRouteImport.update({
+  id: '/eszkozkataszter',
+  path: '/eszkozkataszter',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FejlesztesekRoute = FejlesztesekRouteImport.update({
@@ -89,6 +108,11 @@ const VezetoiAttekintesRoute = VezetoiAttekintesRouteImport.update({
   path: '/vezetoi-attekintes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EszkozIdRoute = EszkozIdRouteImport.update({
+  id: '/eszkoz/$id',
+  path: '/eszkoz/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IgenyIdRoute = IgenyIdRouteImport.update({
   id: '/igeny/$id',
   path: '/igeny/$id',
@@ -98,6 +122,9 @@ const IgenyIdRoute = IgenyIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
+  '/beszerzesi-terv': typeof BeszerzesiTervRoute
+  '/eletciklus-elorejelzes': typeof EletciklusElorejelzesRoute
+  '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
@@ -109,11 +136,15 @@ export interface FileRoutesByFullPath {
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
   '/vezetoi-attekintes': typeof VezetoiAttekintesRoute
+  '/eszkoz/$id': typeof EszkozIdRoute
   '/igeny/$id': typeof IgenyIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
+  '/beszerzesi-terv': typeof BeszerzesiTervRoute
+  '/eletciklus-elorejelzes': typeof EletciklusElorejelzesRoute
+  '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
@@ -125,12 +156,16 @@ export interface FileRoutesByTo {
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
   '/vezetoi-attekintes': typeof VezetoiAttekintesRoute
+  '/eszkoz/$id': typeof EszkozIdRoute
   '/igeny/$id': typeof IgenyIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
+  '/beszerzesi-terv': typeof BeszerzesiTervRoute
+  '/eletciklus-elorejelzes': typeof EletciklusElorejelzesRoute
+  '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
@@ -142,6 +177,7 @@ export interface FileRoutesById {
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
   '/vezetoi-attekintes': typeof VezetoiAttekintesRoute
+  '/eszkoz/$id': typeof EszkozIdRoute
   '/igeny/$id': typeof IgenyIdRoute
 }
 export interface FileRouteTypes {
@@ -149,6 +185,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/adminisztracio'
+    | '/beszerzesi-terv'
+    | '/eletciklus-elorejelzes'
+    | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
     | '/igenyeim'
@@ -160,11 +199,15 @@ export interface FileRouteTypes {
     | '/szolgaltatasok'
     | '/uj-igeny'
     | '/vezetoi-attekintes'
+    | '/eszkoz/$id'
     | '/igeny/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/adminisztracio'
+    | '/beszerzesi-terv'
+    | '/eletciklus-elorejelzes'
+    | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
     | '/igenyeim'
@@ -176,11 +219,15 @@ export interface FileRouteTypes {
     | '/szolgaltatasok'
     | '/uj-igeny'
     | '/vezetoi-attekintes'
+    | '/eszkoz/$id'
     | '/igeny/$id'
   id:
     | '__root__'
     | '/'
     | '/adminisztracio'
+    | '/beszerzesi-terv'
+    | '/eletciklus-elorejelzes'
+    | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
     | '/igenyeim'
@@ -192,12 +239,16 @@ export interface FileRouteTypes {
     | '/szolgaltatasok'
     | '/uj-igeny'
     | '/vezetoi-attekintes'
+    | '/eszkoz/$id'
     | '/igeny/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminisztracioRoute: typeof AdminisztracioRoute
+  BeszerzesiTervRoute: typeof BeszerzesiTervRoute
+  EletciklusElorejelzesRoute: typeof EletciklusElorejelzesRoute
+  EszkozkataszterRoute: typeof EszkozkataszterRoute
   FejlesztesekRoute: typeof FejlesztesekRoute
   FelelossegekRoute: typeof FelelossegekRoute
   IgenyeimRoute: typeof IgenyeimRoute
@@ -209,6 +260,7 @@ export interface RootRouteChildren {
   SzolgaltatasokRoute: typeof SzolgaltatasokRoute
   UjIgenyRoute: typeof UjIgenyRoute
   VezetoiAttekintesRoute: typeof VezetoiAttekintesRoute
+  EszkozIdRoute: typeof EszkozIdRoute
   IgenyIdRoute: typeof IgenyIdRoute
 }
 
@@ -226,6 +278,27 @@ declare module '@tanstack/react-router' {
       path: '/adminisztracio'
       fullPath: '/adminisztracio'
       preLoaderRoute: typeof AdminisztracioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/beszerzesi-terv': {
+      id: '/beszerzesi-terv'
+      path: '/beszerzesi-terv'
+      fullPath: '/beszerzesi-terv'
+      preLoaderRoute: typeof BeszerzesiTervRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eletciklus-elorejelzes': {
+      id: '/eletciklus-elorejelzes'
+      path: '/eletciklus-elorejelzes'
+      fullPath: '/eletciklus-elorejelzes'
+      preLoaderRoute: typeof EletciklusElorejelzesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eszkozkataszter': {
+      id: '/eszkozkataszter'
+      path: '/eszkozkataszter'
+      fullPath: '/eszkozkataszter'
+      preLoaderRoute: typeof EszkozkataszterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fejlesztesek': {
@@ -305,6 +378,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VezetoiAttekintesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/eszkoz/$id': {
+      id: '/eszkoz/$id'
+      path: '/eszkoz/$id'
+      fullPath: '/eszkoz/$id'
+      preLoaderRoute: typeof EszkozIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/igeny/$id': {
       id: '/igeny/$id'
       path: '/igeny/$id'
@@ -318,6 +398,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminisztracioRoute: AdminisztracioRoute,
+  BeszerzesiTervRoute: BeszerzesiTervRoute,
+  EletciklusElorejelzesRoute: EletciklusElorejelzesRoute,
+  EszkozkataszterRoute: EszkozkataszterRoute,
   FejlesztesekRoute: FejlesztesekRoute,
   FelelossegekRoute: FelelossegekRoute,
   IgenyeimRoute: IgenyeimRoute,
@@ -329,6 +412,7 @@ const rootRouteChildren: RootRouteChildren = {
   SzolgaltatasokRoute: SzolgaltatasokRoute,
   UjIgenyRoute: UjIgenyRoute,
   VezetoiAttekintesRoute: VezetoiAttekintesRoute,
+  EszkozIdRoute: EszkozIdRoute,
   IgenyIdRoute: IgenyIdRoute,
 }
 export const routeTree = rootRouteImport

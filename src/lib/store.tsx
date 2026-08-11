@@ -29,13 +29,46 @@ import type {
   User,
 } from "./types";
 import { INVENTORY, specForModel } from "./inventory-data";
+import type {
+  Asset,
+  AssetAuditEvent,
+  AssetEvent,
+  DiscrepancyKind,
+  InventoryCheck,
+  InventoryDiscrepancy,
+  PersonalSoftwareLicence,
+  PersonalCheckAnswer,
+  ProcurementPlanItem,
+  ReplacementDecision,
+  ReplacementDecisionKey,
+  SharedCheckAnswer,
+} from "./asset-types";
+import {
+  ASSETS,
+  ASSET_ASSIGNMENTS,
+  ASSET_EVENTS,
+  INITIAL_ASSET_AUDIT,
+  INITIAL_CHECKS,
+  INITIAL_DISCREPANCIES,
+  INITIAL_PROCUREMENT_ITEMS,
+  INITIAL_REPLACEMENT_DECISIONS,
+  PERSONAL_LICENCES,
+} from "./asset-data";
 
-const STORAGE_KEY = "aok-portal-state-v1";
+const STORAGE_KEY = "aok-portal-state-v2";
 
 interface PersistedState {
   requests: ServiceRequest[];
   notifications: AppNotification[];
   inventory: InventoryItem[];
+  assets: Asset[];
+  licences: PersonalSoftwareLicence[];
+  assetEvents: AssetEvent[];
+  assetAudit: AssetAuditEvent[];
+  checks: InventoryCheck[];
+  discrepancies: InventoryDiscrepancy[];
+  replacementDecisions: ReplacementDecision[];
+  planItems: ProcurementPlanItem[];
   currentUserId: string;
   activeRole: RoleKey;
   loggedIn: boolean;
@@ -45,6 +78,14 @@ const initialState: PersistedState = {
   requests: REQUESTS,
   notifications: NOTIFICATIONS,
   inventory: INVENTORY,
+  assets: ASSETS,
+  licences: PERSONAL_LICENCES,
+  assetEvents: ASSET_EVENTS,
+  assetAudit: INITIAL_ASSET_AUDIT,
+  checks: INITIAL_CHECKS,
+  discrepancies: INITIAL_DISCREPANCIES,
+  replacementDecisions: INITIAL_REPLACEMENT_DECISIONS,
+  planItems: INITIAL_PROCUREMENT_ITEMS,
   currentUserId: "u-kovacs",
   activeRole: "igenylo",
   loggedIn: false,
@@ -68,6 +109,21 @@ interface StoreValue extends PersistedState {
   addInventoryItem: (input: Omit<InventoryItem, "id" | "ownerId" | "status" | "createdAt" | "spec">) => string;
   removeInventoryItem: (id: string) => void;
   decideInventoryItem: (id: string, decision: "jovahagyva" | "elutasitva", comment?: string) => void;
+  assignments: typeof ASSET_ASSIGNMENTS;
+  updateAsset: (id: string, patch: Partial<Asset>, label?: string) => void;
+  submitCheck: (assetId: string, answer: PersonalCheckAnswer | SharedCheckAnswer, comment?: string) => void;
+  reportDiscrepancy: (input: {
+    kind: DiscrepancyKind;
+    assetId?: string | undefined;
+    licenceId?: string | undefined;
+    description: string;
+  }) => void;
+  resolveDiscrepancy: (id: string, status: InventoryDiscrepancy["status"], resolution?: string) => void;
+  decideReplacement: (assetId: string, decision: ReplacementDecisionKey, comment?: string) => void;
+  markLicenceUnused: (licenceId: string, unused: boolean) => void;
+  addPlanItem: (item: Omit<ProcurementPlanItem, "id">) => string;
+  updatePlanItem: (id: string, patch: Partial<ProcurementPlanItem>) => void;
+  removePlanItem: (id: string) => void;
   resetDemo: () => void;
 }
 
@@ -362,6 +418,161 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             : i,
         ),
       })),
+    assignments: ASSET_ASSIGNMENTS,
+    updateAsset: (id, patch, label) =>
+      setState((s) => ({
+        ...s,
+        assets: s.assets.map((a) => (a.id === id ? { ...a, ...patch } : a)),
+        assetEvents: [
+          ...s.assetEvents,
+          {
+            id: `ae-${Date.now()}`,
+            assetId: id,
+            at: today(),
+            type: "muszaki_adat",
+            actorId: currentUser.id,
+            title: label ?? "Eszközadat módosítása",
+            detail: Object.keys(patch).join(", "),
+          },
+        ],
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "asset",
+            entityId: id,
+            action: label ?? "Eszközadat módosítása",
+            detail: Object.keys(patch).join(", "),
+          },
+          ...s.assetAudit,
+        ],
+      })),
+    submitCheck: (assetId, answer, comment) =>
+      setState((s) => ({
+        ...s,
+        checks: [
+          {
+            id: `chk-${Date.now()}`,
+            assetId,
+            cycle: "2026. évi leltár",
+            userId: currentUser.id,
+            answer,
+            at: today(),
+            comment,
+            stage: "leltarfelelos_ellenorzes",
+          },
+          ...s.checks.filter((c) => !(c.assetId === assetId && c.userId === currentUser.id)),
+        ],
+        assetEvents: [
+          ...s.assetEvents,
+          {
+            id: `ae-${Date.now()}`,
+            assetId,
+            at: today(),
+            type: "leltar_ellenorzes",
+            actorId: currentUser.id,
+            title: "Leltárellenőrzés visszaigazolása",
+            detail: answer,
+          },
+        ],
+      })),
+    reportDiscrepancy: (input) =>
+      setState((s) => ({
+        ...s,
+        discrepancies: [
+          {
+            id: `dis-${Date.now()}`,
+            kind: input.kind,
+            assetId: input.assetId,
+            licenceId: input.licenceId,
+            reportedBy: currentUser.id,
+            at: today(),
+            description: input.description,
+            status: "nyitott",
+          },
+          ...s.discrepancies,
+        ],
+        notifications: [
+          {
+            id: `n-${Date.now()}`,
+            text: "Leltári eltérés bejelentve – leltárfelelős ellenőrzésére vár",
+            at: today(),
+            read: false,
+          },
+          ...s.notifications,
+        ],
+      })),
+    resolveDiscrepancy: (id, status, resolution) =>
+      setState((s) => ({
+        ...s,
+        discrepancies: s.discrepancies.map((d) =>
+          d.id === id ? { ...d, status, resolution, handledBy: currentUser.id } : d,
+        ),
+      })),
+    decideReplacement: (assetId, decision, comment) =>
+      setState((s) => ({
+        ...s,
+        replacementDecisions: [
+          { assetId, decision, decidedBy: currentUser.id, decidedAt: today(), comment },
+          ...s.replacementDecisions.filter((d) => d.assetId !== assetId),
+        ],
+        assetEvents: [
+          ...s.assetEvents,
+          {
+            id: `ae-${Date.now()}`,
+            assetId,
+            at: today(),
+            type: "csere_dontes",
+            actorId: currentUser.id,
+            title: "Csereigény döntés",
+            detail: decision,
+          },
+        ],
+      })),
+    markLicenceUnused: (licenceId, unused) =>
+      setState((s) => ({
+        ...s,
+        licences: s.licences.map((l) => (l.id === licenceId ? { ...l, reportedUnused: unused } : l)),
+      })),
+    addPlanItem: (item) => {
+      const id = `pp-${Date.now()}`;
+      setState((s) => ({
+        ...s,
+        planItems: [...s.planItems, { ...item, id }],
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "beszerzes",
+            entityId: id,
+            action: "Beszerzési terv tétel létrehozása",
+            detail: `${item.planYear} ${item.quarter} · ${item.quantity} db`,
+          },
+          ...s.assetAudit,
+        ],
+      }));
+      return id;
+    },
+    updatePlanItem: (id, patch) =>
+      setState((s) => ({
+        ...s,
+        planItems: s.planItems.map((p) => (p.id === id ? { ...p, ...patch } : p)),
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "beszerzes",
+            entityId: id,
+            action: "Beszerzési terv tétel módosítása",
+            detail: Object.keys(patch).join(", "),
+          },
+          ...s.assetAudit,
+        ],
+      })),
+    removePlanItem: (id) => setState((s) => ({ ...s, planItems: s.planItems.filter((p) => p.id !== id) })),
     resetDemo: () => {
       window.localStorage.removeItem(STORAGE_KEY);
       setState({ ...initialState, loggedIn: true });

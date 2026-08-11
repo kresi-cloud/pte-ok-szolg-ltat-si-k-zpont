@@ -18,6 +18,7 @@ import {
 import { useStore } from "@/lib/store";
 import { HARDWARE_MODELS, SOFTWARE_SUGGESTIONS, specForModel } from "@/lib/inventory-data";
 import { INVENTORY_STATUS_LABELS, type InventoryItem } from "@/lib/types";
+import { MyAssets, MyLicences, SharedAssets } from "@/components/personal-assets";
 
 export const Route = createFileRoute("/leltar")({
   head: () => ({
@@ -141,11 +142,26 @@ function Inventory() {
         })}
       </div>
 
-      <Tabs defaultValue="hardver">
-        <TabsList>
-          <TabsTrigger value="hardver">Hardverleltár</TabsTrigger>
-          <TabsTrigger value="szoftver">Szoftverleltár</TabsTrigger>
+      <Tabs defaultValue="eszkozeim">
+        <TabsList className="flex-wrap">
+          <TabsTrigger value="eszkozeim">Rám rendelt eszközök</TabsTrigger>
+          <TabsTrigger value="licencek">Szoftverlicenceim</TabsTrigger>
+          <TabsTrigger value="kozos">Közös eszközök</TabsTrigger>
+          <TabsTrigger value="hardver">Saját bejelentés – hardver</TabsTrigger>
+          <TabsTrigger value="szoftver">Saját bejelentés – szoftver</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="eszkozeim">
+          <MyAssets />
+        </TabsContent>
+
+        <TabsContent value="licencek">
+          <MyLicences />
+        </TabsContent>
+
+        <TabsContent value="kozos">
+          <SharedAssets />
+        </TabsContent>
 
         <TabsContent value="hardver" className="space-y-4">
           <section className="card-surface p-5">
