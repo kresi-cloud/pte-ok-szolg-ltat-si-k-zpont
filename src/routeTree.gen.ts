@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminisztracioRouteImport } from './routes/adminisztracio'
 import { Route as BeszerzesiTervRouteImport } from './routes/beszerzesi-terv'
+import { Route as EletciklusElorejelzesRouteImport } from './routes/eletciklus-elorejelzes'
 import { Route as EszkozkataszterRouteImport } from './routes/eszkozkataszter'
 import { Route as FejlesztesekRouteImport } from './routes/fejlesztesek'
 import { Route as FelelossegekRouteImport } from './routes/felelossegek'
@@ -40,6 +41,11 @@ const AdminisztracioRoute = AdminisztracioRouteImport.update({
 const BeszerzesiTervRoute = BeszerzesiTervRouteImport.update({
   id: '/beszerzesi-terv',
   path: '/beszerzesi-terv',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EletciklusElorejelzesRoute = EletciklusElorejelzesRouteImport.update({
+  id: '/eletciklus-elorejelzes',
+  path: '/eletciklus-elorejelzes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EszkozkataszterRoute = EszkozkataszterRouteImport.update({
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
   '/beszerzesi-terv': typeof BeszerzesiTervRoute
+  '/eletciklus-elorejelzes': typeof EletciklusElorejelzesRoute
   '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
   '/beszerzesi-terv': typeof BeszerzesiTervRoute
+  '/eletciklus-elorejelzes': typeof EletciklusElorejelzesRoute
   '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
   '/beszerzesi-terv': typeof BeszerzesiTervRoute
+  '/eletciklus-elorejelzes': typeof EletciklusElorejelzesRoute
   '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/'
     | '/adminisztracio'
     | '/beszerzesi-terv'
+    | '/eletciklus-elorejelzes'
     | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/'
     | '/adminisztracio'
     | '/beszerzesi-terv'
+    | '/eletciklus-elorejelzes'
     | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/'
     | '/adminisztracio'
     | '/beszerzesi-terv'
+    | '/eletciklus-elorejelzes'
     | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
@@ -235,6 +247,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminisztracioRoute: typeof AdminisztracioRoute
   BeszerzesiTervRoute: typeof BeszerzesiTervRoute
+  EletciklusElorejelzesRoute: typeof EletciklusElorejelzesRoute
   EszkozkataszterRoute: typeof EszkozkataszterRoute
   FejlesztesekRoute: typeof FejlesztesekRoute
   FelelossegekRoute: typeof FelelossegekRoute
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       path: '/beszerzesi-terv'
       fullPath: '/beszerzesi-terv'
       preLoaderRoute: typeof BeszerzesiTervRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eletciklus-elorejelzes': {
+      id: '/eletciklus-elorejelzes'
+      path: '/eletciklus-elorejelzes'
+      fullPath: '/eletciklus-elorejelzes'
+      preLoaderRoute: typeof EletciklusElorejelzesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/eszkozkataszter': {
@@ -379,6 +399,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminisztracioRoute: AdminisztracioRoute,
   BeszerzesiTervRoute: BeszerzesiTervRoute,
+  EletciklusElorejelzesRoute: EletciklusElorejelzesRoute,
   EszkozkataszterRoute: EszkozkataszterRoute,
   FejlesztesekRoute: FejlesztesekRoute,
   FelelossegekRoute: FelelossegekRoute,
