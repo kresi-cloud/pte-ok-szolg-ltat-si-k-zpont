@@ -54,16 +54,24 @@ function Home() {
 
   return (
     <div className="space-y-10">
-      <section className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-display text-3xl font-semibold">Jó napot, {firstName}!</h1>
-          <p className="mt-1.5 text-muted-foreground">Miben segíthetünk?</p>
-        </div>
-        <Button asChild size="lg">
-          <Link to="/uj-igeny">
-            <Plus className="size-4" /> Új igény indítása
+      <section className="pte-band -mx-4 -mt-8 px-4 py-12 lg:-mx-8 lg:px-12">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div className="max-w-2xl">
+            <p className="text-xs font-medium tracking-[0.18em] uppercase opacity-75">
+              PTE ÁOK · Digitális Szolgáltatási Portál
+            </p>
+            <h1 className="mt-3 text-4xl font-semibold lg:text-5xl">Jó napot, {firstName}!</h1>
+            <p className="mt-3 text-base opacity-85">
+              Miben segíthetünk? Indítson igényt, kövesse ügyeit és intézze teendőit egy helyen.
+            </p>
+          </div>
+          <Link
+            to="/uj-igeny"
+            className="pte-cta inline-flex items-center gap-2 rounded-sm px-6 py-3.5 text-sm transition-colors"
+          >
+            <Plus className="size-4" /> Új igény indítása <ArrowRight className="size-4" />
           </Link>
-        </Button>
+        </div>
       </section>
 
       {(todos.length > 0 || approvals.length > 0) && (
