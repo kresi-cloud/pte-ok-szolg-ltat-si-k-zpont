@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminisztracioRouteImport } from './routes/adminisztracio'
+import { Route as BeszerzesiTervRouteImport } from './routes/beszerzesi-terv'
 import { Route as EszkozkataszterRouteImport } from './routes/eszkozkataszter'
 import { Route as FejlesztesekRouteImport } from './routes/fejlesztesek'
 import { Route as FelelossegekRouteImport } from './routes/felelossegek'
@@ -34,6 +35,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminisztracioRoute = AdminisztracioRouteImport.update({
   id: '/adminisztracio',
   path: '/adminisztracio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BeszerzesiTervRoute = BeszerzesiTervRouteImport.update({
+  id: '/beszerzesi-terv',
+  path: '/beszerzesi-terv',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EszkozkataszterRoute = EszkozkataszterRouteImport.update({
@@ -110,6 +116,7 @@ const IgenyIdRoute = IgenyIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
+  '/beszerzesi-terv': typeof BeszerzesiTervRoute
   '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
+  '/beszerzesi-terv': typeof BeszerzesiTervRoute
   '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
+  '/beszerzesi-terv': typeof BeszerzesiTervRoute
   '/eszkozkataszter': typeof EszkozkataszterRoute
   '/fejlesztesek': typeof FejlesztesekRoute
   '/felelossegek': typeof FelelossegekRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/adminisztracio'
+    | '/beszerzesi-terv'
     | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/adminisztracio'
+    | '/beszerzesi-terv'
     | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/adminisztracio'
+    | '/beszerzesi-terv'
     | '/eszkozkataszter'
     | '/fejlesztesek'
     | '/felelossegek'
@@ -222,6 +234,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminisztracioRoute: typeof AdminisztracioRoute
+  BeszerzesiTervRoute: typeof BeszerzesiTervRoute
   EszkozkataszterRoute: typeof EszkozkataszterRoute
   FejlesztesekRoute: typeof FejlesztesekRoute
   FelelossegekRoute: typeof FelelossegekRoute
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       path: '/adminisztracio'
       fullPath: '/adminisztracio'
       preLoaderRoute: typeof AdminisztracioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/beszerzesi-terv': {
+      id: '/beszerzesi-terv'
+      path: '/beszerzesi-terv'
+      fullPath: '/beszerzesi-terv'
+      preLoaderRoute: typeof BeszerzesiTervRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/eszkozkataszter': {
@@ -358,6 +378,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminisztracioRoute: AdminisztracioRoute,
+  BeszerzesiTervRoute: BeszerzesiTervRoute,
   EszkozkataszterRoute: EszkozkataszterRoute,
   FejlesztesekRoute: FejlesztesekRoute,
   FelelossegekRoute: FelelossegekRoute,
