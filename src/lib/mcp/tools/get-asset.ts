@@ -31,7 +31,7 @@ export default defineTool({
       model: model ? `${model.manufacturer} ${model.model}` : a.modelKey,
       spec: model?.spec,
       orgUnit: ORG_UNITS.find((u) => u.id === a.orgUnitId)?.name ?? a.orgUnitId,
-      location: ASSET_LOCATIONS.find((l) => l.id === a.locationId)?.name ?? a.locationId,
+      location: (() => { const l = ASSET_LOCATIONS.find((x) => x.id === a.locationId); return l ? `${l.building} ${l.room}` : a.locationId; })(),
       usage: a.usage,
       purpose: a.purpose,
       purchaseDate: a.purchaseDate,
