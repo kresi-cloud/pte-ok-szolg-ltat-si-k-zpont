@@ -4,7 +4,15 @@ import { useStore, USERS } from "@/lib/store";
 import { ROLE_LABELS } from "@/lib/types";
 import { lookup } from "@/lib/store";
 
-const DEMO_USERS = ["u-kovacs", "u-szabo", "u-horvath", "u-nemeth", "u-feher", "u-molnar"];
+const DEMO_USERS = [
+  "u-kovacs",
+  "u-szabo",
+  "u-horvath",
+  "u-nemeth",
+  "u-molnar",
+  "u-dekan",
+  "u-superuser",
+];
 
 export function LoginScreen() {
   const { login } = useStore();
