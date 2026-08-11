@@ -153,6 +153,7 @@ function Admin() {
 
         <TabsContent value="ai">
           <section className="card-surface space-y-5 p-5">
+            {/* AI beállítások */}
             <h2 className="font-display text-base font-semibold">AI-támogatás beállításai</h2>
             <p className="text-sm text-muted-foreground">
               Az AI kizárólag javaslatot tesz; minden döntést munkatárs hoz meg, és minden javaslat
