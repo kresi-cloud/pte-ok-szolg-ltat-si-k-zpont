@@ -326,6 +326,42 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         notifications: s.notifications.map((n) => ({ ...n, read: true })),
       })),
     rateRequest: (id, rating) => patchRequest(id, (r) => ({ ...r, rating })),
+    addInventoryItem: (input) => {
+      const id = `inv-${Date.now()}`;
+      const item: InventoryItem = {
+        ...input,
+        id,
+        ownerId: currentUser.id,
+        status: "jovahagyasra_var",
+        createdAt: today(),
+        spec: input.kind === "hardver" ? specForModel(input.modelKey) : undefined,
+      };
+      setState((s) => ({
+        ...s,
+        inventory: [item, ...s.inventory],
+        notifications: [
+          {
+            id: `n-${Date.now()}`,
+            text: `${item.name} felvéve a személyi leltárba – rendszergazdai jóváhagyásra vár`,
+            at: today(),
+            read: false,
+          },
+          ...s.notifications,
+        ],
+      }));
+      return id;
+    },
+    removeInventoryItem: (id) =>
+      setState((s) => ({ ...s, inventory: s.inventory.filter((i) => i.id !== id) })),
+    decideInventoryItem: (id, decision, comment) =>
+      setState((s) => ({
+        ...s,
+        inventory: s.inventory.map((i) =>
+          i.id === id
+            ? { ...i, status: decision, decidedAt: today(), decidedBy: currentUser.id, decisionComment: comment }
+            : i,
+        ),
+      })),
     resetDemo: () => {
       window.localStorage.removeItem(STORAGE_KEY);
       setState({ ...initialState, loggedIn: true });
