@@ -268,3 +268,47 @@ export interface AppNotification {
   at: string;
   read: boolean;
 }
+
+export type InventoryKind = "hardver" | "szoftver";
+
+export type InventoryStatus = "jovahagyasra_var" | "jovahagyva" | "elutasitva";
+
+export const INVENTORY_STATUS_LABELS: Record<InventoryStatus, string> = {
+  jovahagyasra_var: "Jóváhagyásra vár",
+  jovahagyva: "Jóváhagyva",
+  elutasitva: "Elutasítva",
+};
+
+export interface HardwareSpec {
+  os: string;
+  osVersion: string;
+  cpu: string;
+  cpuCores: number;
+  ram: string;
+  storage: string;
+  features: string[];
+}
+
+export interface InventoryItem {
+  id: string;
+  ownerId: string;
+  kind: InventoryKind;
+  name: string;
+  /** hardver: modellkulcs a felismerési adatbázisból; szoftver: verzió */
+  modelKey?: string | undefined;
+  serial?: string | undefined;
+  location?: string | undefined;
+  note?: string | undefined;
+  /** szoftver mezők */
+  version?: string | undefined;
+  licenseType?: string | undefined;
+  licenseKey?: string | undefined;
+  installedOn?: string | undefined;
+  /** hardver: automatikusan hozzárendelt műszaki adatok */
+  spec?: HardwareSpec | undefined;
+  status: InventoryStatus;
+  createdAt: string;
+  decidedAt?: string | undefined;
+  decidedBy?: string | undefined;
+  decisionComment?: string | undefined;
+}
