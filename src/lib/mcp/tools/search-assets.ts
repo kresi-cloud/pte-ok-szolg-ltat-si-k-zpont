@@ -26,7 +26,7 @@ export default defineTool({
       if (orgUnitId && a.orgUnitId !== orgUnitId) return false;
       if (lifecycle && lifecycleStatus(a) !== lifecycle) return false;
       if (!q) return true;
-      return `${a.inventoryNo} ${a.deviceId} ${a.serial} ${model?.name ?? ""} ${model?.vendor ?? ""}`
+      return `${a.inventoryNo} ${a.deviceId} ${a.serial} ${model?.model ?? ""} ${model?.manufacturer ?? ""}`
         .toLowerCase()
         .includes(q);
     })
@@ -38,7 +38,7 @@ export default defineTool({
           inventoryNo: a.inventoryNo,
           deviceId: a.deviceId,
           category: ASSET_CATEGORIES.find((c) => c.key === a.categoryKey)?.label ?? a.categoryKey,
-          model: model ? `${model.vendor} ${model.name}` : a.modelKey,
+          model: model ? `${model.manufacturer} ${model.model}` : a.modelKey,
           orgUnit: ORG_UNITS.find((u) => u.id === a.orgUnitId)?.name ?? a.orgUnitId,
           usage: a.usage,
           purchaseDate: a.purchaseDate,
