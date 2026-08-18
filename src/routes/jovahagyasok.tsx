@@ -239,6 +239,8 @@ function ApprovalQueue() {
           </TableBody>
         </Table>
       </section>
+      </>
+      )}
     </div>
   );
 }
