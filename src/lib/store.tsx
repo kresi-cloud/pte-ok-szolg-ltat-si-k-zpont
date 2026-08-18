@@ -476,14 +476,39 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     removeInventoryItem: (id) =>
       setState((s) => ({ ...s, inventory: s.inventory.filter((i) => i.id !== id) })),
     decideInventoryItem: (id, decision, comment) =>
-      setState((s) => ({
-        ...s,
-        inventory: s.inventory.map((i) =>
-          i.id === id
-            ? { ...i, status: decision, decidedAt: today(), decidedBy: currentUser.id, decisionComment: comment }
-            : i,
-        ),
-      })),
+      setState((s) => {
+        const item = s.inventory.find((i) => i.id === id);
+        const label = decision === "jovahagyva" ? "jóváhagyva" : "elutasítva";
+        return {
+          ...s,
+          inventory: s.inventory.map((i) =>
+            i.id === id
+              ? { ...i, status: decision, decidedAt: today(), decidedBy: currentUser.id, decisionComment: comment }
+              : i,
+          ),
+          assetAudit: [
+            {
+              id: `aud-${Date.now()}`,
+              at: today(),
+              actorId: currentUser.id,
+              entity: "leltar" as AssetAuditEvent["entity"],
+              entityId: id,
+              action: `Személyi leltártétel ${label}`,
+              detail: `${item?.name ?? id}${comment ? ` · ${comment}` : ""}`,
+            },
+            ...s.assetAudit,
+          ],
+          notifications: [
+            {
+              id: `n-${Date.now()}`,
+              at: today(),
+              read: false,
+              text: `„${item?.name ?? "Leltártétel"}” személyi leltártétel ${label}${comment ? ` – ${comment}` : ""}`,
+            },
+            ...s.notifications,
+          ],
+        };
+      }),
     assignments: ASSET_ASSIGNMENTS,
     updateAsset: (id, patch, label) =>
       setState((s) => ({
@@ -575,6 +600,27 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         discrepancies: s.discrepancies.map((d) =>
           d.id === id ? { ...d, status, resolution, handledBy: currentUser.id } : d,
         ),
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "eltérés" as AssetAuditEvent["entity"],
+            entityId: id,
+            action: `Leltári eltérés státusza: ${status}`,
+            detail: resolution ?? "",
+          },
+          ...s.assetAudit,
+        ],
+        notifications: [
+          {
+            id: `n-${Date.now()}`,
+            at: today(),
+            read: false,
+            text: `Leltári eltérés lezárva (${status})${resolution ? ` – ${resolution}` : ""}`,
+          },
+          ...s.notifications,
+        ],
       })),
     decideReplacement: (assetId, decision, comment) =>
       setState((s) => ({
@@ -600,6 +646,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setState((s) => ({
         ...s,
         licences: s.licences.map((l) => (l.id === licenceId ? { ...l, reportedUnused: unused } : l)),
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "licenc" as AssetAuditEvent["entity"],
+            entityId: licenceId,
+            action: unused ? "Licenc nem használtnak jelölve" : "Licenc újra használatban",
+            detail: "",
+          },
+          ...s.assetAudit,
+        ],
       })),
     addPlanItem: (item) => {
       const id = `pp-${Date.now()}`;
@@ -638,7 +696,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...s.assetAudit,
         ],
       })),
-    removePlanItem: (id) => setState((s) => ({ ...s, planItems: s.planItems.filter((p) => p.id !== id) })),
+    removePlanItem: (id) =>
+      setState((s) => ({
+        ...s,
+        planItems: s.planItems.filter((p) => p.id !== id),
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "beszerzes",
+            entityId: id,
+            action: "Beszerzési terv tétel törlése",
+            detail: "",
+          },
+          ...s.assetAudit,
+        ],
+      })),
     resetDemo: () => {
       window.localStorage.removeItem(STORAGE_KEY);
       setState({ ...initialState, loggedIn: true });
