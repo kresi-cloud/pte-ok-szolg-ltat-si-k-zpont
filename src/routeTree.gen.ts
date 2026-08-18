@@ -19,6 +19,7 @@ import { Route as FejlesztesekRouteImport } from './routes/fejlesztesek'
 import { Route as FelelossegekRouteImport } from './routes/felelossegek'
 import { Route as IgenyeimRouteImport } from './routes/igenyeim'
 import { Route as JogosultsagokRouteImport } from './routes/jogosultsagok'
+import { Route as JovahagyasokRouteImport } from './routes/jovahagyasok'
 import { Route as LeltarRouteImport } from './routes/leltar'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MunkaterRouteImport } from './routes/munkater'
@@ -82,6 +83,11 @@ const IgenyeimRoute = IgenyeimRouteImport.update({
 const JogosultsagokRoute = JogosultsagokRouteImport.update({
   id: '/jogosultsagok',
   path: '/jogosultsagok',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JovahagyasokRoute = JovahagyasokRouteImport.update({
+  id: '/jovahagyasok',
+  path: '/jovahagyasok',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeltarRoute = LeltarRouteImport.update({
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
   '/jogosultsagok': typeof JogosultsagokRoute
+  '/jovahagyasok': typeof JovahagyasokRoute
   '/leltar': typeof LeltarRoute
   '/mcp': typeof McpRoute
   '/munkater': typeof MunkaterRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByTo {
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
   '/jogosultsagok': typeof JogosultsagokRoute
+  '/jovahagyasok': typeof JovahagyasokRoute
   '/leltar': typeof LeltarRoute
   '/mcp': typeof McpRoute
   '/munkater': typeof MunkaterRoute
@@ -222,6 +230,7 @@ export interface FileRoutesById {
   '/felelossegek': typeof FelelossegekRoute
   '/igenyeim': typeof IgenyeimRoute
   '/jogosultsagok': typeof JogosultsagokRoute
+  '/jovahagyasok': typeof JovahagyasokRoute
   '/leltar': typeof LeltarRoute
   '/mcp': typeof McpRoute
   '/munkater': typeof MunkaterRoute
@@ -250,6 +259,7 @@ export interface FileRouteTypes {
     | '/felelossegek'
     | '/igenyeim'
     | '/jogosultsagok'
+    | '/jovahagyasok'
     | '/leltar'
     | '/mcp'
     | '/munkater'
@@ -276,6 +286,7 @@ export interface FileRouteTypes {
     | '/felelossegek'
     | '/igenyeim'
     | '/jogosultsagok'
+    | '/jovahagyasok'
     | '/leltar'
     | '/mcp'
     | '/munkater'
@@ -302,6 +313,7 @@ export interface FileRouteTypes {
     | '/felelossegek'
     | '/igenyeim'
     | '/jogosultsagok'
+    | '/jovahagyasok'
     | '/leltar'
     | '/mcp'
     | '/munkater'
@@ -329,6 +341,7 @@ export interface RootRouteChildren {
   FelelossegekRoute: typeof FelelossegekRoute
   IgenyeimRoute: typeof IgenyeimRoute
   JogosultsagokRoute: typeof JogosultsagokRoute
+  JovahagyasokRoute: typeof JovahagyasokRoute
   LeltarRoute: typeof LeltarRoute
   McpRoute: typeof McpRoute
   MunkaterRoute: typeof MunkaterRoute
@@ -415,6 +428,13 @@ declare module '@tanstack/react-router' {
       path: '/jogosultsagok'
       fullPath: '/jogosultsagok'
       preLoaderRoute: typeof JogosultsagokRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jovahagyasok': {
+      id: '/jovahagyasok'
+      path: '/jovahagyasok'
+      fullPath: '/jovahagyasok'
+      preLoaderRoute: typeof JovahagyasokRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leltar': {
@@ -529,6 +549,7 @@ const rootRouteChildren: RootRouteChildren = {
   FelelossegekRoute: FelelossegekRoute,
   IgenyeimRoute: IgenyeimRoute,
   JogosultsagokRoute: JogosultsagokRoute,
+  JovahagyasokRoute: JovahagyasokRoute,
   LeltarRoute: LeltarRoute,
   McpRoute: McpRoute,
   MunkaterRoute: MunkaterRoute,
