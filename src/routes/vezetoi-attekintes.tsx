@@ -211,6 +211,73 @@ function LeaderView() {
         </div>
       </section>
 
+      <section className="mt-8 grid gap-6 lg:grid-cols-2">
+        <div className="rounded-md border border-border bg-card">
+          <div className="flex items-center justify-between gap-3 border-b border-border p-5">
+            <h2 className="font-display text-lg font-semibold">Döntésre váró ügyek</h2>
+            <Link
+              to="/jovahagyasok"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            >
+              Jóváhagyási sor <ArrowRight className="size-3.5" aria-hidden="true" />
+            </Link>
+          </div>
+          <ul className="divide-y divide-border">
+            {waitingApproval.slice(0, 6).map((r) => (
+              <li key={r.id} className="flex items-center gap-3 p-4 text-sm">
+                <span className="font-mono text-xs text-muted-foreground">{r.id}</span>
+                <span className="min-w-0 flex-1 truncate">{r.title}</span>
+                <span className="hidden text-xs text-muted-foreground sm:block">
+                  {r.approvals.find((a) => a.decision === "fuggoben")
+                    ? lookup.userName(r.approvals.find((a) => a.decision === "fuggoben")!.approverId)
+                    : "—"}
+                </span>
+                <Link
+                  to="/igeny/$id"
+                  params={{ id: r.id }}
+                  className="text-primary hover:underline"
+                >
+                  Eset
+                </Link>
+              </li>
+            ))}
+            {waitingApproval.length === 0 && (
+              <li className="p-6 text-center text-sm text-muted-foreground">
+                Nincs döntésre váró ügy.
+              </li>
+            )}
+          </ul>
+        </div>
+
+        <div className="rounded-md border border-border bg-card">
+          <div className="border-b border-border p-5">
+            <h2 className="font-display text-lg font-semibold">SLA-kockázatos ügyek</h2>
+            <p className="text-sm text-muted-foreground">
+              Határidőn kívül kerülhetnek – felelős csapattal és határidővel.
+            </p>
+          </div>
+          <ul className="divide-y divide-border">
+            {risky.slice(0, 6).map((r) => (
+              <li key={r.id} className="flex items-center gap-3 p-4 text-sm">
+                <span className="font-mono text-xs text-muted-foreground">{r.id}</span>
+                <span className="min-w-0 flex-1 truncate">{r.title}</span>
+                <span className="hidden text-xs text-muted-foreground sm:block">
+                  {lookup.team(r.teamId)} · {r.dueDate ?? "nincs határidő"}
+                </span>
+                <Link to="/igeny/$id" params={{ id: r.id }} className="text-primary hover:underline">
+                  Eset
+                </Link>
+              </li>
+            ))}
+            {risky.length === 0 && (
+              <li className="p-6 text-center text-sm text-muted-foreground">
+                Nincs SLA-kockázatos ügy.
+              </li>
+            )}
+          </ul>
+        </div>
+      </section>
+
       <section className="mt-8 rounded-md border border-border bg-card">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-5">
           <div>
