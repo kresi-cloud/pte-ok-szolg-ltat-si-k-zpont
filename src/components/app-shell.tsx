@@ -6,7 +6,7 @@ import {
   ClipboardList,
   GaugeCircle,
   Grid2x2,
-  Crown,
+  CheckCheck,
   KeyRound,
   Home,
   LayoutList,
