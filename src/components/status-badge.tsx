@@ -78,9 +78,9 @@ export function PriorityBadge({ priority }: { priority: Priority }) {
 export function AiBadge({ children }: { children: React.ReactNode }) {
   return (
     <div className="rounded-lg border border-info/30 bg-info/5 p-4">
-      <p className="mb-3 flex items-center gap-2 text-xs font-semibold tracking-wide text-info uppercase">
-        <span aria-hidden="true">✦</span> AI-javaslat – emberi jóváhagyást igényel
-      </p>
+    <p className="mb-3 flex items-center gap-2 text-xs font-semibold tracking-wide text-info uppercase">
+      <span aria-hidden="true">✦</span> AI-értékelés – manuális jóváhagyás szükséges
+    </p>
       {children}
     </div>
   );
