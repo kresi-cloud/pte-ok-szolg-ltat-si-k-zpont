@@ -76,6 +76,8 @@ function ApprovalQueue() {
 
   const rows = tab === "sajat" ? myPending : tab === "fuggo" ? allPending : risky;
 
+  const canApprove = store.activeRole !== "igenylo";
+
   const decide = (r: ServiceRequest, decision: "jovahagyva" | "elutasitva") => {
     const mine = r.approvals.find(
       (a) => a.decision === "fuggoben" && a.approverId === store.currentUser.id,
@@ -93,6 +95,19 @@ function ApprovalQueue() {
 
   return (
     <div className="space-y-6">
+      {!canApprove ? (
+        <div className="card-surface p-6">
+          <h1 className="font-display text-2xl font-semibold">Jóváhagyási sor</h1>
+          <p className="mt-2 text-muted-foreground">
+            Igénylő szerepkörben nincs jóváhagyási hatásköre – az Ön igényeiről a szervezeti
+            jóváhagyó és a szolgáltatásgazda dönt. Saját ügyeit az „Igényeim” oldalon követheti.
+          </p>
+          <Button asChild className="mt-4">
+            <Link to="/igenyeim">Igényeim megnyitása</Link>
+          </Button>
+        </div>
+      ) : (
+      <>
       <div>
         <h1 className="font-display text-2xl font-semibold">Jóváhagyási sor</h1>
         <p className="mt-1.5 text-muted-foreground">
@@ -224,6 +239,8 @@ function ApprovalQueue() {
           </TableBody>
         </Table>
       </section>
+      </>
+      )}
     </div>
   );
 }
