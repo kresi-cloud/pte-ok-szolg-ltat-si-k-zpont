@@ -283,6 +283,7 @@ function RequestDetail() {
                   </div>
                 ))}
               </dl>
+              {staff && (
               <div className="mt-4 flex gap-2">
                 <Button
                   size="sm"
@@ -297,6 +298,7 @@ function RequestDetail() {
                   Módosítás kézzel
                 </Button>
               </div>
+              )}
             </AiBadge>
           )}
 
