@@ -81,18 +81,21 @@ function RequestDetail() {
   }
 
   const staff = ["ugyintezo", "szolgaltatasgazda", "admin"].includes(store.activeRole);
+  /** Döntéshozók: teljes rálátás az ügy belső adataira, de módosítás nélkül. */
+  const leader = ["vezeto", "dekan"].includes(store.activeRole);
+  const fullView = staff || leader;
   const isRequester = request.requesterId === store.currentUser.id;
   const planItem = store.planItems.find((p) => p.sourceRequestId === request.id);
   const pendingApproval = request.approvals.find(
     (a) => a.decision === "fuggoben" && a.approverId === store.currentUser.id,
   );
-  const visibleMessages = request.messages.filter((m) => staff || !m.internal);
+  const visibleMessages = request.messages.filter((m) => fullView || !m.internal);
   const currentIndex = TIMELINE.indexOf(request.status);
 
   return (
     <div className="space-y-6">
       <Link
-        to={staff ? "/munkater" : "/igenyeim"}
+        to={staff ? "/munkater" : leader ? "/vezetoi-attekintes" : "/igenyeim"}
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="size-4" aria-hidden="true" /> Vissza
@@ -252,7 +255,7 @@ function RequestDetail() {
             </dl>
           </section>
 
-          {staff && request.ai && (
+          {fullView && request.ai && (
             <AiBadge>
               <dl className="grid gap-3 text-sm sm:grid-cols-2">
                 {[
@@ -280,6 +283,7 @@ function RequestDetail() {
                   </div>
                 ))}
               </dl>
+              {staff && (
               <div className="mt-4 flex gap-2">
                 <Button
                   size="sm"
@@ -294,16 +298,17 @@ function RequestDetail() {
                   Módosítás kézzel
                 </Button>
               </div>
+              )}
             </AiBadge>
           )}
 
-          {staff && request.internal && (
+          {fullView && request.internal && (
             <section className="card-surface p-6">
               <h2 className="flex items-center gap-2 font-display text-base font-semibold">
                 <Lock className="size-4" aria-hidden="true" /> Belső szolgáltatási adatok
               </h2>
               <p className="mt-1 text-xs text-muted-foreground">
-                Csak szolgáltatási munkatársak számára látható.
+                Szolgáltatási munkatársak és kari döntéshozók számára látható.
               </p>
               <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
                 {[

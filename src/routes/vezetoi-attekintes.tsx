@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -12,8 +12,20 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { DOMAINS, ORG_UNITS, PROJECTS, lookup, useStore } from "@/lib/store";
-import { STATUS_LABELS, type StatusKey } from "@/lib/types";
+import { ArrowRight, ChevronRight, Layers } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { itemCost } from "@/lib/asset-logic";
+import { DOMAINS, ORG_UNITS, PROJECTS, TEAMS, lookup, useStore } from "@/lib/store";
+import { STATUS_LABELS, type ServiceRequest, type StatusKey } from "@/lib/types";
 
 export const Route = createFileRoute("/vezetoi-attekintes")({
   head: () => ({
@@ -22,13 +34,18 @@ export const Route = createFileRoute("/vezetoi-attekintes")({
       {
         name: "description",
         content:
-          "Kari szintű mutatók: igényvolumen, átfutási idők, SLA-teljesítés, költségek és portfólió.",
+          "Kari szintű vezetői irányítópult: minden digitális igény, projekt és költség egy nézetben, eset szintre lebontható.",
       },
-      { property: "og:title", content: "Vezetői áttekintés – ÁOK Digitális Szolgáltatási Portál" },
-      { property: "og:description", content: "Kari digitalizációs mutatók egy nézetben." },
+      { property: "og:title", content: "Vezetői áttekintés – ÁOK Portál" },
+      {
+        property: "og:description",
+        content: "Teljes kari rálátás, tetszőleges bontásban, eset szintig.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: Exec,
+  component: LeaderView,
 });
 
 const OPEN: StatusKey[] = [
@@ -43,164 +60,359 @@ const OPEN: StatusKey[] = [
   "atadasra_var",
 ];
 
-const CHART_COLORS = [
+const COLORS = [
   "var(--color-chart-1)",
   "var(--color-chart-2)",
   "var(--color-chart-3)",
   "var(--color-chart-4)",
+  "var(--color-chart-5)",
 ];
 
-function Exec() {
-  const { requests } = useStore();
+type Dimension = "domain" | "unit" | "status" | "team";
 
-  const byDomain = useMemo(
-    () =>
-      DOMAINS.map((d) => ({
-        name: d.short,
-        nyitott: requests.filter((r) => r.domain === d.key && OPEN.includes(r.status)).length,
-        lezart: requests.filter((r) => r.domain === d.key && r.status === "lezarva").length,
-      })),
-    [requests],
-  );
+const DIMENSIONS: { key: Dimension; label: string }[] = [
+  { key: "domain", label: "Szolgáltatási terület" },
+  { key: "unit", label: "Szervezeti egység" },
+  { key: "status", label: "Állapot" },
+  { key: "team", label: "Végrehajtó csapat" },
+];
 
-  const byUnit = useMemo(
-    () =>
-      ORG_UNITS.map((o) => ({
-        name: o.name.length > 22 ? `${o.name.slice(0, 20)}…` : o.name,
-        igeny: requests.filter((r) => r.orgUnitId === o.id).length,
-      }))
-        .filter((x) => x.igeny > 0)
-        .sort((a, b) => b.igeny - a.igeny),
-    [requests],
-  );
+const huf = (n: number) => `${Math.round(n / 1000).toLocaleString("hu-HU")} eFt`;
 
-  const statusSplit = useMemo(() => {
-    const map = new Map<StatusKey, number>();
-    requests.forEach((r) => map.set(r.status, (map.get(r.status) ?? 0) + 1));
-    return [...map.entries()].map(([k, v]) => ({ name: STATUS_LABELS[k], value: v }));
-  }, [requests]);
+function groupKey(r: ServiceRequest, dim: Dimension): string {
+  if (dim === "domain") return r.domain;
+  if (dim === "unit") return r.orgUnitId;
+  if (dim === "team") return r.teamId ?? "—";
+  return r.status;
+}
 
+function groupLabel(key: string, dim: Dimension): string {
+  if (dim === "domain") return lookup.domain(key)?.short ?? key;
+  if (dim === "unit") return lookup.unit(key);
+  if (dim === "team") return lookup.team(key);
+  return STATUS_LABELS[key as StatusKey] ?? key;
+}
+
+function LeaderView() {
+  const { requests, planItems } = useStore();
+  const [dimension, setDimension] = useState<Dimension>("domain");
+  const [drill, setDrill] = useState<string | null>(null);
+
+  const open = requests.filter((r) => OPEN.includes(r.status));
   const closed = requests.filter((r) => r.status === "lezarva");
-  const rated = closed.filter((r) => r.rating);
-  const cost = requests.reduce((s, r) => s + (r.estimatedCost ?? 0), 0);
+  const risky = requests.filter((r) => r.slaRisk && OPEN.includes(r.status));
+  const waitingApproval = requests.filter((r) => r.status === "jovahagyasra_var");
+  const totalCost = requests.reduce((s, r) => s + (r.estimatedCost ?? 0), 0);
+  const plannedCost = planItems.reduce((s, p) => s + itemCost(p).withContingency, 0);
+
+  const groups = useMemo(() => {
+    const map = new Map<string, ServiceRequest[]>();
+    for (const r of requests) {
+      const k = groupKey(r, dimension);
+      map.set(k, [...(map.get(k) ?? []), r]);
+    }
+    return [...map.entries()]
+      .map(([key, items]) => ({
+        key,
+        label: groupLabel(key, dimension),
+        total: items.length,
+        open: items.filter((r) => OPEN.includes(r.status)).length,
+        risk: items.filter((r) => r.slaRisk && OPEN.includes(r.status)).length,
+        cost: items.reduce((s, r) => s + (r.estimatedCost ?? 0), 0),
+      }))
+      .sort((a, b) => b.total - a.total);
+  }, [requests, dimension]);
+
+  const drillItems = useMemo(
+    () => (drill ? requests.filter((r) => groupKey(r, dimension) === drill) : []),
+    [drill, dimension, requests],
+  );
 
   const kpis = [
-    { label: "Összes igény", value: String(requests.length) },
-    { label: "Nyitott igény", value: String(requests.filter((r) => OPEN.includes(r.status)).length) },
-    { label: "SLA-teljesítés", value: `${Math.round((1 - requests.filter((r) => r.slaRisk).length / Math.max(1, requests.length)) * 100)}%` },
-    { label: "Átlagos átfutás", value: "11,4 nap" },
-    {
-      label: "Elégedettség",
-      value: rated.length
-        ? `${(rated.reduce((s, r) => s + (r.rating ?? 0), 0) / rated.length).toFixed(1)} / 5`
-        : "—",
-    },
-    { label: "Tervezett költség", value: `${(cost / 1_000_000).toFixed(1)} MFt` },
+    { label: "Nyitott ügyek", value: open.length, hint: `${requests.length} összes igény` },
+    { label: "Jóváhagyásra vár", value: waitingApproval.length, hint: "vezetői döntést igényel" },
+    { label: "SLA-kockázat", value: risky.length, hint: "határidőn kívül kerülhet" },
+    { label: "Lezárt ügyek", value: closed.length, hint: "teljesített igények" },
+    { label: "Igényelt költség", value: huf(totalCost), hint: "összes igény becsült értéke" },
+    { label: "Tervezett beszerzés", value: huf(plannedCost), hint: "beszerzési terv sorai" },
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-semibold">Vezetői áttekintés</h1>
-        <p className="mt-1.5 text-muted-foreground">
-          Kari szintű kép a digitális szolgáltatási igényekről és fejlesztésekről.
+    <div className="mx-auto max-w-[1400px] px-4 py-8 lg:px-8">
+      <header className="rounded-md bg-primary px-6 py-8 text-primary-foreground lg:px-10">
+        <p className="text-xs font-semibold tracking-[0.18em] uppercase opacity-80">
+          Vezetői irányítópult
         </p>
-      </div>
+        <h1 className="mt-2 font-display text-3xl font-semibold lg:text-4xl">
+          Kari digitális működés egy képernyőn
+        </h1>
+        <p className="mt-2 max-w-3xl text-sm opacity-90">
+          Minden szolgáltatási igény, fejlesztési projekt és beszerzési tétel összesítve. Bármely
+          mutató tetszőleges bontásban megnyitható, egészen az egyes ügyek szintjéig.
+        </p>
+      </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+      <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
         {kpis.map((k) => (
-          <div key={k.label} className="card-surface p-5">
-            <p className="text-sm text-muted-foreground">{k.label}</p>
+          <div key={k.label} className="rounded-md border border-border bg-card p-4">
+            <p className="text-xs text-muted-foreground">{k.label}</p>
             <p className="mt-1 font-display text-2xl font-semibold">{k.value}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{k.hint}</p>
           </div>
         ))}
-      </div>
+      </section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <section className="card-surface p-5">
-          <h2 className="font-display text-base font-semibold">Igények szolgáltatási területenként</h2>
-          <div className="mt-4 h-72">
+      <section className="mt-6 grid gap-6 lg:grid-cols-2">
+        <div className="rounded-md border border-border bg-card p-5">
+          <h2 className="font-display text-lg font-semibold">Nyitott ügyek területenként</h2>
+          <div className="mt-4 h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={byDomain}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="var(--color-muted-foreground)" />
-                <YAxis tick={{ fontSize: 12 }} stroke="var(--color-muted-foreground)" allowDecimals={false} />
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--color-card)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: 8,
-                    fontSize: 12,
-                  }}
-                />
-                <Bar dataKey="nyitott" name="Nyitott" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="lezart" name="Lezárt" fill="var(--color-chart-2)" radius={[4, 4, 0, 0]} />
+              <BarChart
+                data={DOMAINS.map((d) => ({
+                  name: d.short,
+                  nyitott: open.filter((r) => r.domain === d.key).length,
+                  lezart: closed.filter((r) => r.domain === d.key).length,
+                }))}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="name" fontSize={11} />
+                <YAxis fontSize={11} allowDecimals={false} />
+                <Tooltip />
+                <Bar dataKey="nyitott" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="lezart" fill="var(--color-chart-3)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </section>
+        </div>
 
-        <section className="card-surface p-5">
-          <h2 className="font-display text-base font-semibold">Állapotmegoszlás</h2>
-          <div className="mt-4 h-72">
+        <div className="rounded-md border border-border bg-card p-5">
+          <h2 className="font-display text-lg font-semibold">Fejlesztési portfólió állapota</h2>
+          <div className="mt-4 h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={statusSplit} dataKey="value" nameKey="name" innerRadius={55} outerRadius={95}>
-                  {statusSplit.map((_, i) => (
-                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                <Pie
+                  data={[...new Set(PROJECTS.map((p) => p.stage))].map((s) => ({
+                    name: s,
+                    value: PROJECTS.filter((p) => p.stage === s).length,
+                  }))}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={90}
+                  label
+                >
+                  {PROJECTS.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--color-card)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: 8,
-                    fontSize: 12,
-                  }}
-                />
+                <Tooltip />
               </PieChart>
             </ResponsiveContainer>
           </div>
-        </section>
-
-        <section className="card-surface p-5 lg:col-span-2">
-          <h2 className="font-display text-base font-semibold">Igények szervezeti egységenként</h2>
-          <div className="mt-4 h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={byUnit} layout="vertical" margin={{ left: 40 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 12 }} allowDecimals={false} stroke="var(--color-muted-foreground)" />
-                <YAxis type="category" dataKey="name" width={170} tick={{ fontSize: 12 }} stroke="var(--color-muted-foreground)" />
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--color-card)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: 8,
-                    fontSize: 12,
-                  }}
-                />
-                <Bar dataKey="igeny" name="Igény" fill="var(--color-chart-3)" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
-      </div>
-
-      <section className="card-surface p-5">
-        <h2 className="font-display text-base font-semibold">Fejlesztési portfólió – kiemelt tételek</h2>
-        <ul className="mt-4 divide-y divide-border">
-          {PROJECTS.slice(0, 5).map((p) => (
-            <li key={p.id} className="grid gap-2 py-3 text-sm sm:grid-cols-[1fr_140px_120px_120px]">
-              <span className="font-medium">{p.name}</span>
-              <span className="text-muted-foreground">{lookup.team(p.teamId)}</span>
-              <span className="text-muted-foreground">{p.strategicRelevance}</span>
-              <span className="text-muted-foreground">
-                {(p.estimatedCost / 1_000_000).toFixed(1)} MFt
-              </span>
-            </li>
-          ))}
-        </ul>
+        </div>
       </section>
+
+      <section className="mt-8 grid gap-6 lg:grid-cols-2">
+        <div className="rounded-md border border-border bg-card">
+          <div className="flex items-center justify-between gap-3 border-b border-border p-5">
+            <h2 className="font-display text-lg font-semibold">Döntésre váró ügyek</h2>
+            <Link
+              to="/jovahagyasok"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            >
+              Jóváhagyási sor <ArrowRight className="size-3.5" aria-hidden="true" />
+            </Link>
+          </div>
+          <ul className="divide-y divide-border">
+            {waitingApproval.slice(0, 6).map((r) => (
+              <li key={r.id} className="flex items-center gap-3 p-4 text-sm">
+                <span className="font-mono text-xs text-muted-foreground">{r.id}</span>
+                <span className="min-w-0 flex-1 truncate">{r.title}</span>
+                <span className="hidden text-xs text-muted-foreground sm:block">
+                  {r.approvals.find((a) => a.decision === "fuggoben")
+                    ? lookup.userName(r.approvals.find((a) => a.decision === "fuggoben")!.approverId)
+                    : "—"}
+                </span>
+                <Link
+                  to="/igeny/$id"
+                  params={{ id: r.id }}
+                  className="text-primary hover:underline"
+                >
+                  Eset
+                </Link>
+              </li>
+            ))}
+            {waitingApproval.length === 0 && (
+              <li className="p-6 text-center text-sm text-muted-foreground">
+                Nincs döntésre váró ügy.
+              </li>
+            )}
+          </ul>
+        </div>
+
+        <div className="rounded-md border border-border bg-card">
+          <div className="border-b border-border p-5">
+            <h2 className="font-display text-lg font-semibold">SLA-kockázatos ügyek</h2>
+            <p className="text-sm text-muted-foreground">
+              Határidőn kívül kerülhetnek – felelős csapattal és határidővel.
+            </p>
+          </div>
+          <ul className="divide-y divide-border">
+            {risky.slice(0, 6).map((r) => (
+              <li key={r.id} className="flex items-center gap-3 p-4 text-sm">
+                <span className="font-mono text-xs text-muted-foreground">{r.id}</span>
+                <span className="min-w-0 flex-1 truncate">{r.title}</span>
+                <span className="hidden text-xs text-muted-foreground sm:block">
+                  {lookup.team(r.teamId)} · {r.dueDate ?? "nincs határidő"}
+                </span>
+                <Link to="/igeny/$id" params={{ id: r.id }} className="text-primary hover:underline">
+                  Eset
+                </Link>
+              </li>
+            ))}
+            {risky.length === 0 && (
+              <li className="p-6 text-center text-sm text-muted-foreground">
+                Nincs SLA-kockázatos ügy.
+              </li>
+            )}
+          </ul>
+        </div>
+      </section>
+
+      <section className="mt-8 rounded-md border border-border bg-card">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-5">
+          <div>
+            <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
+              <Layers className="size-4" aria-hidden="true" /> Lebontás
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Válasszon bontást, majd nyisson meg egy sort az ügyek listájához.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {DIMENSIONS.map((d) => (
+              <Button
+                key={d.key}
+                size="sm"
+                variant={dimension === d.key ? "default" : "outline"}
+                onClick={() => {
+                  setDimension(d.key);
+                  setDrill(null);
+                }}
+              >
+                {d.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{DIMENSIONS.find((d) => d.key === dimension)!.label}</TableHead>
+              <TableHead className="text-right">Összes</TableHead>
+              <TableHead className="text-right">Nyitott</TableHead>
+              <TableHead className="text-right">SLA-kockázat</TableHead>
+              <TableHead className="text-right">Becsült költség</TableHead>
+              <TableHead />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {groups.map((g) => (
+              <TableRow key={g.key} data-state={drill === g.key ? "selected" : undefined}>
+                <TableCell className="font-medium">{g.label}</TableCell>
+                <TableCell className="text-right">{g.total}</TableCell>
+                <TableCell className="text-right">{g.open}</TableCell>
+                <TableCell className="text-right">
+                  {g.risk > 0 ? (
+                    <Badge variant="destructive">{g.risk}</Badge>
+                  ) : (
+                    <span className="text-muted-foreground">0</span>
+                  )}
+                </TableCell>
+                <TableCell className="text-right">{huf(g.cost)}</TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setDrill(drill === g.key ? null : g.key)}
+                  >
+                    Ügyek <ChevronRight className="size-4" aria-hidden="true" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </section>
+
+      {drill && (
+        <section className="mt-6 rounded-md border border-border bg-card">
+          <div className="flex items-center justify-between border-b border-border p-5">
+            <h2 className="font-display text-lg font-semibold">
+              {groupLabel(drill, dimension)} – {drillItems.length} ügy
+            </h2>
+            <Button variant="ghost" size="sm" onClick={() => setDrill(null)}>
+              Bezárás
+            </Button>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Azonosító</TableHead>
+                <TableHead>Ügy</TableHead>
+                <TableHead>Igénylő</TableHead>
+                <TableHead>Egység</TableHead>
+                <TableHead>Állapot</TableHead>
+                <TableHead className="text-right">Költség</TableHead>
+                <TableHead />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {drillItems.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell className="font-mono text-xs">{r.id}</TableCell>
+                  <TableCell className="max-w-[320px] truncate">{r.title}</TableCell>
+                  <TableCell className="text-sm">{lookup.userName(r.requesterId)}</TableCell>
+                  <TableCell className="text-sm">{lookup.unit(r.orgUnitId)}</TableCell>
+                  <TableCell>
+                    <Badge variant={r.slaRisk ? "destructive" : "secondary"}>
+                      {STATUS_LABELS[r.status]}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right text-sm">{huf(r.estimatedCost ?? 0)}</TableCell>
+                  <TableCell className="text-right">
+                    <Link
+                      to="/igeny/$id"
+                      params={{ id: r.id }}
+                      className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                    >
+                      Eset megnyitása <ArrowRight className="size-3.5" aria-hidden="true" />
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </section>
+      )}
+
+      <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {TEAMS.map((t) => {
+          const items = requests.filter((r) => r.teamId === t.id && OPEN.includes(r.status));
+          return (
+            <div key={t.id} className="rounded-md border border-border bg-card p-4">
+              <p className="text-sm font-medium">{t.name}</p>
+              <p className="mt-1 font-display text-2xl font-semibold">{items.length}</p>
+              <p className="text-xs text-muted-foreground">nyitott ügy</p>
+            </div>
+          );
+        })}
+      </section>
+
+      <p className="mt-6 text-xs text-muted-foreground">
+        {ORG_UNITS.length} szervezeti egység · {PROJECTS.length} fejlesztési projekt · adatok a
+        demonstrációs adatbázisból.
+      </p>
     </div>
   );
 }
