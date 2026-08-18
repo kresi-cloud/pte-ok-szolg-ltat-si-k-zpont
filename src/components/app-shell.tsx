@@ -57,7 +57,7 @@ const NAV: NavItem[] = [
   { to: "/eletciklus-elorejelzes", label: "Életciklus-előrejelzés", icon: TrendingUp, roles: ["szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
   { to: "/szolgaltatasok", label: "Szolgáltatások", icon: LayoutList, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
   { to: "/fejlesztesek", label: "Fejlesztések", icon: Rocket, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
-  { to: "/jovahagyasok", label: "Jóváhagyási sor", icon: CheckCheck, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin"] },
+  { to: "/jovahagyasok", label: "Jóváhagyási sor", icon: CheckCheck, roles: ["jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin"] },
   { to: "/munkater", label: "Szolgáltatási munkatér", icon: Grid2x2, roles: ["ugyintezo", "szolgaltatasgazda", "admin"] },
   { to: "/portfolio", label: "Fejlesztési portfólió", icon: Building2, roles: ["ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
   { to: "/vezetoi-attekintes", label: "Vezetői áttekintés", icon: GaugeCircle, roles: ["jovahagyo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
