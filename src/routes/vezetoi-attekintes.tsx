@@ -237,6 +237,26 @@ function LeaderView() {
             ))}
           </div>
         </div>
+            <p className="text-sm text-muted-foreground">
+              Válasszon bontást, majd nyisson meg egy sort az ügyek listájához.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {DIMENSIONS.map((d) => (
+              <Button
+                key={d.key}
+                size="sm"
+                variant={dimension === d.key ? "default" : "outline"}
+                onClick={() => {
+                  setDimension(d.key);
+                  setDrill(null);
+                }}
+              >
+                {d.label}
+              </Button>
+            ))}
+          </div>
+        </div>
 
         <Table>
           <TableHeader>
