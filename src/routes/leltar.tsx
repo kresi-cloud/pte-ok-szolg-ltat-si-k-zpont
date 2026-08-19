@@ -263,8 +263,7 @@ function Inventory() {
                   <div>
                     <h3 className="font-display text-base font-semibold">{i.name}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {HARDWARE_MODELS.find((m) => m.key === i.modelKey)?.label ?? "Egyedi eszköz"}
-                      {i.location ? ` · ${i.location}` : ""}
+                      {HARDWARE_MODELS.find((m) => m.key === i.modelKey)?.label ?? "Egyedi eszköz"} · Személyi használat
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Gyári szám: {i.serial || "—"} · PTE leltárkód: {i.inventoryNo || "—"}
