@@ -14,6 +14,7 @@ import {
   LogOut,
   Laptop,
   Boxes,
+  PackageCheck,
   ShoppingCart,
   TrendingUp,
   Plus,
@@ -48,12 +49,13 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { to: "/", label: "Kezdőlap", icon: Home, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
-  { to: "/uj-igeny", label: "Új igény", icon: Plus, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
-  { to: "/igenyeim", label: "Igényeim", icon: ClipboardList, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
-  { to: "/leltar", label: "Személyi leltár", icon: Laptop, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
-  { to: "/eszkozkataszter", label: "Eszközkataszter", icon: Boxes, roles: ["jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
-  { to: "/beszerzesi-terv", label: "Beszerzési terv", icon: ShoppingCart, roles: ["ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
+  { to: "/", label: "Kezdőlap", icon: Home, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "superuser"] },
+  { to: "/uj-igeny", label: "Új igény", icon: Plus, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "superuser"] },
+  { to: "/igenyeim", label: "Igényeim", icon: ClipboardList, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "superuser"] },
+  { to: "/leltar", label: "Személyi leltár", icon: Laptop, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "superuser"] },
+  { to: "/eszkozkataszter", label: "Eszközkataszter", icon: Boxes, roles: ["jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "superuser"] },
+  { to: "/beszerzesek", label: "Beszerzői munkatér", icon: PackageCheck, roles: ["beszerzo", "szolgaltatasgazda", "dekan", "admin", "superuser"] },
+  { to: "/beszerzesi-terv", label: "Beszerzési terv", icon: ShoppingCart, roles: ["ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "superuser"] },
   { to: "/eletciklus-elorejelzes", label: "Életciklus-előrejelzés", icon: TrendingUp, roles: ["szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
   { to: "/szolgaltatasok", label: "Szolgáltatások", icon: LayoutList, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
   { to: "/fejlesztesek", label: "Fejlesztések", icon: Rocket, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
@@ -64,7 +66,7 @@ const NAV: NavItem[] = [
   { to: "/felelossegek", label: "Szolgáltatások és felelősségek", icon: ShieldCheck, roles: ["szolgaltatasgazda", "admin"] },
   { to: "/adminisztracio", label: "Adminisztráció", icon: Settings2, roles: ["admin"] },
   { to: "/jogosultsagok", label: "Jogosultságkezelés", icon: KeyRound, roles: ["superuser"] },
-  { to: "/segitseg", label: "Segítség", icon: LifeBuoy, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
+  { to: "/segitseg", label: "Segítség", icon: LifeBuoy, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "superuser"] },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -212,7 +214,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   Demó: felhasználóváltás
                 </DropdownMenuLabel>
                 {store.users.filter((u) =>
-                  ["u-kovacs", "u-szabo", "u-horvath", "u-nemeth", "u-molnar", "u-dekan", "u-superuser"].includes(u.id),
+                  ["u-kovacs", "u-szabo", "u-horvath", "u-nemeth", "u-molnar", "u-dekan", "u-beszerzo", "u-superuser"].includes(u.id),
                 ).map((u) => (
                   <DropdownMenuItem key={u.id} onSelect={() => store.switchUser(u.id)}>
                     {u.name} – {ROLE_LABELS[u.roles[0]!]}
