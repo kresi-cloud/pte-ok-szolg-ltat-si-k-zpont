@@ -738,11 +738,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       window.localStorage.removeItem(STORAGE_KEY);
       setState({ ...initialState, loggedIn: true });
     },
-    activeAnnouncements: state.announcements.filter(
+    activeAnnouncements: (state.announcements ?? []).filter(
       (a) =>
         a.active &&
         a.expiresAt >= today() &&
-        (a.level === "fontos" || !state.dismissedAnnouncements.includes(a.id)),
+        (a.level === "fontos" || !(state.dismissedAnnouncements ?? []).includes(a.id)),
     ),
     addAnnouncement: (input) => {
       const id = `ann-${Date.now()}`;
