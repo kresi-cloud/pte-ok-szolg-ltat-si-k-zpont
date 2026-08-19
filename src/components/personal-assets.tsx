@@ -139,11 +139,10 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
             </Link>
           </h3>
           <p className="text-sm text-muted-foreground">
-            {asset.inventoryNo} · {assetLookup.categoryLabel(asset.categoryKey)} ·{" "}
-            {assetLookup.locationLabel(asset.locationId)}
+            {assetLookup.categoryLabel(asset.categoryKey)} · Személyi használat
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Gyári szám: {asset.serial || "—"}
+            Gyári szám: {asset.serial || "—"} · PTE leltárkód: {asset.inventoryNo}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
