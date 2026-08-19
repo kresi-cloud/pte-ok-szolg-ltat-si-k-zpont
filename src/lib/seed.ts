@@ -1,4 +1,5 @@
 import type {
+  Announcement,
   AppNotification,
   Approval,
   AuditEvent,
