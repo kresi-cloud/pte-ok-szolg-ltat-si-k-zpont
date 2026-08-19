@@ -209,15 +209,6 @@ function Inventory() {
                   placeholder="pl. PTE-AOK-NB-2314"
                 />
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="hw-loc">Elhelyezés</Label>
-                <Input
-                  id="hw-loc"
-                  value={hw.location}
-                  onChange={(e) => setHw({ ...hw, location: e.target.value })}
-                  placeholder="pl. Élettani Intézet, 214. szoba"
-                />
-              </div>
               <div className="space-y-1.5 md:col-span-2">
                 <Label htmlFor="hw-note">Megjegyzés</Label>
                 <Textarea
