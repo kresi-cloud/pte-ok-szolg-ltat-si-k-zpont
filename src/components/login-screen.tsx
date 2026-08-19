@@ -11,6 +11,7 @@ const DEMO_USERS = [
   "u-nemeth",
   "u-molnar",
   "u-dekan",
+  "u-beszerzo",
   "u-superuser",
 ];
 

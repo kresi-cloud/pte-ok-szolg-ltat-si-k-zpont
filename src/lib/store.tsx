@@ -743,6 +743,49 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...s.assetAudit,
         ],
       })),
+    decidePlanApproval: (id, decision, comment) =>
+      setState((s) => {
+        const target = (s.planApprovals ?? []).find((p) => p.id === id);
+        return {
+          ...s,
+          planApprovals: (s.planApprovals ?? []).map((p) =>
+            p.id === id
+              ? {
+                  ...p,
+                  status: decision,
+                  decidedBy: currentUser.id,
+                  decidedAt: today(),
+                  comment,
+                }
+              : p,
+          ),
+          notifications: [
+            {
+              id: `n-${Date.now()}`,
+              at: today(),
+              text: target
+                ? `${target.planYear}. évi ${target.quarter ? `${target.quarter} negyedéves` : "éves"} beszerzési terv: ${
+                    decision === "jovahagyva" ? "dékáni jóváhagyás megtörtént" : "átdolgozásra visszaküldve"
+                  }.`
+                : "Beszerzési terv döntés rögzítve.",
+              read: false,
+            },
+            ...s.notifications,
+          ],
+          assetAudit: [
+            {
+              id: `aud-${Date.now()}`,
+              at: today(),
+              actorId: currentUser.id,
+              entity: "beszerzes",
+              entityId: id,
+              action: decision === "jovahagyva" ? "Terv dékáni jóváhagyása" : "Terv visszaküldése átdolgozásra",
+              detail: comment ?? "",
+            },
+            ...s.assetAudit,
+          ],
+        };
+      }),
     resetDemo: () => {
       window.localStorage.removeItem(STORAGE_KEY);
       setState({ ...initialState, loggedIn: true });
