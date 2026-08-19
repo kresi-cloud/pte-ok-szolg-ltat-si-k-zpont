@@ -128,12 +128,6 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Search className="size-5" />
             </Button>
 
-            <Link
-              to="/uj-igeny"
-              className="pte-cta hidden items-center gap-2 rounded-sm px-4 py-2.5 text-sm transition-colors md:inline-flex"
-            >
-              <Plus className="size-4" aria-hidden="true" /> Új igény
-            </Link>
 
             <Popover onOpenChange={(o) => o && store.markNotificationsRead()}>
               <PopoverTrigger asChild>
