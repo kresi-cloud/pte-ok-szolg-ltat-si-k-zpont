@@ -14,8 +14,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CATALOG, ORG_UNITS, TEAMS, USERS, lookup, useStore } from "@/lib/store";
-import { INVENTORY_STATUS_LABELS, ROLE_LABELS } from "@/lib/types";
+import {
+  ANNOUNCEMENT_LEVEL_LABELS,
+  INVENTORY_STATUS_LABELS,
+  ROLE_LABELS,
+  type AnnouncementLevel,
+} from "@/lib/types";
 import { HARDWARE_MODELS } from "@/lib/inventory-data";
 import { SpecGrid } from "@/routes/leltar";
 
@@ -56,6 +69,7 @@ function Admin() {
           <TabsTrigger value="leltar">
             Leltár jóváhagyás{pending.length > 0 ? ` (${pending.length})` : ""}
           </TabsTrigger>
+          <TabsTrigger value="kozlemenyek">Közlemények</TabsTrigger>
           <TabsTrigger value="ai">AI-beállítások</TabsTrigger>
         </TabsList>
 
@@ -247,6 +261,10 @@ function Admin() {
           </div>
         </TabsContent>
 
+        <TabsContent value="kozlemenyek">
+          <AnnouncementsAdmin />
+        </TabsContent>
+
         <TabsContent value="ai">
           <section className="card-surface space-y-5 p-5">
             {/* AI beállítások */}
@@ -290,6 +308,168 @@ function Admin() {
           </section>
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+const todayStr = () => new Date().toISOString().slice(0, 10);
+const defaultExpiry = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + 14);
+  return d.toISOString().slice(0, 10);
+};
+
+function AnnouncementsAdmin() {
+  const { announcements, addAnnouncement, updateAnnouncement, removeAnnouncement } = useStore();
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [level, setLevel] = useState<AnnouncementLevel>("info");
+  const [expiresAt, setExpiresAt] = useState(defaultExpiry());
+
+  const submit = () => {
+    if (!title.trim() || !body.trim()) {
+      toast.error("A cím és a szöveg megadása kötelező.");
+      return;
+    }
+    if (expiresAt < todayStr()) {
+      toast.error("A lejárat dátuma nem lehet a mai napnál korábbi.");
+      return;
+    }
+    addAnnouncement({ title: title.trim(), body: body.trim(), level, expiresAt, active: true });
+    setTitle("");
+    setBody("");
+    setLevel("info");
+    setExpiresAt(defaultExpiry());
+    toast.success("A közlemény megjelenik minden felhasználó kezdőlapján.");
+  };
+
+  return (
+    <div className="space-y-4">
+      <section className="card-surface space-y-4 p-5">
+        <div>
+          <h2 className="font-display text-base font-semibold">Új közlemény minden felhasználónak</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            A közzétett hír a portál kezdőlapján jelenik meg minden bejelentkezett felhasználónak, a
+            megadott lejárat napjáig. Ha nincs érvényes közlemény, a blokk nem látszik.
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="ann-title">Cím</Label>
+            <Input
+              id="ann-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Pl. Tervezett karbantartás a kari hálózaton"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="ann-level">Fontosság</Label>
+              <Select value={level} onValueChange={(v) => setLevel(v as AnnouncementLevel)}>
+                <SelectTrigger id="ann-level">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(ANNOUNCEMENT_LEVEL_LABELS) as AnnouncementLevel[]).map((k) => (
+                    <SelectItem key={k} value={k}>
+                      {ANNOUNCEMENT_LEVEL_LABELS[k]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ann-exp">Lejárat</Label>
+              <Input
+                id="ann-exp"
+                type="date"
+                min={todayStr()}
+                value={expiresAt}
+                onChange={(e) => setExpiresAt(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="ann-body">Szöveg</Label>
+          <Textarea
+            id="ann-body"
+            rows={3}
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder="A közlemény részletei…"
+          />
+        </div>
+        <Button onClick={submit}>Közzététel</Button>
+      </section>
+
+      <section className="card-surface overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Cím</TableHead>
+              <TableHead>Fontosság</TableHead>
+              <TableHead>Közzétéve</TableHead>
+              <TableHead>Lejárat</TableHead>
+              <TableHead>Állapot</TableHead>
+              <TableHead className="text-right">Műveletek</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {announcements.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} className="text-muted-foreground">
+                  Még nincs közlemény.
+                </TableCell>
+              </TableRow>
+            )}
+            {announcements.map((a) => {
+              const expired = a.expiresAt < todayStr();
+              return (
+                <TableRow key={a.id}>
+                  <TableCell className="max-w-sm">
+                    <span className="block font-medium">{a.title}</span>
+                    <span className="block text-xs text-muted-foreground">{a.body}</span>
+                  </TableCell>
+                  <TableCell>{ANNOUNCEMENT_LEVEL_LABELS[a.level]}</TableCell>
+                  <TableCell>{a.publishedAt}</TableCell>
+                  <TableCell>
+                    <Input
+                      type="date"
+                      className="w-40"
+                      value={a.expiresAt}
+                      onChange={(e) => updateAnnouncement(a.id, { expiresAt: e.target.value })}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {expired ? "Lejárt" : a.active ? "Aktív" : "Visszavonva"}
+                  </TableCell>
+                  <TableCell className="text-right whitespace-nowrap">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateAnnouncement(a.id, { active: !a.active })}
+                    >
+                      {a.active ? "Visszavonás" : "Újraaktiválás"}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="ml-2"
+                      onClick={() => {
+                        removeAnnouncement(a.id);
+                        toast.success("Közlemény törölve.");
+                      }}
+                    >
+                      Törlés
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </section>
     </div>
   );
 }

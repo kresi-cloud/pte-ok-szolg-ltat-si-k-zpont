@@ -1,15 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  Boxes,
-  CircleAlert,
-  Globe,
-  Laptop,
-  Plus,
-  Workflow,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowRight, Boxes, CircleAlert, Globe, Laptop, Workflow } from "lucide-react";
 import { StatusBadge } from "@/components/status-badge";
+import { AnnouncementsBanner } from "@/components/announcements-banner";
 import { DOMAINS, lookup, useStore } from "@/lib/store";
 import type { DomainKey } from "@/lib/types";
 
@@ -41,8 +33,6 @@ const DOMAIN_ICONS: Record<DomainKey, typeof Boxes> = {
 
 function Home() {
   const { currentUser, requests } = useStore();
-  const firstName = currentUser.name.split(" ").slice(-1)[0];
-
   const mine = requests.filter((r) => r.requesterId === currentUser.id);
   const active = mine.filter((r) => !["lezarva", "elutasitva"].includes(r.status));
   const todos = mine.filter((r) => r.status === "pontositas");
@@ -54,25 +44,9 @@ function Home() {
 
   return (
     <div className="space-y-10">
-      <section className="pte-band -mx-4 -mt-8 px-4 py-12 lg:-mx-8 lg:px-12">
-        <div className="flex flex-wrap items-end justify-between gap-6">
-          <div className="max-w-2xl">
-            <p className="text-xs font-medium tracking-[0.18em] uppercase opacity-75">
-              PTE ÁOK · Digitális Szolgáltatási Portál
-            </p>
-            <h1 className="mt-3 text-4xl font-semibold lg:text-5xl">Jó napot, {firstName}!</h1>
-            <p className="mt-3 text-base opacity-85">
-              Miben segíthetünk? Indítson igényt, kövesse ügyeit és intézze teendőit egy helyen.
-            </p>
-          </div>
-          <Link
-            to="/uj-igeny"
-            className="pte-cta inline-flex items-center gap-2 rounded-sm px-6 py-3.5 text-sm transition-colors"
-          >
-            <Plus className="size-4" /> Új igény indítása <ArrowRight className="size-4" />
-          </Link>
-        </div>
-      </section>
+      <h1 className="sr-only">Kezdőlap – ÁOK Digitális Szolgáltatási Portál</h1>
+
+      <AnnouncementsBanner />
 
       {(todos.length > 0 || approvals.length > 0) && (
         <section aria-labelledby="teendoim">

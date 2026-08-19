@@ -1,4 +1,5 @@
 import type {
+  Announcement,
   AppNotification,
   Approval,
   AuditEvent,
@@ -1409,4 +1410,22 @@ export const INSIGHTS = [
   "Az öt legrégebbi nyitott ügyből három beszerzési jóváhagyásra vár.",
   "A digitalizációs fejlesztések 42%-a három szervezeti egységtől érkezik.",
   "A pontosításra váró igények átlagosan 4,2 napot töltenek válaszra várva.",
+];
+const inDays = (n: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+
+export const ANNOUNCEMENTS: Announcement[] = [
+  {
+    id: "ann-1",
+    title: "Tervezett karbantartás a Neptun és a kari hálózat egyes szolgáltatásain",
+    body: "A hétvégi karbantartás ideje alatt (szombat 08:00–14:00) a Neptun és a kari VPN időszakosan nem lesz elérhető. A portálon beadott igények feldolgozása a karbantartás után folytatódik.",
+    level: "figyelmeztetes",
+    publishedAt: inDays(-2),
+    expiresAt: inDays(10),
+    active: true,
+    createdBy: "u-nemeth",
+  },
 ];
