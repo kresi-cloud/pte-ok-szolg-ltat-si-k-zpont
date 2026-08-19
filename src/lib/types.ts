@@ -338,3 +338,24 @@ export interface InventoryItem {
   decidedBy?: string | undefined;
   decisionComment?: string | undefined;
 }
+
+export type AnnouncementLevel = "info" | "figyelmeztetes" | "fontos";
+
+export const ANNOUNCEMENT_LEVEL_LABELS: Record<AnnouncementLevel, string> = {
+  info: "Információ",
+  figyelmeztetes: "Figyelmeztetés",
+  fontos: "Fontos",
+};
+
+/** Minden felhasználónak szóló portálhír, lejárati idővel. */
+export interface Announcement {
+  id: string;
+  title: string;
+  body: string;
+  level: AnnouncementLevel;
+  publishedAt: string;
+  /** ISO dátum (YYYY-MM-DD); a lejárat napjának végéig látszik */
+  expiresAt: string;
+  active: boolean;
+  createdBy: string;
+}
