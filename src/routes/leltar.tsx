@@ -104,7 +104,7 @@ function Inventory() {
   const hardware = mine.filter((i) => i.kind === "hardver");
   const software = mine.filter((i) => i.kind === "szoftver");
 
-  const [hw, setHw] = useState({ name: "", modelKey: "", serial: "", location: "", note: "" });
+  const [hw, setHw] = useState({ name: "", modelKey: "", serial: "", inventoryNo: "", location: "", note: "" });
   const [sw, setSw] = useState({ name: "", version: "", licenseType: "", licenseKey: "", installedOn: "" });
 
   const preview = hw.modelKey ? specForModel(hw.modelKey) : null;
@@ -192,12 +192,21 @@ function Inventory() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="hw-serial">Leltári vagy gyári szám</Label>
+                <Label htmlFor="hw-serial">Szériaszám / gyári szám</Label>
                 <Input
                   id="hw-serial"
                   value={hw.serial}
                   onChange={(e) => setHw({ ...hw, serial: e.target.value })}
-                  placeholder="pl. AOK-NB-2314"
+                  placeholder="pl. SN-5CG2314XYZ"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="hw-invno">PTE leltárkód</Label>
+                <Input
+                  id="hw-invno"
+                  value={hw.inventoryNo}
+                  onChange={(e) => setHw({ ...hw, inventoryNo: e.target.value })}
+                  placeholder="pl. PTE-AOK-NB-2314"
                 />
               </div>
               <div className="space-y-1.5">
@@ -243,10 +252,11 @@ function Inventory() {
                   name: hw.name.trim(),
                   modelKey: hw.modelKey,
                   serial: hw.serial || undefined,
+                  inventoryNo: hw.inventoryNo || undefined,
                   location: hw.location || undefined,
                   note: hw.note || undefined,
                 });
-                setHw({ name: "", modelKey: "", serial: "", location: "", note: "" });
+                setHw({ name: "", modelKey: "", serial: "", inventoryNo: "", location: "", note: "" });
                 toast.success("Az eszköz rögzítve, rendszergazdai jóváhagyásra vár.");
               }}
             >
@@ -264,8 +274,10 @@ function Inventory() {
                     <h3 className="font-display text-base font-semibold">{i.name}</h3>
                     <p className="text-sm text-muted-foreground">
                       {HARDWARE_MODELS.find((m) => m.key === i.modelKey)?.label ?? "Egyedi eszköz"}
-                      {i.serial ? ` · ${i.serial}` : ""}
                       {i.location ? ` · ${i.location}` : ""}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Gyári szám: {i.serial || "—"} · PTE leltárkód: {i.inventoryNo || "—"}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">

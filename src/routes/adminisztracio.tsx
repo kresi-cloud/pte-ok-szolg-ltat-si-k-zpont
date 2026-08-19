@@ -193,6 +193,11 @@ function Admin() {
                             ? (HARDWARE_MODELS.find((m) => m.key === i.modelKey)?.label ?? "Egyedi eszköz")
                             : [i.version && `verzió ${i.version}`, i.licenseType].filter(Boolean).join(" · ")}
                         </p>
+                        {i.kind === "hardver" && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Gyári szám: {i.serial || "—"} · PTE leltárkód: {i.inventoryNo || "—"}
+                          </p>
+                        )}
                       </div>
                       <span className="text-xs text-muted-foreground">beküldve: {i.createdAt}</span>
                     </div>
@@ -235,6 +240,8 @@ function Admin() {
                 <TableRow>
                   <TableHead>Tétel</TableHead>
                   <TableHead>Típus</TableHead>
+                  <TableHead>Gyári szám</TableHead>
+                  <TableHead>PTE leltárkód</TableHead>
                   <TableHead>Tulajdonos</TableHead>
                   <TableHead>Operációs rendszer</TableHead>
                   <TableHead>Processzor</TableHead>
@@ -249,6 +256,8 @@ function Admin() {
                     <TableCell className="text-muted-foreground">
                       {i.kind === "hardver" ? "Hardver" : "Szoftver"}
                     </TableCell>
+                    <TableCell className="text-muted-foreground">{i.serial ?? "—"}</TableCell>
+                    <TableCell className="text-muted-foreground">{i.inventoryNo ?? "—"}</TableCell>
                     <TableCell>{lookup.userName(i.ownerId)}</TableCell>
                     <TableCell>{i.spec ? `${i.spec.os} ${i.spec.osVersion}` : "—"}</TableCell>
                     <TableCell>{i.spec?.cpu ?? "—"}</TableCell>
