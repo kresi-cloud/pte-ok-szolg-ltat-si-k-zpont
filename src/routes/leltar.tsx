@@ -104,7 +104,7 @@ function Inventory() {
   const hardware = mine.filter((i) => i.kind === "hardver");
   const software = mine.filter((i) => i.kind === "szoftver");
 
-  const [hw, setHw] = useState({ name: "", modelKey: "", serial: "", inventoryNo: "", location: "", note: "" });
+  const [hw, setHw] = useState({ name: "", modelKey: "", serial: "", inventoryNo: "", note: "" });
   const [sw, setSw] = useState({ name: "", version: "", licenseType: "", licenseKey: "", installedOn: "" });
 
   const preview = hw.modelKey ? specForModel(hw.modelKey) : null;
@@ -209,15 +209,6 @@ function Inventory() {
                   placeholder="pl. PTE-AOK-NB-2314"
                 />
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="hw-loc">Elhelyezés</Label>
-                <Input
-                  id="hw-loc"
-                  value={hw.location}
-                  onChange={(e) => setHw({ ...hw, location: e.target.value })}
-                  placeholder="pl. Élettani Intézet, 214. szoba"
-                />
-              </div>
               <div className="space-y-1.5 md:col-span-2">
                 <Label htmlFor="hw-note">Megjegyzés</Label>
                 <Textarea
@@ -253,10 +244,9 @@ function Inventory() {
                   modelKey: hw.modelKey,
                   serial: hw.serial || undefined,
                   inventoryNo: hw.inventoryNo || undefined,
-                  location: hw.location || undefined,
                   note: hw.note || undefined,
                 });
-                setHw({ name: "", modelKey: "", serial: "", inventoryNo: "", location: "", note: "" });
+                setHw({ name: "", modelKey: "", serial: "", inventoryNo: "", note: "" });
                 toast.success("Az eszköz rögzítve, rendszergazdai jóváhagyásra vár.");
               }}
             >
@@ -273,8 +263,7 @@ function Inventory() {
                   <div>
                     <h3 className="font-display text-base font-semibold">{i.name}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {HARDWARE_MODELS.find((m) => m.key === i.modelKey)?.label ?? "Egyedi eszköz"}
-                      {i.location ? ` · ${i.location}` : ""}
+                      {HARDWARE_MODELS.find((m) => m.key === i.modelKey)?.label ?? "Egyedi eszköz"} · Személyi használat
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Gyári szám: {i.serial || "—"} · PTE leltárkód: {i.inventoryNo || "—"}
