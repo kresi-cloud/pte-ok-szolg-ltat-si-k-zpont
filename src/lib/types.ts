@@ -6,6 +6,7 @@ export type RoleKey =
   | "vezeto"
   | "dekan"
   | "admin"
+  | "beszerzo"
   | "superuser";
 
 export const ROLE_LABELS: Record<RoleKey, string> = {
@@ -16,6 +17,7 @@ export const ROLE_LABELS: Record<RoleKey, string> = {
   vezeto: "Kari vezető",
   dekan: "Dékán",
   admin: "Rendszeradminisztrátor",
+  beszerzo: "Beszerző",
   superuser: "Superuser (jogosultságkezelő)",
 };
 
@@ -27,6 +29,8 @@ export const ROLE_DESCRIPTIONS: Record<RoleKey, string> = {
   vezeto: "Kari szintű mutatókat és portfóliót lát.",
   dekan: "Teljes kari rálátás, bármely ügy eset szintre bontható.",
   admin: "Rendszerbeállítások, katalógus, leltárjóváhagyás.",
+  beszerzo:
+    "Megkapja a jóváhagyott eseti beszerzéseket, kezeli a negyedéves és éves beszerzési terveket.",
   superuser: "Kizárólagos jog a felhasználói jogosultságok kiosztására.",
 };
 
