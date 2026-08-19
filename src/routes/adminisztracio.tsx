@@ -14,8 +14,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CATALOG, ORG_UNITS, TEAMS, USERS, lookup, useStore } from "@/lib/store";
-import { INVENTORY_STATUS_LABELS, ROLE_LABELS } from "@/lib/types";
+import {
+  ANNOUNCEMENT_LEVEL_LABELS,
+  INVENTORY_STATUS_LABELS,
+  ROLE_LABELS,
+  type AnnouncementLevel,
+} from "@/lib/types";
 import { HARDWARE_MODELS } from "@/lib/inventory-data";
 import { SpecGrid } from "@/routes/leltar";
 
@@ -56,6 +69,7 @@ function Admin() {
           <TabsTrigger value="leltar">
             Leltár jóváhagyás{pending.length > 0 ? ` (${pending.length})` : ""}
           </TabsTrigger>
+          <TabsTrigger value="kozlemenyek">Közlemények</TabsTrigger>
           <TabsTrigger value="ai">AI-beállítások</TabsTrigger>
         </TabsList>
 
