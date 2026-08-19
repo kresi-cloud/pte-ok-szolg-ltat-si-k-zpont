@@ -16,7 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useStore } from "@/lib/store";
-import { HARDWARE_MODELS, SOFTWARE_SUGGESTIONS, specForModel } from "@/lib/inventory-data";
+import { HARDWARE_MODELS, SOFTWARE_SUGGESTIONS, isMobileModel, specForModel } from "@/lib/inventory-data";
+import { ASSET_LOCATIONS } from "@/lib/asset-data";
 import { INVENTORY_STATUS_LABELS, type InventoryItem } from "@/lib/types";
 import { MyAssets, MyLicences, SharedAssets } from "@/components/personal-assets";
 
@@ -104,10 +105,21 @@ function Inventory() {
   const hardware = mine.filter((i) => i.kind === "hardver");
   const software = mine.filter((i) => i.kind === "szoftver");
 
-  const [hw, setHw] = useState({ name: "", modelKey: "", serial: "", inventoryNo: "", note: "" });
+  const [hw, setHw] = useState({
+    name: "",
+    modelKey: "",
+    serial: "",
+    inventoryNo: "",
+    building: "",
+    room: "",
+    note: "",
+  });
   const [sw, setSw] = useState({ name: "", version: "", licenseType: "", licenseKey: "", installedOn: "" });
 
   const preview = hw.modelKey ? specForModel(hw.modelKey) : null;
+  const needsLocation = Boolean(hw.modelKey) && !isMobileModel(hw.modelKey);
+  const buildings = [...new Set(ASSET_LOCATIONS.map((l) => l.building))];
+  const rooms = ASSET_LOCATIONS.filter((l) => l.building === hw.building).map((l) => l.room);
 
   return (
     <div className="space-y-6">
@@ -209,6 +221,51 @@ function Inventory() {
                   placeholder="pl. PTE-AOK-NB-2314"
                 />
               </div>
+              {needsLocation && (
+                <>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="hw-building">Épület</Label>
+                    <Select
+                      value={hw.building}
+                      onValueChange={(v) => setHw({ ...hw, building: v, room: "" })}
+                    >
+                      <SelectTrigger id="hw-building">
+                        <SelectValue placeholder="Válasszon épületet" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {buildings.map((b) => (
+                          <SelectItem key={b} value={b}>
+                            {b}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="hw-room">Helyiség</Label>
+                    <Select
+                      value={hw.room}
+                      onValueChange={(v) => setHw({ ...hw, room: v })}
+                      disabled={!hw.building}
+                    >
+                      <SelectTrigger id="hw-room">
+                        <SelectValue placeholder="Válasszon helyiséget" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {rooms.map((r) => (
+                          <SelectItem key={r} value={r}>
+                            {r}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <p className="text-xs text-muted-foreground md:col-span-2">
+                    A nem mobil eszközöket (asztali gép, munkaállomás, laboreszköz, nyomtató) épülethez
+                    és helyiséghez kell rendelni.
+                  </p>
+                </>
+              )}
               <div className="space-y-1.5 md:col-span-2">
                 <Label htmlFor="hw-note">Megjegyzés</Label>
                 <Textarea
@@ -236,7 +293,7 @@ function Inventory() {
 
             <Button
               className="mt-4"
-              disabled={!hw.name.trim() || !hw.modelKey}
+              disabled={!hw.name.trim() || !hw.modelKey || (needsLocation && (!hw.building || !hw.room))}
               onClick={() => {
                 addInventoryItem({
                   kind: "hardver",
@@ -244,9 +301,12 @@ function Inventory() {
                   modelKey: hw.modelKey,
                   serial: hw.serial || undefined,
                   inventoryNo: hw.inventoryNo || undefined,
+                  building: needsLocation ? hw.building : undefined,
+                  room: needsLocation ? hw.room : undefined,
+                  location: needsLocation ? `${hw.building} · ${hw.room}` : undefined,
                   note: hw.note || undefined,
                 });
-                setHw({ name: "", modelKey: "", serial: "", inventoryNo: "", note: "" });
+                setHw({ name: "", modelKey: "", serial: "", inventoryNo: "", building: "", room: "", note: "" });
                 toast.success("Az eszköz rögzítve, rendszergazdai jóváhagyásra vár.");
               }}
             >
@@ -263,7 +323,12 @@ function Inventory() {
                   <div>
                     <h3 className="font-display text-base font-semibold">{i.name}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {HARDWARE_MODELS.find((m) => m.key === i.modelKey)?.label ?? "Egyedi eszköz"} · Személyi használat
+                      {HARDWARE_MODELS.find((m) => m.key === i.modelKey)?.label ?? "Egyedi eszköz"} ·{" "}
+                      {isMobileModel(i.modelKey)
+                        ? "Személyi használat"
+                        : (i.location ??
+                          ([i.building, i.room].filter(Boolean).join(" · ") ||
+                            "Elhelyezés megadása szükséges"))}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Gyári szám: {i.serial || "—"} · PTE leltárkód: {i.inventoryNo || "—"}

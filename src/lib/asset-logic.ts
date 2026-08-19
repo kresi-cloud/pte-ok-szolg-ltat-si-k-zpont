@@ -45,6 +45,13 @@ export function daysBetween(a: string, b: string) {
   return Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
 }
 
+/** Mobil eszközkategóriák: ezeket személyi használatba adjuk, nincs fix helyiség. */
+export const MOBILE_ASSET_CATEGORIES = ["notebook", "tablet", "mobil"] as const;
+
+export function isMobileAssetCategory(key: string): boolean {
+  return (MOBILE_ASSET_CATEGORIES as readonly string[]).includes(key);
+}
+
 export function yearsSince(date: string, ref = TODAY) {
   return daysBetween(date, ref) / 365.25;
 }

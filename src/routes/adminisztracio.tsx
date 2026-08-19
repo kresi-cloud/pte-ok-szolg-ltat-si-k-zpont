@@ -195,7 +195,8 @@ function Admin() {
                         </p>
                         {i.kind === "hardver" && (
                           <p className="mt-1 text-xs text-muted-foreground">
-                            Gyári szám: {i.serial || "—"} · PTE leltárkód: {i.inventoryNo || "—"}
+                            Gyári szám: {i.serial || "—"} · PTE leltárkód: {i.inventoryNo || "—"} ·{" "}
+                            {i.location ?? ([i.building, i.room].filter(Boolean).join(" · ") || "Személyi használat")}
                           </p>
                         )}
                       </div>
