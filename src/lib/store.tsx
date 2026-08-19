@@ -9,6 +9,7 @@ import {
 } from "react";
 import {
   CATALOG,
+  ANNOUNCEMENTS,
   DOMAINS,
   NOTIFICATIONS,
   ORG_UNITS,
@@ -19,6 +20,7 @@ import {
   USERS,
 } from "./seed";
 import type {
+  Announcement,
   AppNotification,
   InventoryItem,
   Project,
@@ -62,6 +64,8 @@ const STORAGE_KEY = "aok-portal-state-v2";
 interface PersistedState {
   requests: ServiceRequest[];
   notifications: AppNotification[];
+  announcements: Announcement[];
+  dismissedAnnouncements: string[];
   inventory: InventoryItem[];
   assets: Asset[];
   licences: PersonalSoftwareLicence[];
@@ -81,6 +85,8 @@ interface PersistedState {
 const initialState: PersistedState = {
   requests: REQUESTS,
   notifications: NOTIFICATIONS,
+  announcements: ANNOUNCEMENTS,
+  dismissedAnnouncements: [],
   inventory: INVENTORY,
   assets: ASSETS,
   licences: PERSONAL_LICENCES,
@@ -131,6 +137,11 @@ interface StoreValue extends PersistedState {
   updatePlanItem: (id: string, patch: Partial<ProcurementPlanItem>) => void;
   removePlanItem: (id: string) => void;
   setUserRoles: (userId: string, roles: RoleKey[], reason: string) => void;
+  activeAnnouncements: Announcement[];
+  addAnnouncement: (input: Omit<Announcement, "id" | "publishedAt" | "createdBy">) => string;
+  updateAnnouncement: (id: string, patch: Partial<Announcement>) => void;
+  removeAnnouncement: (id: string) => void;
+  dismissAnnouncement: (id: string) => void;
   resetDemo: () => void;
 }
 
