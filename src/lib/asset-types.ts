@@ -376,6 +376,44 @@ export interface ProcurementPlanItem {
   sourceRequestId?: string | undefined;
 }
 
+/** Terv-jóváhagyási ciklus: éves és negyedéves beszerzési terv dékáni jóváhagyása. */
+export type PlanScope = "eves" | "negyedeves";
+
+export const PLAN_SCOPE_LABELS: Record<PlanScope, string> = {
+  eves: "Éves beszerzési terv",
+  negyedeves: "Negyedéves beszerzési terv",
+};
+
+/** Jóváhagyási határidő az esedékesség előtt (nap). */
+export const PLAN_APPROVAL_LEAD_DAYS: Record<PlanScope, number> = {
+  eves: 60,
+  negyedeves: 30,
+};
+
+export type PlanApprovalStatus = "jovahagyasra_var" | "jovahagyva" | "visszakuldve";
+
+export const PLAN_APPROVAL_STATUS_LABELS: Record<PlanApprovalStatus, string> = {
+  jovahagyasra_var: "Dékáni jóváhagyásra vár",
+  jovahagyva: "Dékán jóváhagyta",
+  visszakuldve: "Átdolgozásra visszaküldve",
+};
+
+export interface PlanApproval {
+  id: string;
+  scope: PlanScope;
+  planYear: number;
+  /** csak negyedéves ciklusnál */
+  quarter?: Quarter | undefined;
+  /** az időszak kezdete (esedékesség) */
+  periodStart: string;
+  /** jóváhagyási határidő: esedékesség - 30/60 nap */
+  dueAt: string;
+  status: PlanApprovalStatus;
+  decidedBy?: string | undefined;
+  decidedAt?: string | undefined;
+  comment?: string | undefined;
+}
+
 /** AssetInventoryChecks / AssetInventoryDiscrepancies */
 export type PersonalCheckAnswer =
   | "nalam_van_hasznalom"

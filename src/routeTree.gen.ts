@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminisztracioRouteImport } from './routes/adminisztracio'
+import { Route as BeszerzesekRouteImport } from './routes/beszerzesek'
 import { Route as BeszerzesiTervRouteImport } from './routes/beszerzesi-terv'
 import { Route as DekaniAttekintesRouteImport } from './routes/dekani-attekintes'
 import { Route as EletciklusElorejelzesRouteImport } from './routes/eletciklus-elorejelzes'
@@ -43,6 +44,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminisztracioRoute = AdminisztracioRouteImport.update({
   id: '/adminisztracio',
   path: '/adminisztracio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BeszerzesekRoute = BeszerzesekRouteImport.update({
+  id: '/beszerzesek',
+  path: '/beszerzesek',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BeszerzesiTervRoute = BeszerzesiTervRouteImport.update({
@@ -167,6 +173,7 @@ const Char91DotmcpChar93InvokeToolToolRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
+  '/beszerzesek': typeof BeszerzesekRoute
   '/beszerzesi-terv': typeof BeszerzesiTervRoute
   '/dekani-attekintes': typeof DekaniAttekintesRoute
   '/eletciklus-elorejelzes': typeof EletciklusElorejelzesRoute
@@ -194,6 +201,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
+  '/beszerzesek': typeof BeszerzesekRoute
   '/beszerzesi-terv': typeof BeszerzesiTervRoute
   '/dekani-attekintes': typeof DekaniAttekintesRoute
   '/eletciklus-elorejelzes': typeof EletciklusElorejelzesRoute
@@ -222,6 +230,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/adminisztracio': typeof AdminisztracioRoute
+  '/beszerzesek': typeof BeszerzesekRoute
   '/beszerzesi-terv': typeof BeszerzesiTervRoute
   '/dekani-attekintes': typeof DekaniAttekintesRoute
   '/eletciklus-elorejelzes': typeof EletciklusElorejelzesRoute
@@ -251,6 +260,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/adminisztracio'
+    | '/beszerzesek'
     | '/beszerzesi-terv'
     | '/dekani-attekintes'
     | '/eletciklus-elorejelzes'
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/adminisztracio'
+    | '/beszerzesek'
     | '/beszerzesi-terv'
     | '/dekani-attekintes'
     | '/eletciklus-elorejelzes'
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/adminisztracio'
+    | '/beszerzesek'
     | '/beszerzesi-terv'
     | '/dekani-attekintes'
     | '/eletciklus-elorejelzes'
@@ -333,6 +345,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminisztracioRoute: typeof AdminisztracioRoute
+  BeszerzesekRoute: typeof BeszerzesekRoute
   BeszerzesiTervRoute: typeof BeszerzesiTervRoute
   DekaniAttekintesRoute: typeof DekaniAttekintesRoute
   EletciklusElorejelzesRoute: typeof EletciklusElorejelzesRoute
@@ -372,6 +385,13 @@ declare module '@tanstack/react-router' {
       path: '/adminisztracio'
       fullPath: '/adminisztracio'
       preLoaderRoute: typeof AdminisztracioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/beszerzesek': {
+      id: '/beszerzesek'
+      path: '/beszerzesek'
+      fullPath: '/beszerzesek'
+      preLoaderRoute: typeof BeszerzesekRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/beszerzesi-terv': {
@@ -541,6 +561,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminisztracioRoute: AdminisztracioRoute,
+  BeszerzesekRoute: BeszerzesekRoute,
   BeszerzesiTervRoute: BeszerzesiTervRoute,
   DekaniAttekintesRoute: DekaniAttekintesRoute,
   EletciklusElorejelzesRoute: EletciklusElorejelzesRoute,

@@ -294,6 +294,16 @@ export const USERS: User[] = [
     teamId: "t-it",
     initials: "TR",
   },
+  {
+    id: "u-beszerzo",
+    name: "Fekete Gábor",
+    title: "beszerzési referens",
+    email: "fekete.gabor@aok.pte.hu",
+    employeeId: "PTE-100002",
+    orgUnitId: "ou-dekani",
+    roles: ["beszerzo"],
+    initials: "FG",
+  },
 ];
 
 export const TEAMS: ServiceTeam[] = [
