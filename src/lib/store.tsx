@@ -188,7 +188,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) setState({ ...initialState, ...(JSON.parse(raw) as PersistedState) });
+      if (raw) {
+        const saved = JSON.parse(raw) as Partial<PersistedState>;
+        const merged = { ...initialState } as PersistedState;
+        for (const [key, value] of Object.entries(saved)) {
+          if (value === undefined || value === null) continue;
+          const fallback = (initialState as unknown as Record<string, unknown>)[key];
+          if (Array.isArray(fallback) && !Array.isArray(value)) continue;
+          (merged as unknown as Record<string, unknown>)[key] = value;
+        }
+        setState(merged);
+      }
     } catch {
       /* ignore */
     }
@@ -728,11 +738,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       window.localStorage.removeItem(STORAGE_KEY);
       setState({ ...initialState, loggedIn: true });
     },
-    activeAnnouncements: state.announcements.filter(
+    activeAnnouncements: (state.announcements ?? []).filter(
       (a) =>
         a.active &&
         a.expiresAt >= today() &&
-        (a.level === "fontos" || !state.dismissedAnnouncements.includes(a.id)),
+        (a.level === "fontos" || !(state.dismissedAnnouncements ?? []).includes(a.id)),
     ),
     addAnnouncement: (input) => {
       const id = `ann-${Date.now()}`;
