@@ -41,6 +41,7 @@ import type {
   InventoryDiscrepancy,
   PersonalSoftwareLicence,
   PersonalCheckAnswer,
+  PlanApproval,
   ProcurementPlanItem,
   ReplacementDecision,
   ReplacementDecisionKey,
@@ -58,6 +59,7 @@ import {
   PERSONAL_LICENCES,
 } from "./asset-data";
 import { needsProcurement, planItemFromRequest } from "./request-procurement";
+import { buildPlanApprovals } from "./plan-approvals";
 
 const STORAGE_KEY = "aok-portal-state-v2";
 
@@ -75,6 +77,7 @@ interface PersistedState {
   discrepancies: InventoryDiscrepancy[];
   replacementDecisions: ReplacementDecision[];
   planItems: ProcurementPlanItem[];
+  planApprovals: PlanApproval[];
   currentUserId: string;
   activeRole: RoleKey;
   loggedIn: boolean;
@@ -96,6 +99,7 @@ const initialState: PersistedState = {
   discrepancies: INITIAL_DISCREPANCIES,
   replacementDecisions: INITIAL_REPLACEMENT_DECISIONS,
   planItems: INITIAL_PROCUREMENT_ITEMS,
+  planApprovals: buildPlanApprovals(),
   currentUserId: "u-kovacs",
   activeRole: "igenylo",
   loggedIn: false,
@@ -136,6 +140,11 @@ interface StoreValue extends PersistedState {
   addPlanItem: (item: Omit<ProcurementPlanItem, "id">) => string;
   updatePlanItem: (id: string, patch: Partial<ProcurementPlanItem>) => void;
   removePlanItem: (id: string) => void;
+  decidePlanApproval: (
+    id: string,
+    decision: "jovahagyva" | "visszakuldve",
+    comment?: string,
+  ) => void;
   setUserRoles: (userId: string, roles: RoleKey[], reason: string) => void;
   activeAnnouncements: Announcement[];
   addAnnouncement: (input: Omit<Announcement, "id" | "publishedAt" | "createdBy">) => string;
