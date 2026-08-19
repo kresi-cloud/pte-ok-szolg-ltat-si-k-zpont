@@ -21,10 +21,8 @@ import {
 } from "@/lib/asset-logic";
 import { Field, LicenceBadge, LifecycleBadge, PriorityBadge, StatTile } from "@/components/asset-bits";
 import {
-  DISCREPANCY_LABELS,
   PERSONAL_CHECK_LABELS,
   SHARED_CHECK_LABELS,
-  type DiscrepancyKind,
   type PersonalCheckAnswer,
   type SharedCheckAnswer,
 } from "@/lib/asset-types";
@@ -123,9 +121,6 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
   const check = store.checks.find((c) => c.assetId === asset.id && c.userId === store.currentUser.id);
   const [answer, setAnswer] = useState<string>(shared ? "megtalalhato" : "nalam_van_hasznalom");
   const [comment, setComment] = useState("");
-  const [reportOpen, setReportOpen] = useState(false);
-  const [kind, setKind] = useState<DiscrepancyKind>("hibas_adat");
-  const [desc, setDesc] = useState("");
   const osEnd = osSupportEnd(asset);
 
   const answers = shared ? SHARED_CHECK_LABELS : PERSONAL_CHECK_LABELS;
