@@ -21,10 +21,8 @@ import {
 } from "@/lib/asset-logic";
 import { Field, LicenceBadge, LifecycleBadge, PriorityBadge, StatTile } from "@/components/asset-bits";
 import {
-  DISCREPANCY_LABELS,
   PERSONAL_CHECK_LABELS,
   SHARED_CHECK_LABELS,
-  type DiscrepancyKind,
   type PersonalCheckAnswer,
   type SharedCheckAnswer,
 } from "@/lib/asset-types";
@@ -123,9 +121,6 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
   const check = store.checks.find((c) => c.assetId === asset.id && c.userId === store.currentUser.id);
   const [answer, setAnswer] = useState<string>(shared ? "megtalalhato" : "nalam_van_hasznalom");
   const [comment, setComment] = useState("");
-  const [reportOpen, setReportOpen] = useState(false);
-  const [kind, setKind] = useState<DiscrepancyKind>("hibas_adat");
-  const [desc, setDesc] = useState("");
   const osEnd = osSupportEnd(asset);
 
   const answers = shared ? SHARED_CHECK_LABELS : PERSONAL_CHECK_LABELS;
@@ -240,53 +235,6 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
         )}
       </div>
 
-      <div className="mt-3">
-        <Button variant="outline" size="sm" onClick={() => setReportOpen((v) => !v)}>
-          {reportOpen ? "Bejelentés bezárása" : "Eltérés vagy hiba bejelentése"}
-        </Button>
-        {reportOpen && (
-          <div className="mt-3 grid gap-3 rounded-md border border-border p-4 md:grid-cols-3">
-            <div className="space-y-1.5">
-              <Label htmlFor={`k-${asset.id}`}>Bejelentés típusa</Label>
-              <Select value={kind} onValueChange={(v) => setKind(v as DiscrepancyKind)}>
-                <SelectTrigger id={`k-${asset.id}`}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(DISCREPANCY_LABELS).map(([k, l]) => (
-                    <SelectItem key={k} value={k}>
-                      {l}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5 md:col-span-2">
-              <Label htmlFor={`d-${asset.id}`}>Leírás</Label>
-              <Textarea
-                id={`d-${asset.id}`}
-                maxLength={500}
-                value={desc}
-                onChange={(e) => setDesc(e.target.value)}
-                placeholder="Mi tér el a nyilvántartástól?"
-              />
-            </div>
-            <div>
-              <Button
-                disabled={!desc.trim()}
-                onClick={() => {
-                  store.reportDiscrepancy({ kind, assetId: asset.id, description: desc.trim() });
-                  setDesc("");
-                  setReportOpen(false);
-                  toast.success("Az eltérés bejelentve, a leltárfelelős megvizsgálja.");
-                }}
-              >
-                Bejelentés küldése
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
     </article>
   );
 }
