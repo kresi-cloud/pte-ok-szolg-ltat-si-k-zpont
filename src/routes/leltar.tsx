@@ -327,8 +327,8 @@ function Inventory() {
                       {isMobileModel(i.modelKey)
                         ? "Személyi használat"
                         : (i.location ??
-                          [i.building, i.room].filter(Boolean).join(" · ") ||
-                          "Elhelyezés megadása szükséges")}
+                          ([i.building, i.room].filter(Boolean).join(" · ") ||
+                            "Elhelyezés megadása szükséges"))}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Gyári szám: {i.serial || "—"} · PTE leltárkód: {i.inventoryNo || "—"}
