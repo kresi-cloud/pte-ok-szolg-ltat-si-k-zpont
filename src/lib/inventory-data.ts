@@ -141,6 +141,15 @@ export function specForModel(modelKey?: string): HardwareSpec {
   return HARDWARE_MODELS.find((m) => m.key === modelKey)?.spec ?? GENERIC_SPEC;
 }
 
+/** Mobil (személyi használatra kiadható) eszközkategóriák. */
+export const MOBILE_MODEL_CATEGORIES = ["notebook", "tablet"] as const;
+
+/** Igaz, ha a modell mobil eszköz – ilyenkor nem kell épület/helyiség. */
+export function isMobileModel(modelKey?: string): boolean {
+  const cat = HARDWARE_MODELS.find((m) => m.key === modelKey)?.category;
+  return cat ? (MOBILE_MODEL_CATEGORIES as readonly string[]).includes(cat) : false;
+}
+
 export const SOFTWARE_SUGGESTIONS = [
   "Microsoft 365 Apps",
   "EndNote 21",

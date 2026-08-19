@@ -330,6 +330,9 @@ export interface InventoryItem {
   /** PTE intézményi leltárkód (leltári szám) */
   inventoryNo?: string | undefined;
   location?: string | undefined;
+  /** nem mobil eszköz esetén kötelező elhelyezés */
+  building?: string | undefined;
+  room?: string | undefined;
   note?: string | undefined;
   /** szoftver mezők */
   version?: string | undefined;
