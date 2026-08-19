@@ -142,6 +142,9 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
             {asset.inventoryNo} · {assetLookup.categoryLabel(asset.categoryKey)} ·{" "}
             {assetLookup.locationLabel(asset.locationId)}
           </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Gyári szám: {asset.serial || "—"} · PTE leltárkód: {asset.inventoryNo}
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <LifecycleBadge status={lifecycleStatus(asset)} />
