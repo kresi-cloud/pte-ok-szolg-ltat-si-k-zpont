@@ -104,7 +104,7 @@ function Inventory() {
   const hardware = mine.filter((i) => i.kind === "hardver");
   const software = mine.filter((i) => i.kind === "szoftver");
 
-  const [hw, setHw] = useState({ name: "", modelKey: "", serial: "", inventoryNo: "", location: "", note: "" });
+  const [hw, setHw] = useState({ name: "", modelKey: "", serial: "", inventoryNo: "", note: "" });
   const [sw, setSw] = useState({ name: "", version: "", licenseType: "", licenseKey: "", installedOn: "" });
 
   const preview = hw.modelKey ? specForModel(hw.modelKey) : null;
