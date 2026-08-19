@@ -11,6 +11,7 @@ import { TODAY } from "@/lib/asset-data";
 import {
   assetLookup,
   huf,
+  isMobileAssetCategory,
   licenceStatus,
   lifecycleEnd,
   lifecycleStatus,
@@ -139,7 +140,10 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
             </Link>
           </h3>
           <p className="text-sm text-muted-foreground">
-            {assetLookup.categoryLabel(asset.categoryKey)} · Személyi használat
+            {assetLookup.categoryLabel(asset.categoryKey)} ·{" "}
+            {isMobileAssetCategory(asset.categoryKey)
+              ? "Személyi használat"
+              : assetLookup.locationLabel(asset.locationId)}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             Gyári szám: {asset.serial || "—"} · PTE leltárkód: {asset.inventoryNo}
