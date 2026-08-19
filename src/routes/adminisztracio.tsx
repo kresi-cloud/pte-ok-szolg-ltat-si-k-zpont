@@ -262,6 +262,7 @@ function Admin() {
         </TabsContent>
 
         <TabsContent value="ai">
+          {null}
           <section className="card-surface space-y-5 p-5">
             {/* AI beállítások */}
             <h2 className="font-display text-base font-semibold">AI-támogatás beállításai</h2>
