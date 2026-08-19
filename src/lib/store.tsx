@@ -188,7 +188,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) setState({ ...initialState, ...(JSON.parse(raw) as PersistedState) });
+      if (raw) {
+        const saved = JSON.parse(raw) as Partial<PersistedState>;
+        const merged = { ...initialState } as PersistedState;
+        for (const [key, value] of Object.entries(saved)) {
+          if (value === undefined || value === null) continue;
+          const fallback = (initialState as Record<string, unknown>)[key];
+          if (Array.isArray(fallback) && !Array.isArray(value)) continue;
+          (merged as Record<string, unknown>)[key] = value;
+        }
+        setState(merged);
+      }
     } catch {
       /* ignore */
     }
