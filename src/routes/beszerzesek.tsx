@@ -44,7 +44,7 @@ export const Route = createFileRoute("/beszerzesek")({
 const QUARTERS: Quarter[] = ["Q1", "Q2", "Q3", "Q4"];
 
 function standardLabel(key: string) {
-  return HARDWARE_STANDARDS.find((s) => s.key === key)?.name ?? key;
+  return HARDWARE_STANDARDS.find((s) => s.key === key)?.label ?? key;
 }
 
 function ItemRow({ item, canAct }: { item: ProcurementPlanItem; canAct: boolean }) {
