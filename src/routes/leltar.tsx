@@ -244,10 +244,9 @@ function Inventory() {
                   modelKey: hw.modelKey,
                   serial: hw.serial || undefined,
                   inventoryNo: hw.inventoryNo || undefined,
-                  location: hw.location || undefined,
                   note: hw.note || undefined,
                 });
-                setHw({ name: "", modelKey: "", serial: "", inventoryNo: "", location: "", note: "" });
+                setHw({ name: "", modelKey: "", serial: "", inventoryNo: "", note: "" });
                 toast.success("Az eszköz rögzítve, rendszergazdai jóváhagyásra vár.");
               }}
             >
