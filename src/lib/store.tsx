@@ -193,9 +193,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const merged = { ...initialState } as PersistedState;
         for (const [key, value] of Object.entries(saved)) {
           if (value === undefined || value === null) continue;
-          const fallback = (initialState as Record<string, unknown>)[key];
+          const fallback = (initialState as unknown as Record<string, unknown>)[key];
           if (Array.isArray(fallback) && !Array.isArray(value)) continue;
-          (merged as Record<string, unknown>)[key] = value;
+          (merged as unknown as Record<string, unknown>)[key] = value;
         }
         setState(merged);
       }
