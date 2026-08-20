@@ -31,6 +31,7 @@ import {
 } from "@/lib/types";
 import { HARDWARE_MODELS } from "@/lib/inventory-data";
 import { SpecGrid } from "@/routes/leltar";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/adminisztracio")({
   head: () => ({

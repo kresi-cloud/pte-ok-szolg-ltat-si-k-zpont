@@ -18,6 +18,7 @@ import {
   type Quarter,
 } from "@/lib/asset-types";
 import { daysUntil } from "@/lib/plan-approvals";
+import { PageHeading } from "@/components/page-heading";
 import { StatTile } from "@/components/asset-bits";
 
 export const Route = createFileRoute("/beszerzesek")({

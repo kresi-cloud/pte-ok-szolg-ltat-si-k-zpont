@@ -13,6 +13,7 @@ import {
   YAxis,
 } from "recharts";
 import { ArrowRight, ChevronRight, Layers } from "lucide-react";
+import { PageHeading } from "@/components/page-heading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {

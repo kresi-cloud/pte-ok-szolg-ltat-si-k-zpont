@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { lookup, useStore } from "@/lib/store";
 import { ROLE_DESCRIPTIONS, ROLE_LABELS, type RoleKey } from "@/lib/types";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/jogosultsagok")({
   head: () => ({

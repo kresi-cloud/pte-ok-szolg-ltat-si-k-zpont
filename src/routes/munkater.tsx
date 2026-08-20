@@ -24,6 +24,7 @@ import { PriorityBadge, StatusBadge } from "@/components/status-badge";
 import { DOMAINS, TEAMS, USERS, lookup, useStore } from "@/lib/store";
 import { STATUS_LABELS, type StatusKey } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/munkater")({
   head: () => ({

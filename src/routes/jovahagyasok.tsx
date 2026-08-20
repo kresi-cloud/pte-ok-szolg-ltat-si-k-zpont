@@ -16,6 +16,7 @@ import { StatusBadge, PriorityBadge } from "@/components/status-badge";
 import { lookup, useStore } from "@/lib/store";
 import type { ServiceRequest } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/jovahagyasok")({
   head: () => ({

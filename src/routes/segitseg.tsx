@@ -6,6 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { STATUS_LABELS, STATUS_ORDER } from "@/lib/types";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/segitseg")({
   head: () => ({
