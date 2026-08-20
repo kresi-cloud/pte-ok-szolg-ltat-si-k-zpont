@@ -210,9 +210,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
                   Demó: felhasználóváltás
                 </DropdownMenuLabel>
-                {store.users.filter((u) =>
-                  ["u-kovacs", "u-szabo", "u-horvath", "u-nemeth", "u-molnar", "u-dekan", "u-beszerzo", "u-superuser"].includes(u.id),
-                ).map((u) => (
+                {store.users.filter((u) => DEMO_USER_IDS.includes(u.id)).map((u) => (
                   <DropdownMenuItem key={u.id} onSelect={() => store.switchUser(u.id)}>
                     {u.name} – {ROLE_LABELS[u.roles[0]!]}
                   </DropdownMenuItem>
