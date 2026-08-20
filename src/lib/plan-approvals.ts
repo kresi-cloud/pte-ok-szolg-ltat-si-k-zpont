@@ -17,7 +17,7 @@ function minusDays(dateIso: string, days: number): string {
   return iso(d);
 }
 
-/** Az éves és a négy negyedéves jóváhagyási ciklus a tervezési évre. */
+/** Az azonnali, az éves és a négy negyedéves tervciklus a tervezési évre. */
 export function buildPlanApprovals(year = NEXT_FINANCIAL_YEAR): PlanApproval[] {
   const yearStart = `${year}-01-01`;
   const annual: PlanApproval = {
@@ -26,7 +26,15 @@ export function buildPlanApprovals(year = NEXT_FINANCIAL_YEAR): PlanApproval[] {
     planYear: year,
     periodStart: yearStart,
     dueAt: minusDays(yearStart, PLAN_APPROVAL_LEAD_DAYS.eves),
-    status: "jovahagyasra_var",
+    status: "tervezes",
+  };
+  const immediate: PlanApproval = {
+    id: `pa-${year}-azonnali`,
+    scope: "azonnali",
+    planYear: year,
+    periodStart: yearStart,
+    dueAt: yearStart,
+    status: "tervezes",
   };
   const quarters = (Object.keys(QUARTER_START_MONTH) as Quarter[]).map((q) => {
     const start = iso(new Date(Date.UTC(year, QUARTER_START_MONTH[q], 1)));
@@ -37,11 +45,12 @@ export function buildPlanApprovals(year = NEXT_FINANCIAL_YEAR): PlanApproval[] {
       quarter: q,
       periodStart: start,
       dueAt: minusDays(start, PLAN_APPROVAL_LEAD_DAYS.negyedeves),
-      status: "jovahagyasra_var",
+      status: "tervezes",
     } satisfies PlanApproval;
   });
-  return [annual, ...quarters];
+  return [immediate, annual, ...quarters];
 }
+
 
 /** Hátralévő napok a jóváhagyási határidőig (negatív, ha lejárt). */
 export function daysUntil(dateIso: string, from = new Date()): number {

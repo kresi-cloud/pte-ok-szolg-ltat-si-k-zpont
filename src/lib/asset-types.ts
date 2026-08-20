@@ -377,29 +377,53 @@ export interface ProcurementPlanItem {
   /** gazdasági vezetői átütemezés nyoma */
   rescheduledBy?: string | undefined;
   rescheduledAt?: string | undefined;
+  /** beszerzői bontás: azonnali vagy negyedéves tervtétel */
+  timing?: "azonnali" | "negyedeves" | undefined;
 }
 
-/** Terv-jóváhagyási ciklus: éves és negyedéves beszerzési terv dékáni jóváhagyása. */
-export type PlanScope = "eves" | "negyedeves";
+/** Terv-jóváhagyási ciklus: azonnali, negyedéves és éves beszerzési terv. */
+export type PlanScope = "eves" | "negyedeves" | "azonnali";
 
 export const PLAN_SCOPE_LABELS: Record<PlanScope, string> = {
   eves: "Éves beszerzési terv",
   negyedeves: "Negyedéves beszerzési terv",
+  azonnali: "Azonnali beszerzési csomag",
 };
 
 /** Jóváhagyási határidő az esedékesség előtt (nap). */
 export const PLAN_APPROVAL_LEAD_DAYS: Record<PlanScope, number> = {
   eves: 60,
   negyedeves: 30,
+  azonnali: 0,
 };
 
-export type PlanApprovalStatus = "jovahagyasra_var" | "jovahagyva" | "visszakuldve";
+/** A beszerzési terv életútja: beszerző → gazdasági vezető → dékán → beszerző (végrehajtás). */
+export type PlanApprovalStatus =
+  | "tervezes"
+  | "gazdasagi_ellenorzes"
+  | "dekani_jovahagyas"
+  | "jovahagyva"
+  | "visszakuldve"
+  | "vegrehajtas"
+  /** régi adatokból származó állapot, a dékáni jóváhagyással egyenértékű */
+  | "jovahagyasra_var";
 
 export const PLAN_APPROVAL_STATUS_LABELS: Record<PlanApprovalStatus, string> = {
-  jovahagyasra_var: "Dékáni jóváhagyásra vár",
-  jovahagyva: "Dékán jóváhagyta",
+  tervezes: "Beszerzői tervezés alatt",
+  gazdasagi_ellenorzes: "Gazdasági vezetői ellenőrzés alatt",
+  dekani_jovahagyas: "Dékáni jóváhagyásra vár",
+  jovahagyva: "Dékán jóváhagyta – beszerzőnél",
   visszakuldve: "Átdolgozásra visszaküldve",
+  vegrehajtas: "Beszerzés folyamatban",
+  jovahagyasra_var: "Dékáni jóváhagyásra vár",
 };
+
+export interface PlanApprovalEvent {
+  at: string;
+  actorId: string;
+  action: string;
+  comment?: string | undefined;
+}
 
 export interface PlanApproval {
   id: string;
@@ -412,10 +436,18 @@ export interface PlanApproval {
   /** jóváhagyási határidő: esedékesség - 30/60 nap */
   dueAt: string;
   status: PlanApprovalStatus;
+  submittedBy?: string | undefined;
+  submittedAt?: string | undefined;
+  reviewedBy?: string | undefined;
+  reviewedAt?: string | undefined;
   decidedBy?: string | undefined;
   decidedAt?: string | undefined;
+  executionStartedBy?: string | undefined;
+  executionStartedAt?: string | undefined;
   comment?: string | undefined;
+  history?: PlanApprovalEvent[] | undefined;
 }
+
 
 /** AssetInventoryChecks / AssetInventoryDiscrepancies */
 export type PersonalCheckAnswer =

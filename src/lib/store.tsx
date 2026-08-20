@@ -146,11 +146,16 @@ interface StoreValue extends PersistedState {
     comment?: string,
   ) => void;
   removePlanItem: (id: string) => void;
+  setPlanItemTiming: (id: string, timing: "azonnali" | "negyedeves") => void;
+  submitPlanForFinance: (id: string, comment?: string) => void;
+  financeReviewPlan: (id: string, decision: "tovabb" | "vissza", comment?: string) => void;
+  startPlanExecution: (id: string) => void;
   decidePlanApproval: (
     id: string,
     decision: "jovahagyva" | "visszakuldve",
     comment?: string,
   ) => void;
+
   setUserRoles: (userId: string, roles: RoleKey[], reason: string) => void;
   activeAnnouncements: Announcement[];
   addAnnouncement: (input: Omit<Announcement, "id" | "publishedAt" | "createdBy">) => string;
@@ -780,6 +785,170 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...s.assetAudit,
         ],
       })),
+    setPlanItemTiming: (id, timing) =>
+      setState((s) => ({
+        ...s,
+        planItems: s.planItems.map((p) => (p.id === id ? { ...p, timing } : p)),
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "beszerzes",
+            entityId: id,
+            action: "Beszerzési bontás módosítása",
+            detail: timing === "azonnali" ? "Azonnali beszerzés" : "Negyedéves terv",
+          },
+          ...s.assetAudit,
+        ],
+      })),
+    submitPlanForFinance: (id, comment) =>
+      setState((s) => ({
+        ...s,
+        planApprovals: (s.planApprovals ?? []).map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                status: "gazdasagi_ellenorzes",
+                submittedBy: currentUser.id,
+                submittedAt: today(),
+                comment,
+                history: [
+                  ...(p.history ?? []),
+                  {
+                    at: today(),
+                    actorId: currentUser.id,
+                    action: "Terv beküldve gazdasági ellenőrzésre",
+                    comment,
+                  },
+                ],
+              }
+            : p,
+        ),
+        notifications: [
+          {
+            id: `n-${Date.now()}`,
+            at: today(),
+            text: "Beszerzési terv gazdasági vezetői ellenőrzésre érkezett.",
+            read: false,
+          },
+          ...s.notifications,
+        ],
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "beszerzes",
+            entityId: id,
+            action: "Terv beküldése gazdasági ellenőrzésre",
+            detail: comment ?? "",
+          },
+          ...s.assetAudit,
+        ],
+      })),
+    financeReviewPlan: (id, decision, comment) =>
+      setState((s) => ({
+        ...s,
+        planApprovals: (s.planApprovals ?? []).map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                status: decision === "tovabb" ? "dekani_jovahagyas" : "visszakuldve",
+                reviewedBy: currentUser.id,
+                reviewedAt: today(),
+                comment,
+                history: [
+                  ...(p.history ?? []),
+                  {
+                    at: today(),
+                    actorId: currentUser.id,
+                    action:
+                      decision === "tovabb"
+                        ? "Gazdasági vezetői ellenőrzés kész – dékáni jóváhagyásra küldve"
+                        : "Gazdasági vezető átdolgozásra visszaküldte a beszerzőnek",
+                    comment,
+                  },
+                ],
+              }
+            : p,
+        ),
+        notifications: [
+          {
+            id: `n-${Date.now()}`,
+            at: today(),
+            text:
+              decision === "tovabb"
+                ? "Beszerzési terv dékáni jóváhagyásra vár."
+                : "Beszerzési terv átdolgozásra visszakerült a beszerzőhöz.",
+            read: false,
+          },
+          ...s.notifications,
+        ],
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "beszerzes",
+            entityId: id,
+            action:
+              decision === "tovabb"
+                ? "Terv továbbítása dékáni jóváhagyásra"
+                : "Terv visszaküldése a beszerzőnek",
+            detail: comment ?? "",
+          },
+          ...s.assetAudit,
+        ],
+      })),
+    startPlanExecution: (id) =>
+      setState((s) => {
+        const target = (s.planApprovals ?? []).find((p) => p.id === id);
+        const inScope = (p: (typeof s.planItems)[number]) =>
+          !!target &&
+          p.planYear === target.planYear &&
+          (target.scope === "eves"
+            ? true
+            : target.scope === "azonnali"
+              ? p.timing === "azonnali"
+              : p.quarter === target.quarter && p.timing !== "azonnali");
+        return {
+          ...s,
+          planItems: s.planItems.map((p) =>
+            inScope(p) && p.status !== "teljesult" ? { ...p, status: "beszerzes_alatt" } : p,
+          ),
+          planApprovals: (s.planApprovals ?? []).map((p) =>
+            p.id === id
+              ? {
+                  ...p,
+                  status: "vegrehajtas",
+                  executionStartedBy: currentUser.id,
+                  executionStartedAt: today(),
+                  history: [
+                    ...(p.history ?? []),
+                    {
+                      at: today(),
+                      actorId: currentUser.id,
+                      action: "Beszerzés elindítva a jóváhagyott terv alapján",
+                    },
+                  ],
+                }
+              : p,
+          ),
+          assetAudit: [
+            {
+              id: `aud-${Date.now()}`,
+              at: today(),
+              actorId: currentUser.id,
+              entity: "beszerzes",
+              entityId: id,
+              action: "Beszerzés indítása jóváhagyott terv alapján",
+              detail: "",
+            },
+            ...s.assetAudit,
+          ],
+        };
+      }),
     decidePlanApproval: (id, decision, comment) =>
       setState((s) => {
         const target = (s.planApprovals ?? []).find((p) => p.id === id);
@@ -793,6 +962,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                   decidedBy: currentUser.id,
                   decidedAt: today(),
                   comment,
+                  history: [
+                    ...(p.history ?? []),
+                    {
+                      at: today(),
+                      actorId: currentUser.id,
+                      action:
+                        decision === "jovahagyva"
+                          ? "Dékáni jóváhagyás – a terv visszakerült a beszerzőhöz"
+                          : "Dékán átdolgozásra visszaküldte",
+                      comment,
+                    },
+                  ],
                 }
               : p,
           ),
@@ -801,8 +982,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               id: `n-${Date.now()}`,
               at: today(),
               text: target
-                ? `${target.planYear}. évi ${target.quarter ? `${target.quarter} negyedéves` : "éves"} beszerzési terv: ${
-                    decision === "jovahagyva" ? "dékáni jóváhagyás megtörtént" : "átdolgozásra visszaküldve"
+                ? `${target.planYear}. évi ${target.quarter ? `${target.quarter} negyedéves` : target.scope === "azonnali" ? "azonnali" : "éves"} beszerzési terv: ${
+                    decision === "jovahagyva"
+                      ? "dékáni jóváhagyás megtörtént, indítható a beszerzés"
+                      : "átdolgozásra visszaküldve"
                   }.`
                 : "Beszerzési terv döntés rögzítve.",
               read: false,
@@ -823,6 +1006,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ],
         };
       }),
+
     resetDemo: () => {
       window.localStorage.removeItem(STORAGE_KEY);
       setState({ ...initialState, loggedIn: true });
