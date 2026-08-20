@@ -146,11 +146,16 @@ interface StoreValue extends PersistedState {
     comment?: string,
   ) => void;
   removePlanItem: (id: string) => void;
+  setPlanItemTiming: (id: string, timing: "azonnali" | "negyedeves") => void;
+  submitPlanForFinance: (id: string, comment?: string) => void;
+  financeReviewPlan: (id: string, decision: "tovabb" | "vissza", comment?: string) => void;
+  startPlanExecution: (id: string) => void;
   decidePlanApproval: (
     id: string,
     decision: "jovahagyva" | "visszakuldve",
     comment?: string,
   ) => void;
+
   setUserRoles: (userId: string, roles: RoleKey[], reason: string) => void;
   activeAnnouncements: Announcement[];
   addAnnouncement: (input: Omit<Announcement, "id" | "publishedAt" | "createdBy">) => string;
