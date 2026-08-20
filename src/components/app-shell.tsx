@@ -40,6 +40,7 @@ import { lookup, useStore, USERS } from "@/lib/store";
 import { ROLE_LABELS, type RoleKey } from "@/lib/types";
 import { LoginScreen } from "@/components/login-screen";
 import { GlobalSearch } from "@/components/global-search";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 interface NavItem {
   to: string;
@@ -159,10 +160,12 @@ export function AppShell({ children }: { children: ReactNode }) {
               </PopoverContent>
             </Popover>
 
+            <LanguageSwitcher />
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 rounded-sm border border-white/25 px-2 py-1.5 text-left text-white hover:bg-white/15">
-                  <span className="grid size-7 place-items-center rounded-full bg-accent text-xs font-semibold text-accent-foreground">
+                  <span data-no-i18n className="grid size-7 place-items-center rounded-full bg-accent text-xs font-semibold text-accent-foreground">
                     {user.initials}
                   </span>
                   <span className="hidden leading-tight md:block">
