@@ -374,6 +374,9 @@ export interface ProcurementPlanItem {
   kind: "csere" | "uj_kapacitas";
   /** ha jóváhagyott szolgáltatási igényből keletkezett */
   sourceRequestId?: string | undefined;
+  /** gazdasági vezetői átütemezés nyoma */
+  rescheduledBy?: string | undefined;
+  rescheduledAt?: string | undefined;
 }
 
 /** Terv-jóváhagyási ciklus: éves és negyedéves beszerzési terv dékáni jóváhagyása. */

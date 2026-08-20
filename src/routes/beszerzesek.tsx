@@ -5,7 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useStore, lookup } from "@/lib/store";
-import { NEXT_FINANCIAL_YEAR, HARDWARE_STANDARDS } from "@/lib/asset-data";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { NEXT_FINANCIAL_YEAR, HARDWARE_STANDARDS, TODAY } from "@/lib/asset-data";
 import { huf, itemCost } from "@/lib/asset-logic";
 import {
   PLAN_APPROVAL_LEAD_DAYS,
@@ -44,15 +52,59 @@ export const Route = createFileRoute("/beszerzesek")({
 
 const QUARTERS: Quarter[] = ["Q1", "Q2", "Q3", "Q4"];
 
+/** Egy évre előre eső negyedéves tervblokkok (aktuális negyedévtől számítva). */
+function schedulingBlocks(): { value: string; label: string; planYear: number; quarter: Quarter }[] {
+  const now = new Date(TODAY);
+  const year = now.getFullYear();
+  const qIndex = Math.floor(now.getMonth() / 3);
+  const out: { value: string; label: string; planYear: number; quarter: Quarter }[] = [];
+  for (let i = 0; i < 5; i++) {
+    const abs = qIndex + i;
+    const planYear = year + Math.floor(abs / 4);
+    const quarter = QUARTERS[abs % 4]!;
+    out.push({
+      value: `${planYear}-${quarter}`,
+      label: `${planYear}. ${QUARTER_LABELS[quarter]}`,
+      planYear,
+      quarter,
+    });
+  }
+  return out;
+}
+
+const BLOCKS = schedulingBlocks();
+
 function standardLabel(key: string) {
   return HARDWARE_STANDARDS.find((s) => s.key === key)?.label ?? key;
 }
 
-function ItemRow({ item, canAct }: { item: ProcurementPlanItem; canAct: boolean }) {
+function ItemRow({
+  item,
+  canAct,
+  canSchedule = false,
+  selected,
+  onToggleSelect,
+}: {
+  item: ProcurementPlanItem;
+  canAct: boolean;
+  canSchedule?: boolean | undefined;
+  selected?: boolean | undefined;
+  onToggleSelect?: ((on: boolean) => void) | undefined;
+}) {
   const store = useStore();
   const cost = itemCost(item);
+  const blockValue = `${item.planYear}-${item.quarter}`;
   return (
     <tr className="border-t border-border align-top">
+      {canSchedule && (
+        <td className="px-3 py-3">
+          <Checkbox
+            checked={!!selected}
+            onCheckedChange={(v) => onToggleSelect?.(v === true)}
+            aria-label="Tétel kijelölése átütemezéshez"
+          />
+        </td>
+      )}
       <td className="px-3 py-3">
         <span className="block text-sm font-medium">{standardLabel(item.standardKey)}</span>
         <span className="block text-xs text-muted-foreground">
@@ -68,9 +120,38 @@ function ItemRow({ item, canAct }: { item: ProcurementPlanItem; canAct: boolean 
             Forrásigény: {item.sourceRequestId}
           </Link>
         )}
+        {item.rescheduledAt && (
+          <span className="mt-1 block text-xs text-muted-foreground">
+            Gazdasági vezető által átütemezve: {item.rescheduledAt}
+          </span>
+        )}
       </td>
       <td className="px-3 py-3 text-sm whitespace-nowrap">{huf(cost.withContingency)}</td>
       <td className="px-3 py-3 text-xs">{PROCUREMENT_STATUS_LABELS[item.status]}</td>
+      {canSchedule && (
+        <td className="px-3 py-3">
+          <Select
+            value={BLOCKS.some((b) => b.value === blockValue) ? blockValue : ""}
+            onValueChange={(v) => {
+              const block = BLOCKS.find((b) => b.value === v);
+              if (!block) return;
+              store.reschedulePlanItem(item.id, block.planYear, block.quarter);
+              toast.success(`Átütemezve: ${block.label}`);
+            }}
+          >
+            <SelectTrigger className="w-[170px]">
+              <SelectValue placeholder={`${item.planYear}. ${QUARTER_LABELS[item.quarter]}`} />
+            </SelectTrigger>
+            <SelectContent>
+              {BLOCKS.map((b) => (
+                <SelectItem key={b.value} value={b.value}>
+                  {b.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </td>
+      )}
       <td className="px-3 py-3">
         {canAct && (
           <div className="flex flex-wrap gap-2">
@@ -104,7 +185,19 @@ function ItemRow({ item, canAct }: { item: ProcurementPlanItem; canAct: boolean 
   );
 }
 
-function ItemsTable({ items, canAct }: { items: ProcurementPlanItem[]; canAct: boolean }) {
+function ItemsTable({
+  items,
+  canAct,
+  canSchedule = false,
+  selectedIds,
+  onToggleSelect,
+}: {
+  items: ProcurementPlanItem[];
+  canAct: boolean;
+  canSchedule?: boolean | undefined;
+  selectedIds?: string[] | undefined;
+  onToggleSelect?: ((id: string, on: boolean) => void) | undefined;
+}) {
   if (items.length === 0)
     return <p className="px-3 py-6 text-sm text-muted-foreground">Nincs megjeleníthető tétel.</p>;
   return (
@@ -112,15 +205,24 @@ function ItemsTable({ items, canAct }: { items: ProcurementPlanItem[]; canAct: b
       <table className="w-full min-w-[720px] text-left">
         <thead>
           <tr className="text-xs tracking-wide text-muted-foreground uppercase">
+            {canSchedule && <th className="px-3 py-2" />}
             <th className="px-3 py-2">Tétel</th>
             <th className="px-3 py-2">Becsült bruttó</th>
             <th className="px-3 py-2">Állapot</th>
+            {canSchedule && <th className="px-3 py-2">Tervblokk</th>}
             <th className="px-3 py-2">Művelet</th>
           </tr>
         </thead>
         <tbody>
           {items.map((i) => (
-            <ItemRow key={i.id} item={i} canAct={canAct} />
+            <ItemRow
+              key={i.id}
+              item={i}
+              canAct={canAct}
+              canSchedule={canSchedule}
+              selected={selectedIds?.includes(i.id)}
+              onToggleSelect={(on) => onToggleSelect?.(i.id, on)}
+            />
           ))}
         </tbody>
       </table>
@@ -221,15 +323,26 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
 
 function BuyerWorkspace() {
   const store = useStore();
-  const allowed = ["beszerzo", "dekan", "admin", "szolgaltatasgazda", "superuser"].includes(
-    store.activeRole,
-  );
+  const allowed = [
+    "beszerzo",
+    "gazdasagi_vezeto",
+    "dekan",
+    "admin",
+    "szolgaltatasgazda",
+    "superuser",
+  ].includes(store.activeRole);
+  const canSchedule = store.activeRole === "gazdasagi_vezeto";
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkBlock, setBulkBlock] = useState<string>("");
 
   const yearItems = useMemo(
     () => store.planItems.filter((p) => p.planYear === NEXT_FINANCIAL_YEAR),
     [store.planItems],
   );
-  const adHoc = yearItems.filter((p) => p.sourceRequestId);
+  const adHoc = useMemo(
+    () => store.planItems.filter((p) => p.sourceRequestId),
+    [store.planItems],
+  );
   const approvals = store.planApprovals ?? [];
   const annual = approvals.filter((a) => a.scope === "eves");
   const quarterly = approvals.filter((a) => a.scope === "negyedeves");
@@ -276,10 +389,53 @@ function BuyerWorkspace() {
 
         <TabsContent value="eseti" className="mt-4 space-y-3">
           <p className="text-sm text-muted-foreground">
-            Jóváhagyott szolgáltatási igényből keletkezett tételek – ezeket a beszerző intézi.
+            Jóváhagyott szolgáltatási igényből keletkezett tételek – ezeket a beszerző intézi. A
+            gazdasági vezető ezeket egy évre előre tetszőleges negyedéves tervblokkba sorolhatja át.
           </p>
+          {canSchedule && (
+            <div className="card-surface flex flex-wrap items-center gap-3 p-4">
+              <span className="text-sm font-medium">
+                Tömeges átütemezés ({selectedIds.length} kijelölt)
+              </span>
+              <Select value={bulkBlock} onValueChange={setBulkBlock}>
+                <SelectTrigger className="w-[190px]">
+                  <SelectValue placeholder="Célnegyedév" />
+                </SelectTrigger>
+                <SelectContent>
+                  {BLOCKS.map((b) => (
+                    <SelectItem key={b.value} value={b.value}>
+                      {b.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                size="sm"
+                disabled={selectedIds.length === 0 || !bulkBlock}
+                onClick={() => {
+                  const block = BLOCKS.find((b) => b.value === bulkBlock);
+                  if (!block) return;
+                  selectedIds.forEach((id) =>
+                    store.reschedulePlanItem(id, block.planYear, block.quarter),
+                  );
+                  toast.success(`${selectedIds.length} tétel átütemezve: ${block.label}`);
+                  setSelectedIds([]);
+                }}
+              >
+                Áthelyezés
+              </Button>
+            </div>
+          )}
           <div className="card-surface">
-            <ItemsTable items={adHoc} canAct={store.activeRole === "beszerzo"} />
+            <ItemsTable
+              items={adHoc}
+              canAct={store.activeRole === "beszerzo"}
+              canSchedule={canSchedule}
+              selectedIds={selectedIds}
+              onToggleSelect={(id, on) =>
+                setSelectedIds((prev) => (on ? [...prev, id] : prev.filter((x) => x !== id)))
+              }
+            />
           </div>
         </TabsContent>
 
