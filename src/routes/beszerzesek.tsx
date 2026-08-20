@@ -87,9 +87,9 @@ function ItemRow({
 }: {
   item: ProcurementPlanItem;
   canAct: boolean;
-  canSchedule?: boolean;
-  selected?: boolean;
-  onToggleSelect?: (on: boolean) => void;
+  canSchedule?: boolean | undefined;
+  selected?: boolean | undefined;
+  onToggleSelect?: ((on: boolean) => void) | undefined;
 }) {
   const store = useStore();
   const cost = itemCost(item);
@@ -131,7 +131,7 @@ function ItemRow({
       {canSchedule && (
         <td className="px-3 py-3">
           <Select
-            value={BLOCKS.some((b) => b.value === blockValue) ? blockValue : undefined}
+            value={BLOCKS.some((b) => b.value === blockValue) ? blockValue : ""}
             onValueChange={(v) => {
               const block = BLOCKS.find((b) => b.value === v);
               if (!block) return;
@@ -194,9 +194,9 @@ function ItemsTable({
 }: {
   items: ProcurementPlanItem[];
   canAct: boolean;
-  canSchedule?: boolean;
-  selectedIds?: string[];
-  onToggleSelect?: (id: string, on: boolean) => void;
+  canSchedule?: boolean | undefined;
+  selectedIds?: string[] | undefined;
+  onToggleSelect?: ((id: string, on: boolean) => void) | undefined;
 }) {
   if (items.length === 0)
     return <p className="px-3 py-6 text-sm text-muted-foreground">Nincs megjeleníthető tétel.</p>;
