@@ -41,6 +41,7 @@ import { ROLE_LABELS, type RoleKey } from "@/lib/types";
 import { LoginScreen } from "@/components/login-screen";
 import { GlobalSearch } from "@/components/global-search";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { DEMO_USER_IDS } from "@/lib/demo-users";
 
 interface NavItem {
   to: string;
