@@ -139,6 +139,12 @@ interface StoreValue extends PersistedState {
   markLicenceUnused: (licenceId: string, unused: boolean) => void;
   addPlanItem: (item: Omit<ProcurementPlanItem, "id">) => string;
   updatePlanItem: (id: string, patch: Partial<ProcurementPlanItem>) => void;
+  reschedulePlanItem: (
+    id: string,
+    planYear: number,
+    quarter: ProcurementPlanItem["quarter"],
+    comment?: string,
+  ) => void;
   removePlanItem: (id: string) => void;
   decidePlanApproval: (
     id: string,
@@ -726,6 +732,37 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...s.assetAudit,
         ],
       })),
+    reschedulePlanItem: (id, planYear, quarter, comment) =>
+      setState((s) => {
+        const prev = s.planItems.find((p) => p.id === id);
+        return {
+          ...s,
+          planItems: s.planItems.map((p) =>
+            p.id === id
+              ? {
+                  ...p,
+                  planYear,
+                  quarter,
+                  rescheduledBy: currentUser.id,
+                  rescheduledAt: today(),
+                  comment: comment?.trim() ? comment.trim() : p.comment,
+                }
+              : p,
+          ),
+          assetAudit: [
+            {
+              id: `aud-${Date.now()}`,
+              at: today(),
+              actorId: currentUser.id,
+              entity: "beszerzes",
+              entityId: id,
+              action: "Beszerzési tétel átütemezése (gazdasági vezető)",
+              detail: `${prev ? `${prev.planYear} ${prev.quarter}` : "?"} → ${planYear} ${quarter}${comment?.trim() ? ` · ${comment.trim()}` : ""}`,
+            },
+            ...s.assetAudit,
+          ],
+        };
+      }),
     removePlanItem: (id) =>
       setState((s) => ({
         ...s,
