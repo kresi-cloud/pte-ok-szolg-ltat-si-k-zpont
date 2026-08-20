@@ -7,6 +7,7 @@ export type RoleKey =
   | "dekan"
   | "admin"
   | "beszerzo"
+  | "gazdasagi_vezeto"
   | "superuser";
 
 export const ROLE_LABELS: Record<RoleKey, string> = {
