@@ -116,7 +116,7 @@ export const ORG_UNITS: OrgUnit[] = [
 export const USERS: User[] = [
   {
     id: "u-kovacs",
-    name: "Dr. Kovács Anna",
+    name: "Dr. Csergő A.",
     title: "egyetemi adjunktus",
     email: "kovacs.anna@aok.pte.hu",
     employeeId: "PTE-104582",
@@ -127,7 +127,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-szabo",
-    name: "Prof. Dr. Szabó Gábor",
+    name: "Prof. Dr. Vajkai G.",
     title: "intézetigazgató",
     email: "szabo.gabor@aok.pte.hu",
     employeeId: "PTE-100211",
@@ -137,7 +137,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-horvath",
-    name: "Horváth Péter",
+    name: "Zilahi P.",
     title: "szolgáltatási ügyintéző",
     email: "horvath.peter@aok.pte.hu",
     employeeId: "PTE-118904",
@@ -148,7 +148,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-balogh",
-    name: "Balogh Eszter",
+    name: "Bihari E.",
     title: "webfejlesztési munkatárs",
     email: "balogh.eszter@aok.pte.hu",
     employeeId: "PTE-120334",
@@ -159,7 +159,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-nemeth",
-    name: "Németh Tamás",
+    name: "Dobrossy T.",
     title: "digitalizációs szakértő",
     email: "nemeth.tamas@aok.pte.hu",
     employeeId: "PTE-121887",
@@ -170,7 +170,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-nagy",
-    name: "Dr. Nagy Katalin",
+    name: "Dr. Ecsedi K.",
     title: "hivatalvezető",
     email: "nagy.katalin@aok.pte.hu",
     employeeId: "PTE-100034",
@@ -180,7 +180,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-feher",
-    name: "Prof. Dr. Fehér László",
+    name: "Prof. Dr. Rónaszéki L.",
     title: "dékánhelyettes",
     email: "feher.laszlo@aok.pte.hu",
     employeeId: "PTE-100002",
@@ -190,7 +190,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-molnar",
-    name: "Molnár Júlia",
+    name: "Tarczali J.",
     title: "rendszeradminisztrátor",
     email: "molnar.julia@aok.pte.hu",
     employeeId: "PTE-115502",
@@ -201,7 +201,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-fekete",
-    name: "Dr. Fekete Zsolt",
+    name: "Dr. Perneczky Zs.",
     title: "intézetigazgató",
     email: "fekete.zsolt@aok.pte.hu",
     employeeId: "PTE-100455",
@@ -211,7 +211,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-varga",
-    name: "Dr. Varga Ildikó",
+    name: "Dr. Hollósy I.",
     title: "intézetigazgató",
     email: "varga.ildiko@aok.pte.hu",
     employeeId: "PTE-100678",
@@ -221,7 +221,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-toth",
-    name: "Dr. Tóth Márton",
+    name: "Dr. Kaposvári M.",
     title: "intézetigazgató",
     email: "toth.marton@aok.pte.hu",
     employeeId: "PTE-100781",
@@ -231,7 +231,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-simon",
-    name: "Simon Nóra",
+    name: "Szemerey N.",
     title: "oktatásszervező",
     email: "simon.nora@aok.pte.hu",
     employeeId: "PTE-119003",
@@ -242,7 +242,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-lukacs",
-    name: "Lukács Bence",
+    name: "Bethlendi B.",
     title: "kutatási referens",
     email: "lukacs.bence@aok.pte.hu",
     employeeId: "PTE-119874",
@@ -253,7 +253,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-farkas",
-    name: "Farkas Dóra",
+    name: "Görömbei D.",
     title: "beszerzési referens",
     email: "farkas.dora@aok.pte.hu",
     employeeId: "PTE-117220",
@@ -264,7 +264,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-kiss",
-    name: "Kiss Ádám",
+    name: "Vasadi Á.",
     title: "eszközmenedzsment munkatárs",
     email: "kiss.adam@aok.pte.hu",
     employeeId: "PTE-116001",
@@ -275,7 +275,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-dekan",
-    name: "Prof. Dr. Bogár Ádám",
+    name: "Prof. Dr. Malatinszky Á.",
     title: "dékán",
     email: "dekan@aok.pte.hu",
     employeeId: "PTE-100001",
@@ -285,7 +285,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-superuser",
-    name: "Takács Réka",
+    name: "Bogyay R.",
     title: "jogosultságkezelő superuser",
     email: "takacs.reka@aok.pte.hu",
     employeeId: "PTE-100000",
@@ -296,7 +296,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-beszerzo",
-    name: "Fekete Gábor",
+    name: "Csanaki G.",
     title: "beszerzési referens",
     email: "fekete.gabor@aok.pte.hu",
     employeeId: "PTE-100002",
@@ -306,7 +306,7 @@ export const USERS: User[] = [
   },
   {
     id: "u-gazdvez",
-    name: "Balogh Ildikó",
+    name: "Rákosfalvi I.",
     title: "gazdasági vezető",
     email: "balogh.ildiko@aok.pte.hu",
     employeeId: "PTE-100003",
