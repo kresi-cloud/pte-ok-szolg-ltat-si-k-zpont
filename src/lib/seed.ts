@@ -308,7 +308,7 @@ export const USERS: User[] = [
     id: "u-gazdvez",
     name: "Rákosfalvi I.",
     title: "gazdasági vezető",
-    email: "balogh.ildiko@aok.pte.hu",
+    email: "rakosfalvi.i@aok.pte.hu",
     employeeId: "PTE-100003",
     orgUnitId: "ou-dekani",
     roles: ["gazdasagi_vezeto"],
