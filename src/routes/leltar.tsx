@@ -20,6 +20,7 @@ import { HARDWARE_MODELS, SOFTWARE_SUGGESTIONS, isMobileModel, specForModel } fr
 import { ASSET_LOCATIONS } from "@/lib/asset-data";
 import { INVENTORY_STATUS_LABELS, type InventoryItem } from "@/lib/types";
 import { MyAssets, MyLicences, SharedAssets } from "@/components/personal-assets";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/leltar")({
   head: () => ({
@@ -124,13 +125,10 @@ function Inventory() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Személyi leltár</h1>
-        <p className="mt-1.5 max-w-3xl text-muted-foreground">
-          Itt rögzítheti a személyi használatában lévő hardvereszközöket és szoftvereket. A hardver
-          modelljéhez a rendszer automatikusan hozzárendeli az operációs rendszert és annak
-          verzióját, a processzor-, memória- és tárolóadatokat, valamint a speciális feature-öket.
-          Minden új tétel a rendszeradminisztrátor jóváhagyásával kerül a hivatalos leltárba.
-        </p>
+        <PageHeading
+          title="Személyi leltár"
+          description="Itt rögzítheti a személyi használatában lévő hardvereszközöket és szoftvereket. A hardver modelljéhez a rendszer automatikusan hozzárendeli az operációs rendszert és annak verzióját, a processzor-, memória- és tárolóadatokat, valamint a speciális feature-öket. Minden új tétel a rendszeradminisztrátor jóváhagyásával kerül a hivatalos leltárba."
+        />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">

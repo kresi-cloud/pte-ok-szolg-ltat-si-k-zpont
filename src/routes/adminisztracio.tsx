@@ -31,6 +31,7 @@ import {
 } from "@/lib/types";
 import { HARDWARE_MODELS } from "@/lib/inventory-data";
 import { SpecGrid } from "@/routes/leltar";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/adminisztracio")({
   head: () => ({
@@ -55,10 +56,10 @@ function Admin() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Adminisztráció</h1>
-        <p className="mt-1.5 text-muted-foreground">
-          Törzsadatok és a portál működését szabályozó beállítások.
-        </p>
+        <PageHeading
+          title="Adminisztráció"
+          description="Törzsadatok és a portál működését szabályozó beállítások."
+        />
       </div>
 
       <Tabs defaultValue="felhasznalok">

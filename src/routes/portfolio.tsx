@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PROJECTS, lookup } from "@/lib/store";
 import { PROJECT_STAGES } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/portfolio")({
   head: () => ({
@@ -22,10 +23,10 @@ function Portfolio() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Fejlesztési portfólió</h1>
-        <p className="mt-1.5 text-muted-foreground">
-          Ötlettől a bevezetésig – a kar digitalizációs kezdeményezéseinek egységes nyilvántartása.
-        </p>
+        <PageHeading
+          title="Fejlesztési portfólió"
+          description="Ötlettől a bevezetésig – a kar digitalizációs kezdeményezéseinek egységes nyilvántartása."
+        />
       </div>
 
       <div className="grid gap-4 overflow-x-auto lg:grid-flow-col lg:auto-cols-[minmax(260px,1fr)]">

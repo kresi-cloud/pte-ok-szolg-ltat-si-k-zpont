@@ -16,6 +16,7 @@ import { StatusBadge, PriorityBadge } from "@/components/status-badge";
 import { lookup, useStore } from "@/lib/store";
 import type { ServiceRequest } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/jovahagyasok")({
   head: () => ({
@@ -109,11 +110,10 @@ function ApprovalQueue() {
       ) : (
       <>
       <div>
-        <h1 className="font-display text-2xl font-semibold">Jóváhagyási sor</h1>
-        <p className="mt-1.5 text-muted-foreground">
-          Minden döntésre váró igény egy helyen – a saját teendőitől a kari szintű függő
-          döntésekig, teljes indoklással és lefúrási lehetőséggel.
-        </p>
+        <PageHeading
+          title="Jóváhagyási sor"
+          description="Minden döntésre váró igény egy helyen – a saját teendőitől a kari szintű függő döntésekig, teljes indoklással és lefúrási lehetőséggel."
+        />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">

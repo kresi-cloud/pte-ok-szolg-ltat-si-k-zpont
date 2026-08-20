@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PageHeading } from "@/components/page-heading";
 import { lookup, ORG_UNITS, useStore } from "@/lib/store";
 import { FUNDING_SOURCES, HARDWARE_STANDARDS, NEXT_FINANCIAL_YEAR, REFERENCE_PRICES } from "@/lib/asset-data";
 import {
@@ -81,15 +82,10 @@ function ProcurementPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">
-          Beszerzési terv – {NEXT_FINANCIAL_YEAR}. gazdasági év
-        </h1>
-        <p className="mt-1.5 max-w-4xl text-muted-foreground">
-          A tervezés az életciklus-adatokból automatikusan javasolt cserejelöltekből indul, de minden
-          tétel felülvizsgálható, átütemezhető és indoklással módosítható. A költségbecslés
-          referenciaárakkal, árváltozási feltételezéssel, mennyiségi kedvezménnyel és tartalékkerettel
-          számol – a becslés soha nem tekinthető kötelezettségvállalásnak.
-        </p>
+        <PageHeading
+          title={`Beszerzési terv – ${NEXT_FINANCIAL_YEAR}. gazdasági év`}
+          description="A tervezés az életciklus-adatokból automatikusan javasolt cserejelöltekből indul, de minden tétel felülvizsgálható, átütemezhető és indoklással módosítható. A költségbecslés referenciaárakkal, árváltozási feltételezéssel, mennyiségi kedvezménnyel és tartalékkerettel számol – a becslés soha nem tekinthető kötelezettségvállalásnak."
+        />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

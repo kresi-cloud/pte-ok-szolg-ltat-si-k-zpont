@@ -14,6 +14,7 @@ import {
   lifecycleEnd,
 } from "@/lib/asset-logic";
 import { LicenceBadge, StatTile } from "@/components/asset-bits";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/eletciklus-elorejelzes")({
   head: () => ({
@@ -64,12 +65,10 @@ function ForecastPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Életciklus-előrejelzés</h1>
-        <p className="mt-1.5 max-w-4xl text-muted-foreground">
-          Több évre előre mutatja, hány eszköz életciklusa jár le, mekkora forrásigény várható, és
-          hol keletkeznek csereszempontú csúcsévek. Az előrejelzés évi 3% árváltozási feltételezéssel
-          számol; a becslés tervezési célú, nem kötelezettségvállalás.
-        </p>
+        <PageHeading
+          title="Életciklus-előrejelzés"
+          description="Több évre előre mutatja, hány eszköz életciklusa jár le, mekkora forrásigény várható, és hol keletkeznek csereszempontú csúcsévek. Az előrejelzés évi 3% árváltozási feltételezéssel számol; a becslés tervezési célú, nem kötelezettségvállalás."
+        />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

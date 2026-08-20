@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CATALOG, DOMAINS, lookup } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/szolgaltatasok")({
   head: () => ({
@@ -38,10 +39,10 @@ function Catalog() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Szolgáltatáskatalógus</h1>
-        <p className="mt-1.5 text-muted-foreground">
-          Ha megtalálja a megfelelő szolgáltatást, az igénylés adatai automatikusan kitöltődnek.
-        </p>
+        <PageHeading
+          title="Szolgáltatáskatalógus"
+          description="Ha megtalálja a megfelelő szolgáltatást, az igénylés adatai automatikusan kitöltődnek."
+        />
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

@@ -6,6 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { STATUS_LABELS, STATUS_ORDER } from "@/lib/types";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/segitseg")({
   head: () => ({
@@ -26,11 +27,10 @@ function Help() {
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Segítség</h1>
-        <p className="mt-1.5 text-muted-foreground">
-          A portál célja, hogy egyetlen helyen lehessen digitális és informatikai igényt indítani.
-          Nem kell tudnia, melyik egység illetékes – a rendszer belül irányítja az igényt.
-        </p>
+        <PageHeading
+          title="Segítség"
+          description="A portál célja, hogy egyetlen helyen lehessen digitális és informatikai igényt indítani. Nem kell tudnia, melyik egység illetékes – a rendszer belül irányítja az igényt."
+        />
       </div>
 
       <Accordion type="single" collapsible className="card-surface px-5">

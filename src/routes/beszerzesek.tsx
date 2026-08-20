@@ -18,6 +18,7 @@ import {
   type Quarter,
 } from "@/lib/asset-types";
 import { daysUntil } from "@/lib/plan-approvals";
+import { PageHeading } from "@/components/page-heading";
 import { StatTile } from "@/components/asset-bits";
 
 export const Route = createFileRoute("/beszerzesek")({
@@ -254,11 +255,10 @@ function BuyerWorkspace() {
   return (
     <div className="space-y-8">
       <header className="space-y-1">
-        <h1 className="font-display text-2xl font-semibold">Beszerzői munkatér</h1>
-        <p className="text-sm text-muted-foreground">
-          Jóváhagyott eseti beszerzések, valamint a {NEXT_FINANCIAL_YEAR}. évi negyedéves és éves
-          beszerzési terv jóváhagyási státusza.
-        </p>
+        <PageHeading
+          title="Beszerzői munkatér"
+          description={`Jóváhagyott eseti beszerzések, valamint a ${NEXT_FINANCIAL_YEAR}. évi negyedéves és éves beszerzési terv jóváhagyási státusza.`}
+        />
       </header>
 
       <div className="grid gap-4 sm:grid-cols-3">

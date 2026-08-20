@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PageHeading } from "@/components/page-heading";
 import { lookup, useStore, ORG_UNITS } from "@/lib/store";
 import {
   ASSET_CATEGORIES,
@@ -92,13 +93,10 @@ function CataloguePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Intézményi eszközkataszter</h1>
-        <p className="mt-1.5 max-w-4xl text-muted-foreground">
-          A kar teljes informatikai eszközállománya egy nyilvántartásban: személyi használatú és közös
-          eszközök, műszaki adatok, életciklus-státusz, hardverstandardok és tervezési referenciaárak.
-          Az életciklus-státusz a szervezeti életciklus-politikából és az eszköz állapotából számítódik,
-          nem beégetett szabályból.
-        </p>
+        <PageHeading
+          title="Intézményi eszközkataszter"
+          description="A kar teljes informatikai eszközállománya egy nyilvántartásban: személyi használatú és közös eszközök, műszaki adatok, életciklus-státusz, hardverstandardok és tervezési referenciaárak. Az életciklus-státusz a szervezeti életciklus-politikából és az eszköz állapotából számítódik, nem beégetett szabályból."
+        />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
