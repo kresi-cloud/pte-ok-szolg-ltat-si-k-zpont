@@ -106,11 +106,11 @@ function Permissions() {
     <div className="mx-auto max-w-[1400px] px-4 py-8 lg:px-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-semibold">Jogosultságkezelés</h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            A szerepköröket a kar superuser jogosultságkezelője osztja ki. Minden módosítás
-            indoklással, naplózva történik.
-          </p>
+          <PageHeading
+            title="Jogosultságkezelés"
+            titleClassName="font-display text-3xl font-semibold"
+            description="A szerepköröket a kar superuser jogosultságkezelője osztja ki. Minden módosítás indoklással, naplózva történik."
+          />
         </div>
         <Badge className="gap-1.5">
           <ShieldCheck className="size-3.5" aria-hidden="true" /> Superuser jogkör aktív
