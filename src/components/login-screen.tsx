@@ -3,18 +3,9 @@ import { Button } from "@/components/ui/button";
 import { useStore, USERS } from "@/lib/store";
 import { ROLE_LABELS } from "@/lib/types";
 import { lookup } from "@/lib/store";
+import { DEMO_USER_IDS } from "@/lib/demo-users";
 
-const DEMO_USERS = [
-  "u-kovacs",
-  "u-szabo",
-  "u-horvath",
-  "u-nemeth",
-  "u-molnar",
-  "u-dekan",
-  "u-beszerzo",
-  "u-gazdvez",
-  "u-superuser",
-];
+const DEMO_USERS = DEMO_USER_IDS;
 
 export function LoginScreen() {
   const { login } = useStore();
