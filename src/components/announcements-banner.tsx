@@ -17,7 +17,7 @@ export function AnnouncementsBanner() {
   return (
     <section aria-labelledby="hirek" className="space-y-3">
       <h2 id="hirek" className="font-display text-lg font-semibold">
-        Hírek és közlemények
+        Hírek
       </h2>
       <ul className="space-y-3">
         {activeAnnouncements.map((a) => {
