@@ -377,6 +377,8 @@ export interface ProcurementPlanItem {
   /** gazdasági vezetői átütemezés nyoma */
   rescheduledBy?: string | undefined;
   rescheduledAt?: string | undefined;
+  /** beszerzői bontás: azonnali vagy negyedéves tervtétel */
+  timing?: "azonnali" | "negyedeves" | undefined;
 }
 
 /** Terv-jóváhagyási ciklus: azonnali, negyedéves és éves beszerzési terv. */
