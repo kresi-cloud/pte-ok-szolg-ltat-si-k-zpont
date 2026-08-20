@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PROJECTS, lookup } from "@/lib/store";
 import { PROJECT_STAGES } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/fejlesztesek")({
   head: () => ({

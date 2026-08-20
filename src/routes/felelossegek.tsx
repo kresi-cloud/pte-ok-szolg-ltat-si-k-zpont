@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { RESPONSIBILITIES, lookup } from "@/lib/store";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/felelossegek")({
   head: () => ({

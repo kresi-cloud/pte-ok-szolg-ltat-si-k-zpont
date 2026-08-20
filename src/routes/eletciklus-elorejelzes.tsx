@@ -14,6 +14,7 @@ import {
   lifecycleEnd,
 } from "@/lib/asset-logic";
 import { LicenceBadge, StatTile } from "@/components/asset-bits";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/eletciklus-elorejelzes")({
   head: () => ({
