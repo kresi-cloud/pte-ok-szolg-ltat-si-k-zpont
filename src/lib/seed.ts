@@ -123,7 +123,7 @@ export const USERS: User[] = [
     orgUnitId: "ou-elettani",
     roles: ["igenylo"],
     managerId: "u-szabo",
-    initials: "KA",
+    initials: "CSA",
   },
   {
     id: "u-szabo",
@@ -133,7 +133,7 @@ export const USERS: User[] = [
     employeeId: "PTE-100211",
     orgUnitId: "ou-elettani",
     roles: ["igenylo", "jovahagyo"],
-    initials: "SZG",
+    initials: "VG",
   },
   {
     id: "u-horvath",
@@ -144,7 +144,7 @@ export const USERS: User[] = [
     orgUnitId: "ou-dekani",
     roles: ["ugyintezo"],
     teamId: "t-it",
-    initials: "HP",
+    initials: "ZP",
   },
   {
     id: "u-balogh",
@@ -166,7 +166,7 @@ export const USERS: User[] = [
     orgUnitId: "ou-dekani",
     roles: ["ugyintezo", "szolgaltatasgazda"],
     teamId: "t-dig",
-    initials: "NT",
+    initials: "DT",
   },
   {
     id: "u-nagy",
@@ -176,7 +176,7 @@ export const USERS: User[] = [
     employeeId: "PTE-100034",
     orgUnitId: "ou-dekani",
     roles: ["jovahagyo", "vezeto"],
-    initials: "NK",
+    initials: "EK",
   },
   {
     id: "u-feher",
@@ -186,7 +186,7 @@ export const USERS: User[] = [
     employeeId: "PTE-100002",
     orgUnitId: "ou-dekani",
     roles: ["vezeto"],
-    initials: "FL",
+    initials: "RL",
   },
   {
     id: "u-molnar",
@@ -197,7 +197,7 @@ export const USERS: User[] = [
     orgUnitId: "ou-dekani",
     roles: ["admin", "szolgaltatasgazda"],
     teamId: "t-it",
-    initials: "MJ",
+    initials: "TJ",
   },
   {
     id: "u-fekete",
@@ -207,7 +207,7 @@ export const USERS: User[] = [
     employeeId: "PTE-100455",
     orgUnitId: "ou-anatomiai",
     roles: ["igenylo", "jovahagyo"],
-    initials: "FZ",
+    initials: "PZS",
   },
   {
     id: "u-varga",
@@ -217,7 +217,7 @@ export const USERS: User[] = [
     employeeId: "PTE-100678",
     orgUnitId: "ou-biokemiai",
     roles: ["igenylo", "jovahagyo"],
-    initials: "VI",
+    initials: "HI",
   },
   {
     id: "u-toth",
@@ -227,7 +227,7 @@ export const USERS: User[] = [
     employeeId: "PTE-100781",
     orgUnitId: "ou-farmakologiai",
     roles: ["igenylo", "jovahagyo"],
-    initials: "TM",
+    initials: "KM",
   },
   {
     id: "u-simon",
@@ -238,7 +238,7 @@ export const USERS: User[] = [
     orgUnitId: "ou-oktatas",
     roles: ["igenylo"],
     managerId: "u-nagy",
-    initials: "SN",
+    initials: "SZN",
   },
   {
     id: "u-lukacs",
@@ -249,7 +249,7 @@ export const USERS: User[] = [
     orgUnitId: "ou-kutatas",
     roles: ["igenylo"],
     managerId: "u-nagy",
-    initials: "LB",
+    initials: "BB",
   },
   {
     id: "u-farkas",
@@ -260,7 +260,7 @@ export const USERS: User[] = [
     orgUnitId: "ou-dekani",
     roles: ["ugyintezo", "jovahagyo"],
     teamId: "t-beszerzes",
-    initials: "FD",
+    initials: "GD",
   },
   {
     id: "u-kiss",
@@ -271,7 +271,7 @@ export const USERS: User[] = [
     orgUnitId: "ou-dekani",
     roles: ["ugyintezo"],
     teamId: "t-hw",
-    initials: "KÁ",
+    initials: "VÁ",
   },
   {
     id: "u-dekan",
@@ -281,7 +281,7 @@ export const USERS: User[] = [
     employeeId: "PTE-100001",
     orgUnitId: "ou-dekani",
     roles: ["dekan", "vezeto"],
-    initials: "BÁ",
+    initials: "MÁ",
   },
   {
     id: "u-superuser",
@@ -292,7 +292,7 @@ export const USERS: User[] = [
     orgUnitId: "ou-dekani",
     roles: ["superuser"],
     teamId: "t-it",
-    initials: "TR",
+    initials: "BR",
   },
   {
     id: "u-beszerzo",
@@ -302,7 +302,7 @@ export const USERS: User[] = [
     employeeId: "PTE-100002",
     orgUnitId: "ou-dekani",
     roles: ["beszerzo"],
-    initials: "FG",
+    initials: "CSG",
   },
   {
     id: "u-gazdvez",
@@ -312,7 +312,7 @@ export const USERS: User[] = [
     employeeId: "PTE-100003",
     orgUnitId: "ou-dekani",
     roles: ["gazdasagi_vezeto"],
-    initials: "BI",
+    initials: "RI",
   },
 ];
 
