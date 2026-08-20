@@ -233,14 +233,31 @@ function ItemsTable({
 function ApprovalCard({ approval }: { approval: PlanApproval }) {
   const store = useStore();
   const [comment, setComment] = useState("");
-  const isDean = store.activeRole === "dekan";
+  const role = store.activeRole;
+  const isDean = role === "dekan";
+  const isBuyer = role === "beszerzo";
+  const isFinance = role === "gazdasagi_vezeto";
   const left = daysUntil(approval.dueAt);
-  const items = store.planItems.filter(
-    (p) =>
-      p.planYear === approval.planYear &&
-      (approval.scope === "eves" || p.quarter === approval.quarter),
+  const items = store.planItems.filter((p) =>
+    p.planYear !== approval.planYear
+      ? false
+      : approval.scope === "eves"
+        ? true
+        : approval.scope === "azonnali"
+          ? p.timing === "azonnali"
+          : p.quarter === approval.quarter && p.timing !== "azonnali",
   );
   const total = items.reduce((s, i) => s + itemCost(i).withContingency, 0);
+  const status = approval.status === "jovahagyasra_var" ? "dekani_jovahagyas" : approval.status;
+
+  const STEPS: { key: string; label: string }[] = [
+    { key: "tervezes", label: "Beszerzői tervezés" },
+    { key: "gazdasagi_ellenorzes", label: "Gazdasági ellenőrzés" },
+    { key: "dekani_jovahagyas", label: "Dékáni jóváhagyás" },
+    { key: "jovahagyva", label: "Beszerzés indítása" },
+  ];
+  const activeIndex =
+    status === "vegrehajtas" ? 3 : STEPS.findIndex((s) => s.key === status);
 
   return (
     <article className="card-surface space-y-3 p-5">
@@ -250,76 +267,172 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
             {PLAN_SCOPE_LABELS[approval.scope]} – {approval.planYear}
             {approval.quarter ? ` ${QUARTER_LABELS[approval.quarter]}` : ""}
           </h3>
-          <p className="text-xs text-muted-foreground">
-            Esedékesség: {approval.periodStart} · dékáni jóváhagyási határidő:{" "}
-            <strong>{approval.dueAt}</strong> ({PLAN_APPROVAL_LEAD_DAYS[approval.scope]} nappal az
-            esedékesség előtt)
-          </p>
+          {approval.scope === "azonnali" ? (
+            <p className="text-xs text-muted-foreground">
+              Azonnali (soron kívüli) beszerzési igények csomagja – gazdasági ellenőrzés és dékáni
+              jóváhagyás után indítható.
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Esedékesség: {approval.periodStart} · dékáni jóváhagyási határidő:{" "}
+              <strong>{approval.dueAt}</strong> ({PLAN_APPROVAL_LEAD_DAYS[approval.scope]} nappal az
+              esedékesség előtt)
+            </p>
+          )}
         </div>
         <span
           className={
-            approval.status === "jovahagyva"
+            status === "jovahagyva" || status === "vegrehajtas"
               ? "rounded-sm bg-accent/15 px-2 py-1 text-xs font-semibold text-accent-foreground"
-              : approval.status === "visszakuldve"
+              : status === "visszakuldve"
                 ? "rounded-sm bg-destructive/10 px-2 py-1 text-xs font-semibold text-destructive"
                 : "rounded-sm bg-secondary px-2 py-1 text-xs font-semibold"
           }
         >
-          {PLAN_APPROVAL_STATUS_LABELS[approval.status]}
+          {PLAN_APPROVAL_STATUS_LABELS[status]}
         </span>
       </header>
+
+      <ol className="flex flex-wrap gap-2 text-xs">
+        {STEPS.map((s, i) => (
+          <li
+            key={s.key}
+            className={
+              i <= activeIndex
+                ? "rounded-sm bg-primary/10 px-2 py-1 font-medium text-primary"
+                : "rounded-sm bg-muted px-2 py-1 text-muted-foreground"
+            }
+          >
+            {i + 1}. {s.label}
+          </li>
+        ))}
+      </ol>
 
       <p className="text-sm">
         {items.length} tétel · becsült keret: <strong>{huf(total)}</strong>
       </p>
-      {approval.status === "jovahagyasra_var" && (
-        <p className="text-xs text-muted-foreground">
-          {left >= 0
-            ? `${left} nap van hátra a jóváhagyási határidőig.`
-            : `A jóváhagyási határidő ${Math.abs(left)} napja lejárt.`}
-        </p>
-      )}
-      {approval.decidedAt && (
-        <p className="text-xs text-muted-foreground">
-          Döntés: {approval.decidedAt} · {lookup.user(approval.decidedBy)?.name ?? "dékán"}
-          {approval.comment ? ` – ${approval.comment}` : ""}
-        </p>
+      {(status === "dekani_jovahagyas" || status === "gazdasagi_ellenorzes") &&
+        approval.scope !== "azonnali" && (
+          <p className="text-xs text-muted-foreground">
+            {left >= 0
+              ? `${left} nap van hátra a jóváhagyási határidőig.`
+              : `A jóváhagyási határidő ${Math.abs(left)} napja lejárt.`}
+          </p>
+        )}
+      {(approval.history ?? []).length > 0 && (
+        <ul className="space-y-1 border-t border-border pt-2 text-xs text-muted-foreground">
+          {(approval.history ?? []).map((h, i) => (
+            <li key={i}>
+              {h.at} · {lookup.user(h.actorId)?.name ?? "—"} – {h.action}
+              {h.comment ? ` – ${h.comment}` : ""}
+            </li>
+          ))}
+        </ul>
       )}
 
-      {isDean && approval.status !== "jovahagyva" && (
+      {(isBuyer || isFinance || isDean) && status !== "vegrehajtas" && (
         <div className="space-y-2 border-t border-border pt-3">
-          <Textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Dékáni megjegyzés (opcionális)"
-            rows={2}
-          />
-          <div className="flex flex-wrap gap-2">
+          {isBuyer && (status === "tervezes" || status === "visszakuldve") && (
+            <>
+              <Textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Beszerzői megjegyzés a tervhez (opcionális)"
+                rows={2}
+              />
+              <Button
+                size="sm"
+                onClick={() => {
+                  store.submitPlanForFinance(approval.id, comment || undefined);
+                  toast.success("Terv beküldve gazdasági ellenőrzésre");
+                }}
+              >
+                Beküldés gazdasági ellenőrzésre
+              </Button>
+            </>
+          )}
+
+          {isFinance && status === "gazdasagi_ellenorzes" && (
+            <>
+              <Textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Gazdasági vezetői megjegyzés (opcionális)"
+                rows={2}
+              />
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    store.financeReviewPlan(approval.id, "tovabb", comment || undefined);
+                    toast.success("Terv továbbítva dékáni jóváhagyásra");
+                  }}
+                >
+                  Ellenőrizve – dékáni jóváhagyásra küldöm
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    store.financeReviewPlan(approval.id, "vissza", comment || undefined);
+                    toast("Terv visszaküldve a beszerzőnek");
+                  }}
+                >
+                  Visszaküldés a beszerzőnek
+                </Button>
+              </div>
+            </>
+          )}
+
+          {isDean && status === "dekani_jovahagyas" && (
+            <>
+              <Textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Dékáni megjegyzés (opcionális)"
+                rows={2}
+              />
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    store.decidePlanApproval(approval.id, "jovahagyva", comment || undefined);
+                    toast.success("Terv jóváhagyva – visszakerült a beszerzőhöz");
+                  }}
+                >
+                  Jóváhagyom
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    store.decidePlanApproval(approval.id, "visszakuldve", comment || undefined);
+                    toast("Terv visszaküldve átdolgozásra");
+                  }}
+                >
+                  Átdolgozásra visszaküldöm
+                </Button>
+              </div>
+            </>
+          )}
+
+          {isBuyer && status === "jovahagyva" && (
             <Button
               size="sm"
               onClick={() => {
-                store.decidePlanApproval(approval.id, "jovahagyva", comment || undefined);
-                toast.success("Terv jóváhagyva");
+                store.startPlanExecution(approval.id);
+                toast.success("Beszerzési folyamat elindítva");
               }}
             >
-              Jóváhagyom
+              Beszerzési folyamat indítása
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                store.decidePlanApproval(approval.id, "visszakuldve", comment || undefined);
-                toast("Terv visszaküldve átdolgozásra");
-              }}
-            >
-              Átdolgozásra visszaküldöm
-            </Button>
-          </div>
+          )}
         </div>
       )}
     </article>
   );
 }
+
 
 function BuyerWorkspace() {
   const store = useStore();
