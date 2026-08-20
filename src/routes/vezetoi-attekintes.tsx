@@ -143,13 +143,13 @@ function LeaderView() {
         <p className="text-xs font-semibold tracking-[0.18em] uppercase opacity-80">
           Vezetői irányítópult
         </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold lg:text-4xl">
-          Kari digitális működés egy képernyőn
-        </h1>
-        <p className="mt-2 max-w-3xl text-sm opacity-90">
-          Minden szolgáltatási igény, fejlesztési projekt és beszerzési tétel összesítve. Bármely
-          mutató tetszőleges bontásban megnyitható, egészen az egyes ügyek szintjéig.
-        </p>
+        <PageHeading
+          className="mt-2 text-primary-foreground"
+          titleClassName="font-display text-3xl font-semibold lg:text-4xl"
+          infoClassName="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+          title="Kari digitális működés egy képernyőn"
+          description="Minden szolgáltatási igény, fejlesztési projekt és beszerzési tétel összesítve. Bármely mutató tetszőleges bontásban megnyitható, egészen az egyes ügyek szintjéig."
+        />
       </header>
 
       <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">

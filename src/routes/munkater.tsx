@@ -94,13 +94,17 @@ function Workbench() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Szolgáltatási munkatér</h1>
-        <p className="mt-1.5 text-muted-foreground">
-          {lookup.team(store.currentUser.teamId) !== "—"
-            ? `${lookup.team(store.currentUser.teamId)} · `
-            : ""}
-          munkasor, besorolás és kapacitás.
-        </p>
+        <PageHeading
+          title="Szolgáltatási munkatér"
+          description={
+            <>
+              {lookup.team(store.currentUser.teamId) !== "—"
+                ? `${lookup.team(store.currentUser.teamId)} · `
+                : ""}
+              munkasor, besorolás és kapacitás.
+            </>
+          }
+        />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
