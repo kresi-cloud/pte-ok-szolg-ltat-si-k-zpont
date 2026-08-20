@@ -20,6 +20,7 @@ import { HARDWARE_MODELS, SOFTWARE_SUGGESTIONS, isMobileModel, specForModel } fr
 import { ASSET_LOCATIONS } from "@/lib/asset-data";
 import { INVENTORY_STATUS_LABELS, type InventoryItem } from "@/lib/types";
 import { MyAssets, MyLicences, SharedAssets } from "@/components/personal-assets";
+import { PageHeading } from "@/components/page-heading";
 
 export const Route = createFileRoute("/leltar")({
   head: () => ({
