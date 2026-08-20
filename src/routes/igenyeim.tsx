@@ -46,10 +46,14 @@ function MyRequests() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Igényeim</h1>
-        <p className="mt-1.5 text-muted-foreground">
-          {lookup.unit(currentUser.orgUnitId)} · {mine.length} igény
-        </p>
+        <PageHeading
+          title="Igényeim"
+          description={
+            <>
+              {lookup.unit(currentUser.orgUnitId)} · {mine.length} igény
+            </>
+          }
+        />
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

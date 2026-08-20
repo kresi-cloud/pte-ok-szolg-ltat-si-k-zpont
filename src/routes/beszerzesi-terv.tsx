@@ -81,15 +81,10 @@ function ProcurementPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">
-          Beszerzési terv – {NEXT_FINANCIAL_YEAR}. gazdasági év
-        </h1>
-        <p className="mt-1.5 max-w-4xl text-muted-foreground">
-          A tervezés az életciklus-adatokból automatikusan javasolt cserejelöltekből indul, de minden
-          tétel felülvizsgálható, átütemezhető és indoklással módosítható. A költségbecslés
-          referenciaárakkal, árváltozási feltételezéssel, mennyiségi kedvezménnyel és tartalékkerettel
-          számol – a becslés soha nem tekinthető kötelezettségvállalásnak.
-        </p>
+        <PageHeading
+          title={`Beszerzési terv – ${NEXT_FINANCIAL_YEAR}. gazdasági év`}
+          description="A tervezés az életciklus-adatokból automatikusan javasolt cserejelöltekből indul, de minden tétel felülvizsgálható, átütemezhető és indoklással módosítható. A költségbecslés referenciaárakkal, árváltozási feltételezéssel, mennyiségi kedvezménnyel és tartalékkerettel számol – a becslés soha nem tekinthető kötelezettségvállalásnak."
+        />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

@@ -29,11 +29,10 @@ function Matrix() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Szolgáltatások és felelősségek</h1>
-        <p className="mt-1.5 max-w-3xl text-muted-foreground">
-          Ez a mátrix teszi átláthatóvá, hogy az egyes szolgáltatásoknál ki a felelős, ki hagy jóvá és
-          hová lehet eszkalálni. Az igénylőnek nem kell ismernie – a rendszer eszerint irányít.
-        </p>
+        <PageHeading
+          title="Szolgáltatások és felelősségek"
+          description="Ez a mátrix teszi átláthatóvá, hogy az egyes szolgáltatásoknál ki a felelős, ki hagy jóvá és hová lehet eszkalálni. Az igénylőnek nem kell ismernie – a rendszer eszerint irányít."
+        />
       </div>
 
       <div className="card-surface overflow-x-auto">
