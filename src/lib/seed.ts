@@ -304,6 +304,16 @@ export const USERS: User[] = [
     roles: ["beszerzo"],
     initials: "FG",
   },
+  {
+    id: "u-gazdvez",
+    name: "Balogh Ildikó",
+    title: "gazdasági vezető",
+    email: "balogh.ildiko@aok.pte.hu",
+    employeeId: "PTE-100003",
+    orgUnitId: "ou-dekani",
+    roles: ["gazdasagi_vezeto"],
+    initials: "BI",
+  },
 ];
 
 export const TEAMS: ServiceTeam[] = [
