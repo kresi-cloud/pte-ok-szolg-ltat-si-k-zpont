@@ -120,6 +120,11 @@ function ItemRow({
             Forrásigény: {item.sourceRequestId}
           </Link>
         )}
+        {item.handedToPlannerAt && (
+          <span className="mt-1 block text-xs text-muted-foreground">
+            Eszközmenedzserhez átadva: {item.handedToPlannerAt}
+          </span>
+        )}
         {item.rescheduledAt && (
           <span className="mt-1 block text-xs text-muted-foreground">
             Gazdasági vezető által átütemezve: {item.rescheduledAt}
@@ -130,57 +135,89 @@ function ItemRow({
       <td className="px-3 py-3 text-xs">{PROCUREMENT_STATUS_LABELS[item.status]}</td>
       {canSchedule && (
         <td className="px-3 py-3">
-          <Select
-            value={BLOCKS.some((b) => b.value === blockValue) ? blockValue : ""}
-            onValueChange={(v) => {
-              const block = BLOCKS.find((b) => b.value === v);
-              if (!block) return;
-              store.reschedulePlanItem(item.id, block.planYear, block.quarter);
-              toast.success(`Átütemezve: ${block.label}`);
-            }}
-          >
-            <SelectTrigger className="w-[170px]">
-              <SelectValue placeholder={`${item.planYear}. ${QUARTER_LABELS[item.quarter]}`} />
-            </SelectTrigger>
-            <SelectContent>
-              {BLOCKS.map((b) => (
-                <SelectItem key={b.value} value={b.value}>
-                  {b.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="space-y-2">
+            <Select
+              value={item.timing === "azonnali" ? "azonnali" : "negyedeves"}
+              onValueChange={(v) => {
+                store.setPlanItemTiming(item.id, v as "azonnali" | "negyedeves");
+                toast.success(v === "azonnali" ? "Azonnali beszerzés" : "Negyedéves tervbe sorolva");
+              }}
+            >
+              <SelectTrigger className="w-[170px]">
+                <SelectValue placeholder="Bontás" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="azonnali">Azonnali</SelectItem>
+                <SelectItem value="negyedeves">Negyedéves terv</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={BLOCKS.some((b) => b.value === blockValue) ? blockValue : ""}
+              onValueChange={(v) => {
+                const block = BLOCKS.find((b) => b.value === v);
+                if (!block) return;
+                store.reschedulePlanItem(item.id, block.planYear, block.quarter);
+                toast.success(`Átütemezve: ${block.label}`);
+              }}
+            >
+              <SelectTrigger className="w-[170px]">
+                <SelectValue placeholder={`${item.planYear}. ${QUARTER_LABELS[item.quarter]}`} />
+              </SelectTrigger>
+              <SelectContent>
+                {BLOCKS.map((b) => (
+                  <SelectItem key={b.value} value={b.value}>
+                    {b.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </td>
       )}
       <td className="px-3 py-3">
-        {canAct && (
-          <div className="flex flex-wrap gap-2">
-            {item.status !== "beszerzes_alatt" && item.status !== "teljesult" && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  store.updatePlanItem(item.id, { status: "beszerzes_alatt" });
-                  toast.success("Beszerzés elindítva");
-                }}
-              >
-                Beszerzés indítása
-              </Button>
-            )}
-            {item.status !== "teljesult" && (
-              <Button
-                size="sm"
-                onClick={() => {
-                  store.updatePlanItem(item.id, { status: "teljesult" });
-                  toast.success("Teljesítés rögzítve");
-                }}
-              >
-                Teljesítve
-              </Button>
-            )}
-          </div>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {store.activeRole === "beszerzo" && !item.handedToPlannerAt && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                store.handPlanItemToPlanner(item.id);
+                toast.success("Átadva az IT eszközmenedzsernek tervezésre");
+              }}
+            >
+              Átadás eszközmenedzsernek
+            </Button>
+          )}
+          {canAct && (
+            <>
+              {item.status !== "beszerzes_alatt" && item.status !== "teljesult" && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    store.updatePlanItem(item.id, { status: "beszerzes_alatt" });
+                    toast.success("Beszerzés elindítva");
+                  }}
+                >
+                  Beszerzés indítása
+                </Button>
+              )}
+              {item.status !== "teljesult" && (
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    store.updatePlanItem(item.id, { status: "teljesult" });
+                    toast.success("Teljesítés rögzítve");
+                  }}
+                >
+                  Teljesítve
+                </Button>
+              )}
+            </>
+          )}
+        </div>
       </td>
+
     </tr>
   );
 }
@@ -236,6 +273,7 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
   const role = store.activeRole;
   const isDean = role === "dekan";
   const isBuyer = role === "beszerzo";
+  const isPlanner = role === "eszkozmenedzser";
   const isFinance = role === "gazdasagi_vezeto";
   const left = daysUntil(approval.dueAt);
   const items = store.planItems.filter((p) =>
@@ -251,7 +289,7 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
   const status = approval.status === "jovahagyasra_var" ? "dekani_jovahagyas" : approval.status;
 
   const STEPS: { key: string; label: string }[] = [
-    { key: "tervezes", label: "Beszerzői tervezés" },
+    { key: "tervezes", label: "Eszközmenedzseri tervezés" },
     { key: "gazdasagi_ellenorzes", label: "Gazdasági ellenőrzés" },
     { key: "dekani_jovahagyas", label: "Dékáni jóváhagyás" },
     { key: "jovahagyva", label: "Beszerzés indítása" },
@@ -330,14 +368,14 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
         </ul>
       )}
 
-      {(isBuyer || isFinance || isDean) && status !== "vegrehajtas" && (
+      {(isPlanner || isBuyer || isFinance || isDean) && status !== "vegrehajtas" && (
         <div className="space-y-2 border-t border-border pt-3">
-          {isBuyer && (status === "tervezes" || status === "visszakuldve") && (
+          {isPlanner && (status === "tervezes" || status === "visszakuldve") && (
             <>
               <Textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder="Beszerzői megjegyzés a tervhez (opcionális)"
+                placeholder="Eszközmenedzseri megjegyzés a tervhez (opcionális)"
                 rows={2}
               />
               <Button
@@ -375,10 +413,10 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
                   variant="outline"
                   onClick={() => {
                     store.financeReviewPlan(approval.id, "vissza", comment || undefined);
-                    toast("Terv visszaküldve a beszerzőnek");
+                    toast("Terv visszaküldve az eszközmenedzsernek");
                   }}
                 >
-                  Visszaküldés a beszerzőnek
+                  Visszaküldés az eszközmenedzsernek
                 </Button>
               </div>
             </>
@@ -438,13 +476,15 @@ function BuyerWorkspace() {
   const store = useStore();
   const allowed = [
     "beszerzo",
+    "eszkozmenedzser",
     "gazdasagi_vezeto",
     "dekan",
     "admin",
     "szolgaltatasgazda",
     "superuser",
   ].includes(store.activeRole);
-  const canSchedule = store.activeRole === "gazdasagi_vezeto";
+  const canSchedule =
+    store.activeRole === "gazdasagi_vezeto" || store.activeRole === "eszkozmenedzser";
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkBlock, setBulkBlock] = useState<string>("");
 
@@ -457,6 +497,7 @@ function BuyerWorkspace() {
     [store.planItems],
   );
   const approvals = store.planApprovals ?? [];
+  const immediate = approvals.filter((a) => a.scope === "azonnali");
   const annual = approvals.filter((a) => a.scope === "eves");
   const quarterly = approvals.filter((a) => a.scope === "negyedeves");
 
@@ -502,8 +543,10 @@ function BuyerWorkspace() {
 
         <TabsContent value="eseti" className="mt-4 space-y-3">
           <p className="text-sm text-muted-foreground">
-            Jóváhagyott szolgáltatási igényből keletkezett tételek – ezeket a beszerző intézi. A
-            gazdasági vezető ezeket egy évre előre tetszőleges negyedéves tervblokkba sorolhatja át.
+            Jóváhagyott szolgáltatási igényből keletkezett tételek. A beszerző átadja őket az IT
+            eszközmenedzsernek, aki azonnali vagy negyedéves bontásba sorolja és összeállítja a
+            tervet; ezt a gazdasági vezető ellenőrzi, a dékán hagyja jóvá, majd a beszerző indítja
+            a beszerzést.
           </p>
           {canSchedule && (
             <div className="card-surface flex flex-wrap items-center gap-3 p-4">
@@ -539,6 +582,11 @@ function BuyerWorkspace() {
               </Button>
             </div>
           )}
+          <div className="grid gap-4">
+            {immediate.map((a) => (
+              <ApprovalCard key={a.id} approval={a} />
+            ))}
+          </div>
           <div className="card-surface">
             <ItemsTable
               items={adHoc}

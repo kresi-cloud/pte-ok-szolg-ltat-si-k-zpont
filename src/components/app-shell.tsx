@@ -17,6 +17,7 @@ import {
   PackageCheck,
   ShoppingCart,
   TrendingUp,
+  Trash2,
   Plus,
   Rocket,
   Search,
@@ -51,14 +52,15 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { to: "/", label: "Kezdőlap", icon: Home, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
-  { to: "/uj-igeny", label: "Új igény", icon: Plus, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
-  { to: "/igenyeim", label: "Igényeim", icon: ClipboardList, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
-  { to: "/leltar", label: "Személyi leltár", icon: Laptop, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
-  { to: "/eszkozkataszter", label: "Eszközkataszter", icon: Boxes, roles: ["jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
-  { to: "/beszerzesek", label: "Beszerzői munkatér", icon: PackageCheck, roles: ["beszerzo", "gazdasagi_vezeto", "szolgaltatasgazda", "dekan", "admin", "superuser"] },
-  { to: "/beszerzesi-terv", label: "Beszerzési terv", icon: ShoppingCart, roles: ["ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
-  { to: "/eletciklus-elorejelzes", label: "Életciklus-előrejelzés", icon: TrendingUp, roles: ["szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
+  { to: "/", label: "Kezdőlap", icon: Home, roles: ["eszkozmenedzser", "igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
+  { to: "/uj-igeny", label: "Új igény", icon: Plus, roles: ["eszkozmenedzser", "igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
+  { to: "/igenyeim", label: "Igényeim", icon: ClipboardList, roles: ["eszkozmenedzser", "igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
+  { to: "/leltar", label: "Személyi leltár", icon: Laptop, roles: ["eszkozmenedzser", "igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
+  { to: "/eszkozkataszter", label: "Eszközkataszter", icon: Boxes, roles: ["eszkozmenedzser", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
+  { to: "/beszerzesek", label: "Beszerzői munkatér", icon: PackageCheck, roles: ["eszkozmenedzser", "beszerzo", "gazdasagi_vezeto", "szolgaltatasgazda", "dekan", "admin", "superuser"] },
+  { to: "/beszerzesi-terv", label: "Beszerzési terv", icon: ShoppingCart, roles: ["eszkozmenedzser", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
+  { to: "/selejtezes", label: "Selejtezési javaslat", icon: Trash2, roles: ["eszkozmenedzser", "gazdasagi_vezeto", "dekan", "admin", "superuser"] },
+  { to: "/eletciklus-elorejelzes", label: "Életciklus-előrejelzés", icon: TrendingUp, roles: ["eszkozmenedzser", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
   { to: "/szolgaltatasok", label: "Szolgáltatások", icon: LayoutList, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
   { to: "/fejlesztesek", label: "Fejlesztések", icon: Rocket, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "superuser"] },
   { to: "/jovahagyasok", label: "Jóváhagyási sor", icon: CheckCheck, roles: ["jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin"] },
@@ -68,7 +70,7 @@ const NAV: NavItem[] = [
   { to: "/felelossegek", label: "Szolgáltatások és felelősségek", icon: ShieldCheck, roles: ["szolgaltatasgazda", "admin"] },
   { to: "/adminisztracio", label: "Adminisztráció", icon: Settings2, roles: ["admin"] },
   { to: "/jogosultsagok", label: "Jogosultságkezelés", icon: KeyRound, roles: ["superuser"] },
-  { to: "/segitseg", label: "Segítség", icon: LifeBuoy, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
+  { to: "/segitseg", label: "Segítség", icon: LifeBuoy, roles: ["eszkozmenedzser", "igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin", "beszerzo", "gazdasagi_vezeto", "superuser"] },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {

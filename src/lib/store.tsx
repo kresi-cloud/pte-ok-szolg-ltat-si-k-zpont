@@ -46,6 +46,7 @@ import type {
   ReplacementDecision,
   ReplacementDecisionKey,
   SharedCheckAnswer,
+  ScrapProposal,
 } from "./asset-types";
 import {
   ASSETS,
@@ -78,6 +79,7 @@ interface PersistedState {
   replacementDecisions: ReplacementDecision[];
   planItems: ProcurementPlanItem[];
   planApprovals: PlanApproval[];
+  scrapProposals: ScrapProposal[];
   currentUserId: string;
   activeRole: RoleKey;
   loggedIn: boolean;
@@ -100,6 +102,7 @@ const initialState: PersistedState = {
   replacementDecisions: INITIAL_REPLACEMENT_DECISIONS,
   planItems: INITIAL_PROCUREMENT_ITEMS,
   planApprovals: buildPlanApprovals(),
+  scrapProposals: [],
   currentUserId: "u-kovacs",
   activeRole: "igenylo",
   loggedIn: false,
@@ -147,6 +150,11 @@ interface StoreValue extends PersistedState {
   ) => void;
   removePlanItem: (id: string) => void;
   setPlanItemTiming: (id: string, timing: "azonnali" | "negyedeves") => void;
+  handPlanItemToPlanner: (id: string) => void;
+  createScrapProposal: (input: { year: number; title: string; reason: string; assetIds: string[] }) => string;
+  updateScrapProposal: (id: string, patch: Partial<ScrapProposal>) => void;
+  submitScrapProposal: (id: string) => void;
+  decideScrapProposal: (id: string, decision: "jovahagyva" | "visszakuldve", comment?: string) => void;
   submitPlanForFinance: (id: string, comment?: string) => void;
   financeReviewPlan: (id: string, decision: "tovabb" | "vissza", comment?: string) => void;
   startPlanExecution: (id: string) => void;
@@ -781,6 +789,145 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             entityId: id,
             action: "Beszerzési terv tétel törlése",
             detail: "",
+          },
+          ...s.assetAudit,
+        ],
+      })),
+    handPlanItemToPlanner: (id) =>
+      setState((s) => ({
+        ...s,
+        planItems: s.planItems.map((p) =>
+          p.id === id
+            ? { ...p, handedToPlannerBy: currentUser.id, handedToPlannerAt: today() }
+            : p,
+        ),
+        notifications: [
+          {
+            id: `n-${Date.now()}`,
+            at: today(),
+            text: "Új eszközigény érkezett tervezésre az IT eszközmenedzserhez.",
+            read: false,
+          },
+          ...s.notifications,
+        ],
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "beszerzes",
+            entityId: id,
+            action: "Eszközigény átadása IT eszközmenedzsernek",
+            detail: "",
+          },
+          ...s.assetAudit,
+        ],
+      })),
+    createScrapProposal: (input) => {
+      const id = `sc-${Date.now()}`;
+      setState((s) => ({
+        ...s,
+        scrapProposals: [
+          {
+            id,
+            year: input.year,
+            title: input.title,
+            reason: input.reason,
+            assetIds: input.assetIds,
+            status: "tervezes",
+            createdBy: currentUser.id,
+            createdAt: today(),
+            history: [
+              { at: today(), actorId: currentUser.id, action: "Selejtezési javaslat létrehozva" },
+            ],
+          },
+          ...(s.scrapProposals ?? []),
+        ],
+      }));
+      return id;
+    },
+    updateScrapProposal: (id, patch) =>
+      setState((s) => ({
+        ...s,
+        scrapProposals: (s.scrapProposals ?? []).map((p) => (p.id === id ? { ...p, ...patch } : p)),
+      })),
+    submitScrapProposal: (id) =>
+      setState((s) => ({
+        ...s,
+        scrapProposals: (s.scrapProposals ?? []).map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                status: "gazdasagi_jovahagyasra_var",
+                submittedAt: today(),
+                history: [
+                  ...(p.history ?? []),
+                  {
+                    at: today(),
+                    actorId: currentUser.id,
+                    action: "Beküldve gazdasági vezetői jóváhagyásra",
+                  },
+                ],
+              }
+            : p,
+        ),
+        notifications: [
+          {
+            id: `n-${Date.now()}`,
+            at: today(),
+            text: "Éves selejtezési javaslat érkezett gazdasági vezetői jóváhagyásra.",
+            read: false,
+          },
+          ...s.notifications,
+        ],
+      })),
+    decideScrapProposal: (id, decision, comment) =>
+      setState((s) => ({
+        ...s,
+        scrapProposals: (s.scrapProposals ?? []).map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                status: decision,
+                decidedBy: currentUser.id,
+                decidedAt: today(),
+                comment,
+                history: [
+                  ...(p.history ?? []),
+                  {
+                    at: today(),
+                    actorId: currentUser.id,
+                    action:
+                      decision === "jovahagyva"
+                        ? "Gazdasági vezetői jóváhagyás"
+                        : "Gazdasági vezető átdolgozásra visszaküldte",
+                    comment,
+                  },
+                ],
+              }
+            : p,
+        ),
+        notifications: [
+          {
+            id: `n-${Date.now()}`,
+            at: today(),
+            text:
+              decision === "jovahagyva"
+                ? "A selejtezési javaslatot a gazdasági vezető jóváhagyta."
+                : "A selejtezési javaslat átdolgozásra visszakerült.",
+            read: false,
+          },
+          ...s.notifications,
+        ],
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "beszerzes",
+            entityId: id,
+            action: decision === "jovahagyva" ? "Selejtezési javaslat jóváhagyása" : "Selejtezési javaslat visszaküldése",
+            detail: comment ?? "",
           },
           ...s.assetAudit,
         ],

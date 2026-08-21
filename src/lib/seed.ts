@@ -305,6 +305,17 @@ export const USERS: User[] = [
     initials: "CSG",
   },
   {
+    id: "u-eszkozmgr",
+    name: "Vajkó T.",
+    title: "IT eszközmenedzser",
+    email: "vajko.t@aok.pte.hu",
+    employeeId: "PTE-100004",
+    orgUnitId: "ou-it",
+    roles: ["eszkozmenedzser"],
+    teamId: "t-it",
+    initials: "VT",
+  },
+  {
     id: "u-gazdvez",
     name: "Rákosfalvi I.",
     title: "gazdasági vezető",
