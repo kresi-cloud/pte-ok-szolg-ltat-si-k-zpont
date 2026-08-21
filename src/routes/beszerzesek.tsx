@@ -130,57 +130,89 @@ function ItemRow({
       <td className="px-3 py-3 text-xs">{PROCUREMENT_STATUS_LABELS[item.status]}</td>
       {canSchedule && (
         <td className="px-3 py-3">
-          <Select
-            value={BLOCKS.some((b) => b.value === blockValue) ? blockValue : ""}
-            onValueChange={(v) => {
-              const block = BLOCKS.find((b) => b.value === v);
-              if (!block) return;
-              store.reschedulePlanItem(item.id, block.planYear, block.quarter);
-              toast.success(`Átütemezve: ${block.label}`);
-            }}
-          >
-            <SelectTrigger className="w-[170px]">
-              <SelectValue placeholder={`${item.planYear}. ${QUARTER_LABELS[item.quarter]}`} />
-            </SelectTrigger>
-            <SelectContent>
-              {BLOCKS.map((b) => (
-                <SelectItem key={b.value} value={b.value}>
-                  {b.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="space-y-2">
+            <Select
+              value={item.timing === "azonnali" ? "azonnali" : "negyedeves"}
+              onValueChange={(v) => {
+                store.setPlanItemTiming(item.id, v as "azonnali" | "negyedeves");
+                toast.success(v === "azonnali" ? "Azonnali beszerzés" : "Negyedéves tervbe sorolva");
+              }}
+            >
+              <SelectTrigger className="w-[170px]">
+                <SelectValue placeholder="Bontás" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="azonnali">Azonnali</SelectItem>
+                <SelectItem value="negyedeves">Negyedéves terv</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={BLOCKS.some((b) => b.value === blockValue) ? blockValue : ""}
+              onValueChange={(v) => {
+                const block = BLOCKS.find((b) => b.value === v);
+                if (!block) return;
+                store.reschedulePlanItem(item.id, block.planYear, block.quarter);
+                toast.success(`Átütemezve: ${block.label}`);
+              }}
+            >
+              <SelectTrigger className="w-[170px]">
+                <SelectValue placeholder={`${item.planYear}. ${QUARTER_LABELS[item.quarter]}`} />
+              </SelectTrigger>
+              <SelectContent>
+                {BLOCKS.map((b) => (
+                  <SelectItem key={b.value} value={b.value}>
+                    {b.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </td>
       )}
       <td className="px-3 py-3">
-        {canAct && (
-          <div className="flex flex-wrap gap-2">
-            {item.status !== "beszerzes_alatt" && item.status !== "teljesult" && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  store.updatePlanItem(item.id, { status: "beszerzes_alatt" });
-                  toast.success("Beszerzés elindítva");
-                }}
-              >
-                Beszerzés indítása
-              </Button>
-            )}
-            {item.status !== "teljesult" && (
-              <Button
-                size="sm"
-                onClick={() => {
-                  store.updatePlanItem(item.id, { status: "teljesult" });
-                  toast.success("Teljesítés rögzítve");
-                }}
-              >
-                Teljesítve
-              </Button>
-            )}
-          </div>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {store.activeRole === "beszerzo" && !item.handedToPlannerAt && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                store.handPlanItemToPlanner(item.id);
+                toast.success("Átadva az IT eszközmenedzsernek tervezésre");
+              }}
+            >
+              Átadás eszközmenedzsernek
+            </Button>
+          )}
+          {canAct && (
+            <>
+              {item.status !== "beszerzes_alatt" && item.status !== "teljesult" && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    store.updatePlanItem(item.id, { status: "beszerzes_alatt" });
+                    toast.success("Beszerzés elindítva");
+                  }}
+                >
+                  Beszerzés indítása
+                </Button>
+              )}
+              {item.status !== "teljesult" && (
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    store.updatePlanItem(item.id, { status: "teljesult" });
+                    toast.success("Teljesítés rögzítve");
+                  }}
+                >
+                  Teljesítve
+                </Button>
+              )}
+            </>
+          )}
+        </div>
       </td>
+
     </tr>
   );
 }
