@@ -120,6 +120,11 @@ function ItemRow({
             Forrásigény: {item.sourceRequestId}
           </Link>
         )}
+        {item.handedToPlannerAt && (
+          <span className="mt-1 block text-xs text-muted-foreground">
+            Eszközmenedzserhez átadva: {item.handedToPlannerAt}
+          </span>
+        )}
         {item.rescheduledAt && (
           <span className="mt-1 block text-xs text-muted-foreground">
             Gazdasági vezető által átütemezve: {item.rescheduledAt}
@@ -492,6 +497,7 @@ function BuyerWorkspace() {
     [store.planItems],
   );
   const approvals = store.planApprovals ?? [];
+  const immediate = approvals.filter((a) => a.scope === "azonnali");
   const annual = approvals.filter((a) => a.scope === "eves");
   const quarterly = approvals.filter((a) => a.scope === "negyedeves");
 
@@ -537,8 +543,10 @@ function BuyerWorkspace() {
 
         <TabsContent value="eseti" className="mt-4 space-y-3">
           <p className="text-sm text-muted-foreground">
-            Jóváhagyott szolgáltatási igényből keletkezett tételek – ezeket a beszerző intézi. A
-            gazdasági vezető ezeket egy évre előre tetszőleges negyedéves tervblokkba sorolhatja át.
+            Jóváhagyott szolgáltatási igényből keletkezett tételek. A beszerző átadja őket az IT
+            eszközmenedzsernek, aki azonnali vagy negyedéves bontásba sorolja és összeállítja a
+            tervet; ezt a gazdasági vezető ellenőrzi, a dékán hagyja jóvá, majd a beszerző indítja
+            a beszerzést.
           </p>
           {canSchedule && (
             <div className="card-surface flex flex-wrap items-center gap-3 p-4">
@@ -574,6 +582,11 @@ function BuyerWorkspace() {
               </Button>
             </div>
           )}
+          <div className="grid gap-4">
+            {immediate.map((a) => (
+              <ApprovalCard key={a.id} approval={a} />
+            ))}
+          </div>
           <div className="card-surface">
             <ItemsTable
               items={adHoc}
