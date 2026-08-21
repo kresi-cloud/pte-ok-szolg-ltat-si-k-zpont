@@ -377,8 +377,11 @@ export interface ProcurementPlanItem {
   /** gazdasági vezetői átütemezés nyoma */
   rescheduledBy?: string | undefined;
   rescheduledAt?: string | undefined;
-  /** beszerzői bontás: azonnali vagy negyedéves tervtétel */
+  /** bontás: azonnali vagy negyedéves tervtétel (IT eszközmenedzser állítja be) */
   timing?: "azonnali" | "negyedeves" | undefined;
+  /** a beszerző továbbadta az IT eszközmenedzsernek tervezésre */
+  handedToPlannerBy?: string | undefined;
+  handedToPlannerAt?: string | undefined;
 }
 
 /** Terv-jóváhagyási ciklus: azonnali, negyedéves és éves beszerzési terv. */
@@ -538,4 +541,34 @@ export interface AssetAuditEvent {
   entityId: string;
   action: string;
   detail: string;
+}
+
+/** Éves selejtezési javaslat: IT eszközmenedzser készíti, gazdasági vezető hagyja jóvá. */
+export type ScrapProposalStatus =
+  | "tervezes"
+  | "gazdasagi_jovahagyasra_var"
+  | "jovahagyva"
+  | "visszakuldve";
+
+export const SCRAP_STATUS_LABELS: Record<ScrapProposalStatus, string> = {
+  tervezes: "Összeállítás alatt",
+  gazdasagi_jovahagyasra_var: "Gazdasági vezetői jóváhagyásra vár",
+  jovahagyva: "Gazdasági vezető jóváhagyta",
+  visszakuldve: "Átdolgozásra visszaküldve",
+};
+
+export interface ScrapProposal {
+  id: string;
+  year: number;
+  title: string;
+  reason: string;
+  assetIds: string[];
+  status: ScrapProposalStatus;
+  createdBy: string;
+  createdAt: string;
+  submittedAt?: string | undefined;
+  decidedBy?: string | undefined;
+  decidedAt?: string | undefined;
+  comment?: string | undefined;
+  history?: PlanApprovalEvent[] | undefined;
 }
