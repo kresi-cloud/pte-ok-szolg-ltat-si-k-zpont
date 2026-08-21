@@ -47,6 +47,7 @@ const ALL_ROLES: RoleKey[] = [
   "dekan",
   "admin",
   "beszerzo",
+  "eszkozmenedzser",
   "gazdasagi_vezeto",
   "superuser",
 ];
