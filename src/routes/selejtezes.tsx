@@ -10,7 +10,7 @@ import { StatTile } from "@/components/asset-bits";
 import { useStore, lookup } from "@/lib/store";
 import { assetLookup, huf, lifecycleStatus, yearsSince } from "@/lib/asset-logic";
 import { NEXT_FINANCIAL_YEAR } from "@/lib/asset-data";
-import { SCRAP_STATUS_LABELS, type Asset } from "@/lib/asset-types";
+import { LIFECYCLE_LABELS, SCRAP_STATUS_LABELS, type Asset } from "@/lib/asset-types";
 
 export const Route = createFileRoute("/selejtezes")({
   head: () => ({
@@ -37,7 +37,8 @@ export const Route = createFileRoute("/selejtezes")({
 });
 
 function assetLabel(a: Asset) {
-  return `${assetLookup.model(a.modelKey)?.label ?? a.modelKey} · ${a.inventoryNo}`;
+  const m = assetLookup.model(a.modelKey);
+  return `${m ? `${m.manufacturer} ${m.model}` : a.modelKey} · ${a.inventoryNo}`;
 }
 
 function ScrapPage() {
@@ -62,7 +63,12 @@ function ScrapPage() {
         .filter((a) => a.active)
         .filter((a) => {
           const st = lifecycleStatus(a);
-          return st === "lejart" || st === "kritikus" || a.condition === "hibas";
+          return (
+            st === "selejtezesre_var" ||
+            st === "tamogatasbol_kifutott" ||
+            st === "cserere_erett" ||
+            a.condition === "hibas"
+          );
         })
         .slice(0, 60),
     [store.assets],
@@ -146,7 +152,7 @@ function ScrapPage() {
                     </td>
                     <td className="px-3 py-2">{assetLabel(a)}</td>
                     <td className="px-3 py-2">{yearsSince(a.purchaseDate).toFixed(1)} év</td>
-                    <td className="px-3 py-2 text-xs">{a.condition}</td>
+                    <td className="px-3 py-2 text-xs">{LIFECYCLE_LABELS[lifecycleStatus(a)]}</td>
                     <td className="px-3 py-2 text-xs">{lookup.unit(a.orgUnitId)}</td>
                   </tr>
                 ))}
