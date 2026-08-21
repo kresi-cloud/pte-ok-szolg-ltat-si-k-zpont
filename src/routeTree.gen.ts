@@ -27,6 +27,7 @@ import { Route as MunkaterRouteImport } from './routes/munkater'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as ProfilRouteImport } from './routes/profil'
 import { Route as SegitsegRouteImport } from './routes/segitseg'
+import { Route as SelejtezesRouteImport } from './routes/selejtezes'
 import { Route as SzolgaltatasokRouteImport } from './routes/szolgaltatasok'
 import { Route as UjIgenyRouteImport } from './routes/uj-igeny'
 import { Route as VezetoiAttekintesRouteImport } from './routes/vezetoi-attekintes'
@@ -126,6 +127,11 @@ const SegitsegRoute = SegitsegRouteImport.update({
   path: '/segitseg',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SelejtezesRoute = SelejtezesRouteImport.update({
+  id: '/selejtezes',
+  path: '/selejtezes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SzolgaltatasokRoute = SzolgaltatasokRouteImport.update({
   id: '/szolgaltatasok',
   path: '/szolgaltatasok',
@@ -189,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/portfolio': typeof PortfolioRoute
   '/profil': typeof ProfilRoute
   '/segitseg': typeof SegitsegRoute
+  '/selejtezes': typeof SelejtezesRoute
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
   '/vezetoi-attekintes': typeof VezetoiAttekintesRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/portfolio': typeof PortfolioRoute
   '/profil': typeof ProfilRoute
   '/segitseg': typeof SegitsegRoute
+  '/selejtezes': typeof SelejtezesRoute
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
   '/vezetoi-attekintes': typeof VezetoiAttekintesRoute
@@ -246,6 +254,7 @@ export interface FileRoutesById {
   '/portfolio': typeof PortfolioRoute
   '/profil': typeof ProfilRoute
   '/segitseg': typeof SegitsegRoute
+  '/selejtezes': typeof SelejtezesRoute
   '/szolgaltatasok': typeof SzolgaltatasokRoute
   '/uj-igeny': typeof UjIgenyRoute
   '/vezetoi-attekintes': typeof VezetoiAttekintesRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/profil'
     | '/segitseg'
+    | '/selejtezes'
     | '/szolgaltatasok'
     | '/uj-igeny'
     | '/vezetoi-attekintes'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/profil'
     | '/segitseg'
+    | '/selejtezes'
     | '/szolgaltatasok'
     | '/uj-igeny'
     | '/vezetoi-attekintes'
@@ -332,6 +343,7 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/profil'
     | '/segitseg'
+    | '/selejtezes'
     | '/szolgaltatasok'
     | '/uj-igeny'
     | '/vezetoi-attekintes'
@@ -361,6 +373,7 @@ export interface RootRouteChildren {
   PortfolioRoute: typeof PortfolioRoute
   ProfilRoute: typeof ProfilRoute
   SegitsegRoute: typeof SegitsegRoute
+  SelejtezesRoute: typeof SelejtezesRoute
   SzolgaltatasokRoute: typeof SzolgaltatasokRoute
   UjIgenyRoute: typeof UjIgenyRoute
   VezetoiAttekintesRoute: typeof VezetoiAttekintesRoute
@@ -499,6 +512,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SegitsegRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/selejtezes': {
+      id: '/selejtezes'
+      path: '/selejtezes'
+      fullPath: '/selejtezes'
+      preLoaderRoute: typeof SelejtezesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/szolgaltatasok': {
       id: '/szolgaltatasok'
       path: '/szolgaltatasok'
@@ -577,6 +597,7 @@ const rootRouteChildren: RootRouteChildren = {
   PortfolioRoute: PortfolioRoute,
   ProfilRoute: ProfilRoute,
   SegitsegRoute: SegitsegRoute,
+  SelejtezesRoute: SelejtezesRoute,
   SzolgaltatasokRoute: SzolgaltatasokRoute,
   UjIgenyRoute: UjIgenyRoute,
   VezetoiAttekintesRoute: VezetoiAttekintesRoute,
