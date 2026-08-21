@@ -7,6 +7,7 @@ export type RoleKey =
   | "dekan"
   | "admin"
   | "beszerzo"
+  | "eszkozmenedzser"
   | "gazdasagi_vezeto"
   | "superuser";
 
@@ -19,6 +20,7 @@ export const ROLE_LABELS: Record<RoleKey, string> = {
   dekan: "Dékán",
   admin: "Rendszeradminisztrátor",
   beszerzo: "Beszerző",
+  eszkozmenedzser: "IT eszközmenedzser",
   gazdasagi_vezeto: "Gazdasági vezető",
   superuser: "Superuser (jogosultságkezelő)",
 };
@@ -33,8 +35,10 @@ export const ROLE_DESCRIPTIONS: Record<RoleKey, string> = {
   admin: "Rendszerbeállítások, katalógus, leltárjóváhagyás.",
   beszerzo:
     "Megkapja a jóváhagyott eseti beszerzéseket, kezeli a negyedéves és éves beszerzési terveket.",
+  eszkozmenedzser:
+    "A beszerzőtől érkező új eszközigényekből eseti és negyedéves beszerzési tervet állít össze, valamint éves selejtezési javaslatot készít.",
   gazdasagi_vezeto:
-    "Az azonnali (eseti) beszerzéseket egy évre előre negyedéves tervblokkokba ütemezi.",
+    "Ellenőrzi és módosítja az eszközmenedzser terveit, jóváhagyja az éves selejtezési javaslatot, majd dékáni jóváhagyásra küld.",
   superuser: "Kizárólagos jog a felhasználói jogosultságok kiosztására.",
 };
 

@@ -6,6 +6,7 @@ export const DEMO_USER_IDS = [
   "u-molnar",
   "u-dekan",
   "u-beszerzo",
+  "u-eszkozmgr",
   "u-gazdvez",
   "u-superuser",
 ];
