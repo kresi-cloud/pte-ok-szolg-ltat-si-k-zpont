@@ -46,7 +46,7 @@ import type {
   ReplacementDecision,
   ReplacementDecisionKey,
   SharedCheckAnswer,
-  type ScrapProposal,
+  ScrapProposal,
 } from "./asset-types";
 import {
   ASSETS,
