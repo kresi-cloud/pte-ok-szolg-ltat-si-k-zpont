@@ -236,6 +236,7 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
   const role = store.activeRole;
   const isDean = role === "dekan";
   const isBuyer = role === "beszerzo";
+  const isPlanner = role === "eszkozmenedzser";
   const isFinance = role === "gazdasagi_vezeto";
   const left = daysUntil(approval.dueAt);
   const items = store.planItems.filter((p) =>
@@ -251,7 +252,7 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
   const status = approval.status === "jovahagyasra_var" ? "dekani_jovahagyas" : approval.status;
 
   const STEPS: { key: string; label: string }[] = [
-    { key: "tervezes", label: "Beszerzői tervezés" },
+    { key: "tervezes", label: "Eszközmenedzseri tervezés" },
     { key: "gazdasagi_ellenorzes", label: "Gazdasági ellenőrzés" },
     { key: "dekani_jovahagyas", label: "Dékáni jóváhagyás" },
     { key: "jovahagyva", label: "Beszerzés indítása" },
@@ -330,14 +331,14 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
         </ul>
       )}
 
-      {(isBuyer || isFinance || isDean) && status !== "vegrehajtas" && (
+      {(isPlanner || isBuyer || isFinance || isDean) && status !== "vegrehajtas" && (
         <div className="space-y-2 border-t border-border pt-3">
-          {isBuyer && (status === "tervezes" || status === "visszakuldve") && (
+          {isPlanner && (status === "tervezes" || status === "visszakuldve") && (
             <>
               <Textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder="Beszerzői megjegyzés a tervhez (opcionális)"
+                placeholder="Eszközmenedzseri megjegyzés a tervhez (opcionális)"
                 rows={2}
               />
               <Button
@@ -375,10 +376,10 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
                   variant="outline"
                   onClick={() => {
                     store.financeReviewPlan(approval.id, "vissza", comment || undefined);
-                    toast("Terv visszaküldve a beszerzőnek");
+                    toast("Terv visszaküldve az eszközmenedzsernek");
                   }}
                 >
-                  Visszaküldés a beszerzőnek
+                  Visszaküldés az eszközmenedzsernek
                 </Button>
               </div>
             </>
@@ -438,13 +439,15 @@ function BuyerWorkspace() {
   const store = useStore();
   const allowed = [
     "beszerzo",
+    "eszkozmenedzser",
     "gazdasagi_vezeto",
     "dekan",
     "admin",
     "szolgaltatasgazda",
     "superuser",
   ].includes(store.activeRole);
-  const canSchedule = store.activeRole === "gazdasagi_vezeto";
+  const canSchedule =
+    store.activeRole === "gazdasagi_vezeto" || store.activeRole === "eszkozmenedzser";
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkBlock, setBulkBlock] = useState<string>("");
 
