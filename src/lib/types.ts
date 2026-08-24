@@ -381,3 +381,55 @@ export interface Announcement {
   active: boolean;
   createdBy: string;
 }
+
+/** Eszközátadás: a beszerzett eszköz útja a beérkezéstől az igénylői átvételig. */
+export type HandoverStatus =
+  | "beerkezett"
+  | "elokeszites_alatt"
+  | "atadasra_kesz"
+  | "atadva"
+  | "atvetel_igazolva";
+
+export const HANDOVER_STATUS_LABELS: Record<HandoverStatus, string> = {
+  beerkezett: "Beérkezett a beszerzésből",
+  elokeszites_alatt: "Telepítés és beállítás alatt",
+  atadasra_kesz: "Átadásra kész",
+  atadva: "Átadva – átvételi visszaigazolásra vár",
+  atvetel_igazolva: "Átvétel visszaigazolva",
+};
+
+export interface HandoverEvent {
+  at: string;
+  actorId: string;
+  action: string;
+  comment?: string | undefined;
+}
+
+export interface AssetHandover {
+  id: string;
+  /** a beszerzési tervsor, amelyből az eszköz érkezett */
+  planItemId: string;
+  /** az eredeti szolgáltatási igény azonosítója, ha volt */
+  requestId?: string | undefined;
+  /** az átvevő munkatárs */
+  recipientId: string;
+  orgUnitId: string;
+  /** a helyi IT referens, aki telepíti és átadja */
+  referentId?: string | undefined;
+  deviceName: string;
+  /** eszközfelismerési modellkulcs (a műszaki adatok forrása) */
+  modelKey?: string | undefined;
+  serial?: string | undefined;
+  inventoryNo?: string | undefined;
+  building?: string | undefined;
+  room?: string | undefined;
+  installedOs?: string | undefined;
+  note?: string | undefined;
+  status: HandoverStatus;
+  createdAt: string;
+  handedOverAt?: string | undefined;
+  confirmedAt?: string | undefined;
+  /** a létrejött személyi leltártétel azonosítója */
+  inventoryItemId?: string | undefined;
+  history: HandoverEvent[];
+}
