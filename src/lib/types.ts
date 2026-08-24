@@ -9,6 +9,7 @@ export type RoleKey =
   | "beszerzo"
   | "eszkozmenedzser"
   | "gazdasagi_vezeto"
+  | "it_referens"
   | "superuser";
 
 export const ROLE_LABELS: Record<RoleKey, string> = {
@@ -22,6 +23,7 @@ export const ROLE_LABELS: Record<RoleKey, string> = {
   beszerzo: "Beszerző",
   eszkozmenedzser: "IT eszközmenedzser",
   gazdasagi_vezeto: "Gazdasági vezető",
+  it_referens: "Helyi IT referens",
   superuser: "Superuser (jogosultságkezelő)",
 };
 
@@ -39,8 +41,11 @@ export const ROLE_DESCRIPTIONS: Record<RoleKey, string> = {
     "A beszerzőtől érkező új eszközigényekből eseti és negyedéves beszerzési tervet állít össze, valamint éves selejtezési javaslatot készít.",
   gazdasagi_vezeto:
     "Ellenőrzi és módosítja az eszközmenedzser terveit, jóváhagyja az éves selejtezési javaslatot, majd dékáni jóváhagyásra küld.",
+  it_referens:
+    "A beérkezett eszközt telepíti, beállítja, rögzíti a gyári számot és a leltárkódot, majd átadja az igénylőnek.",
   superuser: "Kizárólagos jog a felhasználói jogosultságok kiosztására.",
 };
+
 
 /** Jogosultság-kiosztási naplóbejegyzés (ki, kinek, mit, mikor, miért). */
 export interface RoleAuditEvent {
@@ -375,4 +380,56 @@ export interface Announcement {
   expiresAt: string;
   active: boolean;
   createdBy: string;
+}
+
+/** Eszközátadás: a beszerzett eszköz útja a beérkezéstől az igénylői átvételig. */
+export type HandoverStatus =
+  | "beerkezett"
+  | "elokeszites_alatt"
+  | "atadasra_kesz"
+  | "atadva"
+  | "atvetel_igazolva";
+
+export const HANDOVER_STATUS_LABELS: Record<HandoverStatus, string> = {
+  beerkezett: "Beérkezett a beszerzésből",
+  elokeszites_alatt: "Telepítés és beállítás alatt",
+  atadasra_kesz: "Átadásra kész",
+  atadva: "Átadva – átvételi visszaigazolásra vár",
+  atvetel_igazolva: "Átvétel visszaigazolva",
+};
+
+export interface HandoverEvent {
+  at: string;
+  actorId: string;
+  action: string;
+  comment?: string | undefined;
+}
+
+export interface AssetHandover {
+  id: string;
+  /** a beszerzési tervsor, amelyből az eszköz érkezett */
+  planItemId: string;
+  /** az eredeti szolgáltatási igény azonosítója, ha volt */
+  requestId?: string | undefined;
+  /** az átvevő munkatárs */
+  recipientId: string;
+  orgUnitId: string;
+  /** a helyi IT referens, aki telepíti és átadja */
+  referentId?: string | undefined;
+  deviceName: string;
+  /** eszközfelismerési modellkulcs (a műszaki adatok forrása) */
+  modelKey?: string | undefined;
+  serial?: string | undefined;
+  inventoryNo?: string | undefined;
+  building?: string | undefined;
+  room?: string | undefined;
+  installedOs?: string | undefined;
+  note?: string | undefined;
+  status: HandoverStatus;
+  createdAt: string;
+  handedOverAt?: string | undefined;
+  confirmedAt?: string | undefined;
+  /** a létrejött személyi leltártétel azonosítója */
+  inventoryItemId?: string | undefined;
+  history: HandoverEvent[];
 }

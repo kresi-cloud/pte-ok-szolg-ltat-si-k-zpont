@@ -93,6 +93,7 @@ function ItemRow({
 }) {
   const store = useStore();
   const cost = itemCost(item);
+  const hasHandover = (store.handovers ?? []).some((h) => h.planItemId === item.id);
   const blockValue = `${item.planYear}-${item.quarter}`;
   return (
     <tr className="border-t border-border align-top">
@@ -202,16 +203,21 @@ function ItemRow({
                   Beszerzés indítása
                 </Button>
               )}
-              {item.status !== "teljesult" && (
+              {item.status !== "teljesult" && !hasHandover && (
                 <Button
                   size="sm"
                   onClick={() => {
-                    store.updatePlanItem(item.id, { status: "teljesult" });
-                    toast.success("Teljesítés rögzítve");
+                    store.markPlanItemDelivered(item.id);
+                    toast.success("Beérkezés rögzítve – átadva a helyi IT referensnek");
                   }}
                 >
-                  Teljesítve
+                  Beérkezett – átadásra
                 </Button>
+              )}
+              {hasHandover && (
+                <span className="self-center text-xs text-muted-foreground">
+                  Átadási folyamatban a helyi IT referensnél
+                </span>
               )}
             </>
           )}

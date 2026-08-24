@@ -325,6 +325,17 @@ export const USERS: User[] = [
     roles: ["gazdasagi_vezeto"],
     initials: "RI",
   },
+  {
+    id: "u-itref",
+    name: "Bercsényi L.",
+    title: "helyi IT referens (Élettani Intézet)",
+    email: "bercsenyi.l@aok.pte.hu",
+    employeeId: "PTE-100005",
+    orgUnitId: "ou-elettani",
+    roles: ["it_referens"],
+    teamId: "t-it",
+    initials: "BL",
+  },
 ];
 
 export const TEAMS: ServiceTeam[] = [
