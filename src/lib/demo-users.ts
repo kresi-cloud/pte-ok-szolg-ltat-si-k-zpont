@@ -8,5 +8,7 @@ export const DEMO_USER_IDS = [
   "u-beszerzo",
   "u-eszkozmgr",
   "u-gazdvez",
+  "u-gazdvez",
+  "u-itref",
   "u-superuser",
 ];
