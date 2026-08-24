@@ -1166,6 +1166,253 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         };
       }),
 
+    markPlanItemDelivered: (planItemId) =>
+      setState((s) => {
+        if ((s.handovers ?? []).some((h) => h.planItemId === planItemId)) return s;
+        const item = s.planItems.find((p) => p.id === planItemId);
+        if (!item) return s;
+        const request = item.sourceRequestId
+          ? s.requests.find((r) => r.id === item.sourceRequestId)
+          : undefined;
+        const recipientId = request?.requesterId ?? currentUser.id;
+        const orgUnitId = request?.orgUnitId ?? item.orgUnitId;
+        const referent =
+          effectiveUsers.find((u) => u.roles.includes("it_referens") && u.orgUnitId === orgUnitId) ??
+          effectiveUsers.find((u) => u.roles.includes("it_referens"));
+        const id = `ho-${Date.now()}`;
+        const handover: AssetHandover = {
+          id,
+          planItemId,
+          requestId: item.sourceRequestId,
+          recipientId,
+          orgUnitId,
+          referentId: referent?.id,
+          deviceName: standardLabel(item.standardKey),
+          modelKey: modelKeyForStandard(item.standardKey),
+          status: "beerkezett",
+          createdAt: today(),
+          history: [
+            { at: today(), actorId: currentUser.id, action: "Eszköz beérkezett a beszerzésből" },
+          ],
+        };
+        return {
+          ...s,
+          handovers: [handover, ...(s.handovers ?? [])],
+          planItems: s.planItems.map((p) =>
+            p.id === planItemId ? { ...p, status: "teljesult" } : p,
+          ),
+          notifications: [
+            {
+              id: `n-${Date.now()}`,
+              at: today(),
+              read: false,
+              requestId: item.sourceRequestId,
+              text: `${handover.deviceName} beérkezett – a helyi IT referens telepítésre és átadásra átvette.`,
+            },
+            ...s.notifications,
+          ],
+          assetAudit: [
+            {
+              id: `aud-${Date.now()}`,
+              at: today(),
+              actorId: currentUser.id,
+              entity: "beszerzes",
+              entityId: planItemId,
+              action: "Beszerzett eszköz beérkezése rögzítve",
+              detail: handover.deviceName,
+            },
+            ...s.assetAudit,
+          ],
+        };
+      }),
+    updateHandover: (id, patch, label) =>
+      setState((s) => ({
+        ...s,
+        handovers: (s.handovers ?? []).map((h) =>
+          h.id === id
+            ? {
+                ...h,
+                ...patch,
+                history: label
+                  ? [...h.history, { at: today(), actorId: currentUser.id, action: label }]
+                  : h.history,
+              }
+            : h,
+        ),
+        assetAudit: label
+          ? [
+              {
+                id: `aud-${Date.now()}`,
+                at: today(),
+                actorId: currentUser.id,
+                entity: "leltar",
+                entityId: id,
+                action: label,
+                detail: Object.keys(patch).join(", "),
+              },
+              ...s.assetAudit,
+            ]
+          : s.assetAudit,
+      })),
+    handOverToUser: (id, comment) =>
+      setState((s) => {
+        const h = (s.handovers ?? []).find((x) => x.id === id);
+        if (!h) return s;
+        return {
+          ...s,
+          handovers: (s.handovers ?? []).map((x) =>
+            x.id === id
+              ? {
+                  ...x,
+                  status: "atadva",
+                  handedOverAt: today(),
+                  referentId: x.referentId ?? currentUser.id,
+                  history: [
+                    ...x.history,
+                    {
+                      at: today(),
+                      actorId: currentUser.id,
+                      action: "Eszköz telepítve, beállítva és átadva az igénylőnek",
+                      comment,
+                    },
+                  ],
+                }
+              : x,
+          ),
+          requests: s.requests.map((r) =>
+            r.id === h.requestId
+              ? {
+                  ...r,
+                  status: "atadasra_var",
+                  updatedAt: today(),
+                  nextStep: "Az eszköz átadva, átvételi visszaigazolásra vár.",
+                  audit: [
+                    ...r.audit,
+                    {
+                      id: `a-${Date.now()}`,
+                      at: today(),
+                      actorId: currentUser.id,
+                      action: "Eszközátadás",
+                      detail: `${h.deviceName}${h.serial ? ` · gyári szám: ${h.serial}` : ""}`,
+                    },
+                  ],
+                }
+              : r,
+          ),
+          notifications: [
+            {
+              id: `n-${Date.now()}`,
+              at: today(),
+              read: false,
+              requestId: h.requestId,
+              text: `${h.deviceName} átadásra került – kérjük, igazolja vissza az átvételt a Személyi leltár oldalon.`,
+            },
+            ...s.notifications,
+          ],
+          assetAudit: [
+            {
+              id: `aud-${Date.now()}`,
+              at: today(),
+              actorId: currentUser.id,
+              entity: "leltar",
+              entityId: id,
+              action: "Eszköz átadása az igénylőnek",
+              detail: `${h.deviceName}${comment ? ` · ${comment}` : ""}`,
+            },
+            ...s.assetAudit,
+          ],
+        };
+      }),
+    confirmHandoverReceipt: (id, comment) =>
+      setState((s) => {
+        const h = (s.handovers ?? []).find((x) => x.id === id);
+        if (!h) return s;
+        const invId = `inv-${Date.now()}`;
+        const item: InventoryItem = {
+          id: invId,
+          ownerId: h.recipientId,
+          kind: "hardver",
+          name: h.deviceName,
+          modelKey: h.modelKey,
+          serial: h.serial,
+          inventoryNo: h.inventoryNo,
+          building: h.building,
+          room: h.room,
+          note: `Beszerzési folyamatból átvéve (${h.planItemId})${h.note ? ` · ${h.note}` : ""}`,
+          spec: specForModel(h.modelKey),
+          status: "jovahagyva",
+          createdAt: today(),
+          decidedAt: today(),
+          decidedBy: h.referentId ?? currentUser.id,
+          decisionComment: "Intézményi beszerzés és átadás-átvétel alapján automatikusan jóváhagyva.",
+        };
+        return {
+          ...s,
+          inventory: [item, ...s.inventory],
+          handovers: (s.handovers ?? []).map((x) =>
+            x.id === id
+              ? {
+                  ...x,
+                  status: "atvetel_igazolva",
+                  confirmedAt: today(),
+                  inventoryItemId: invId,
+                  history: [
+                    ...x.history,
+                    {
+                      at: today(),
+                      actorId: currentUser.id,
+                      action: "Átvétel visszaigazolva – eszköz a személyi leltárba került",
+                      comment,
+                    },
+                  ],
+                }
+              : x,
+          ),
+          requests: s.requests.map((r) =>
+            r.id === h.requestId
+              ? {
+                  ...r,
+                  status: "lezarva",
+                  updatedAt: today(),
+                  nextStep: "Az eszköz átadva és átvéve, az igény lezárult.",
+                  audit: [
+                    ...r.audit,
+                    {
+                      id: `a-${Date.now()}`,
+                      at: today(),
+                      actorId: currentUser.id,
+                      action: "Átvétel visszaigazolása",
+                      detail: `${h.deviceName} bekerült a személyi leltárba`,
+                    },
+                  ],
+                }
+              : r,
+          ),
+          notifications: [
+            {
+              id: `n-${Date.now()}`,
+              at: today(),
+              read: false,
+              requestId: h.requestId,
+              text: `${h.deviceName} átvétele visszaigazolva – az eszköz bekerült a személyi leltárba.`,
+            },
+            ...s.notifications,
+          ],
+          assetAudit: [
+            {
+              id: `aud-${Date.now()}`,
+              at: today(),
+              actorId: currentUser.id,
+              entity: "leltar",
+              entityId: invId,
+              action: "Átvétel visszaigazolva, személyi leltártétel létrehozva",
+              detail: `${h.deviceName}${h.inventoryNo ? ` · leltárkód: ${h.inventoryNo}` : ""}`,
+            },
+            ...s.assetAudit,
+          ],
+        };
+      }),
+
     resetDemo: () => {
       window.localStorage.removeItem(STORAGE_KEY);
       setState({ ...initialState, loggedIn: true });
