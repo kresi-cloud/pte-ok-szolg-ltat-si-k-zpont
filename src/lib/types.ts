@@ -9,6 +9,7 @@ export type RoleKey =
   | "beszerzo"
   | "eszkozmenedzser"
   | "gazdasagi_vezeto"
+  | "it_referens"
   | "superuser";
 
 export const ROLE_LABELS: Record<RoleKey, string> = {
@@ -22,6 +23,7 @@ export const ROLE_LABELS: Record<RoleKey, string> = {
   beszerzo: "Beszerző",
   eszkozmenedzser: "IT eszközmenedzser",
   gazdasagi_vezeto: "Gazdasági vezető",
+  it_referens: "Helyi IT referens",
   superuser: "Superuser (jogosultságkezelő)",
 };
 
@@ -39,8 +41,11 @@ export const ROLE_DESCRIPTIONS: Record<RoleKey, string> = {
     "A beszerzőtől érkező új eszközigényekből eseti és negyedéves beszerzési tervet állít össze, valamint éves selejtezési javaslatot készít.",
   gazdasagi_vezeto:
     "Ellenőrzi és módosítja az eszközmenedzser terveit, jóváhagyja az éves selejtezési javaslatot, majd dékáni jóváhagyásra küld.",
+  it_referens:
+    "A beérkezett eszközt telepíti, beállítja, rögzíti a gyári számot és a leltárkódot, majd átadja az igénylőnek.",
   superuser: "Kizárólagos jog a felhasználói jogosultságok kiosztására.",
 };
+
 
 /** Jogosultság-kiosztási naplóbejegyzés (ki, kinek, mit, mikor, miért). */
 export interface RoleAuditEvent {
