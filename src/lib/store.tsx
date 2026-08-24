@@ -22,6 +22,7 @@ import {
 import type {
   Announcement,
   AppNotification,
+  AssetHandover,
   InventoryItem,
   Project,
   RequestMessage,
@@ -32,6 +33,7 @@ import type {
   User,
 } from "./types";
 import { INVENTORY, specForModel } from "./inventory-data";
+import { modelKeyForStandard, standardLabel } from "./handover-mapping";
 import type {
   Asset,
   AssetAuditEvent,
@@ -80,6 +82,7 @@ interface PersistedState {
   planItems: ProcurementPlanItem[];
   planApprovals: PlanApproval[];
   scrapProposals: ScrapProposal[];
+  handovers: AssetHandover[];
   currentUserId: string;
   activeRole: RoleKey;
   loggedIn: boolean;
@@ -103,6 +106,7 @@ const initialState: PersistedState = {
   planItems: INITIAL_PROCUREMENT_ITEMS,
   planApprovals: buildPlanApprovals(),
   scrapProposals: [],
+  handovers: [],
   currentUserId: "u-kovacs",
   activeRole: "igenylo",
   loggedIn: false,
@@ -158,6 +162,14 @@ interface StoreValue extends PersistedState {
   submitPlanForFinance: (id: string, comment?: string) => void;
   financeReviewPlan: (id: string, decision: "tovabb" | "vissza", comment?: string) => void;
   startPlanExecution: (id: string) => void;
+  /** Beszerző: a tervsor eszköze fizikailag beérkezett – átadási folyamat indul. */
+  markPlanItemDelivered: (planItemId: string) => void;
+  /** Helyi IT referens: telepítési és azonosító adatok rögzítése. */
+  updateHandover: (id: string, patch: Partial<AssetHandover>, label?: string) => void;
+  /** Helyi IT referens: eszköz átadása az igénylőnek. */
+  handOverToUser: (id: string, comment?: string) => void;
+  /** Igénylő: átvétel visszaigazolása – az eszköz bekerül a személyi leltárba. */
+  confirmHandoverReceipt: (id: string, comment?: string) => void;
   decidePlanApproval: (
     id: string,
     decision: "jovahagyva" | "visszakuldve",
