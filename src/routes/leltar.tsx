@@ -101,7 +101,11 @@ export function SpecGrid({ item }: { item: InventoryItem }) {
 }
 
 function Inventory() {
-  const { inventory, currentUser, addInventoryItem, removeInventoryItem } = useStore();
+  const store = useStore();
+  const { inventory, currentUser, addInventoryItem, removeInventoryItem } = store;
+  const pendingHandovers = (store.handovers ?? []).filter(
+    (h) => h.recipientId === currentUser.id && h.status === "atadva",
+  );
   const mine = inventory.filter((i) => i.ownerId === currentUser.id);
   const hardware = mine.filter((i) => i.kind === "hardver");
   const software = mine.filter((i) => i.kind === "szoftver");
@@ -130,6 +134,41 @@ function Inventory() {
           description="Itt rögzítheti a személyi használatában lévő hardvereszközöket és szoftvereket. A hardver modelljéhez a rendszer automatikusan hozzárendeli az operációs rendszert és annak verzióját, a processzor-, memória- és tárolóadatokat, valamint a speciális feature-öket. Minden új tétel a rendszeradminisztrátor jóváhagyásával kerül a hivatalos leltárba."
         />
       </div>
+
+      {pendingHandovers.length > 0 && (
+        <section className="card-surface space-y-3 border-l-4 border-l-primary p-5">
+          <h2 className="font-display text-base font-semibold">Átvételre váró eszközök</h2>
+          <p className="text-sm text-muted-foreground">
+            A helyi IT referens telepítette és átadta az alábbi eszközt. Az átvétel
+            visszaigazolásával az eszköz automatikusan bekerül a személyi leltárába.
+          </p>
+          {pendingHandovers.map((h) => (
+            <div
+              key={h.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border p-3"
+            >
+              <div>
+                <p className="text-sm font-semibold">{h.deviceName}</p>
+                <p className="text-xs text-muted-foreground">
+                  {h.serial ? `Gyári szám: ${h.serial}` : ""}
+                  {h.serial && h.inventoryNo ? " · " : ""}
+                  {h.inventoryNo ? `PTE leltárkód: ${h.inventoryNo}` : ""}
+                  {h.installedOs ? ` · ${h.installedOs}` : ""}
+                </p>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => {
+                  store.confirmHandoverReceipt(h.id);
+                  toast.success("Átvétel visszaigazolva – az eszköz bekerült a leltárába");
+                }}
+              >
+                Átvétel visszaigazolása
+              </Button>
+            </div>
+          ))}
+        </section>
+      )}
 
       <div className="grid gap-3 sm:grid-cols-3">
         {[
