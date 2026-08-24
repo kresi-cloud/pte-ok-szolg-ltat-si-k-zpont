@@ -15,9 +15,53 @@ import {
 import { useStore, lookup } from "@/lib/store";
 import { HARDWARE_MODELS, isMobileModel, specForModel } from "@/lib/inventory-data";
 import { ASSET_LOCATIONS } from "@/lib/asset-data";
-import { HANDOVER_STATUS_LABELS, type AssetHandover } from "@/lib/types";
+import {
+  ATTACHMENT_KIND_LABELS,
+  HANDOVER_CHECKLIST,
+  HANDOVER_STATUS_LABELS,
+  type AssetHandover,
+  type HandoverAttachment,
+  type HandoverAttachmentKind,
+} from "@/lib/types";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Paperclip, Trash2 } from "lucide-react";
 import { PageHeading } from "@/components/page-heading";
 import { StatTile } from "@/components/asset-bits";
+
+const MAX_FILE_BYTES = 5 * 1024 * 1024;
+
+/** Kép kicsinyítése és tömörítése, hogy a prototípus tárolója ne teljen be. */
+async function fileToDataUrl(file: File): Promise<string> {
+  const raw = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("Nem sikerült beolvasni a fájlt."));
+    reader.readAsDataURL(file);
+  });
+  if (!file.type.startsWith("image/")) return raw;
+  return new Promise<string>((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const max = 1280;
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return resolve(raw);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", 0.7));
+    };
+    img.onerror = () => resolve(raw);
+    img.src = raw;
+  });
+}
+
+function formatSize(bytes: number): string {
+  return bytes > 1024 * 1024
+    ? `${(bytes / 1024 / 1024).toFixed(1)} MB`
+    : `${Math.max(1, Math.round(bytes / 1024))} kB`;
+}
 
 export const Route = createFileRoute("/eszkozatadas")({
   head: () => ({
