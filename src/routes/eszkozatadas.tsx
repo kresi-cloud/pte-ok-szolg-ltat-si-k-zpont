@@ -92,6 +92,14 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
   const [building, setBuilding] = useState(handover.building ?? "");
   const [room, setRoom] = useState(handover.room ?? "");
   const [note, setNote] = useState(handover.note ?? "");
+  const [attachKind, setAttachKind] = useState<HandoverAttachmentKind>("fenykep");
+  const [uploading, setUploading] = useState(false);
+
+  const checklist = handover.checklist ?? {};
+  const attachments = handover.attachments ?? [];
+  const missingRequired = HANDOVER_CHECKLIST.filter((c) => c.required && !checklist[c.key]);
+  const hasPhoto = attachments.some((a) => a.kind === "fenykep");
+  const requiredDone = missingRequired.length === 0;
 
   const spec = modelKey ? specForModel(modelKey) : undefined;
   const needsLocation = Boolean(modelKey) && !isMobileModel(modelKey);
@@ -222,6 +230,172 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
         </div>
       )}
 
+      {(canAct || attachments.length > 0 || Object.keys(checklist).length > 0) && (
+        <section className="space-y-3 rounded-md border border-border p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h4 className="text-sm font-semibold">Telepítési checklist</h4>
+            <span
+              className={
+                requiredDone
+                  ? "text-xs font-semibold text-emerald-700"
+                  : "text-xs font-semibold text-amber-700"
+              }
+            >
+              Kötelező lépések: {HANDOVER_CHECKLIST.filter((c) => c.required).length - missingRequired.length}
+              /{HANDOVER_CHECKLIST.filter((c) => c.required).length}
+            </span>
+          </div>
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {HANDOVER_CHECKLIST.map((step) => (
+              <li key={step.key} className="flex gap-2">
+                <Checkbox
+                  id={`${handover.id}-${step.key}`}
+                  checked={Boolean(checklist[step.key])}
+                  disabled={!canAct || done}
+                  onCheckedChange={(v) =>
+                    store.updateHandover(
+                      handover.id,
+                      { checklist: { ...checklist, [step.key]: v === true } },
+                      `Checklist: ${step.label} – ${v === true ? "teljesítve" : "visszavonva"}`,
+                    )
+                  }
+                />
+                <label htmlFor={`${handover.id}-${step.key}`} className="cursor-pointer text-xs">
+                  <span className="font-medium">
+                    {step.label}
+                    {step.required && <span className="text-destructive"> *</span>}
+                  </span>
+                  <span className="block text-muted-foreground">{step.hint}</span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section className="space-y-3 rounded-md border border-border p-4">
+        <h4 className="text-sm font-semibold">
+          Fénykép- és dokumentumcsatolás
+          <span className="text-destructive"> *</span>
+        </h4>
+        <p className="text-xs text-muted-foreground">
+          Legalább egy fénykép kötelező (eszköz és felragasztott leltárcímke). Ajánlott az
+          átadás-átvételi jegyzőkönyv és a szállítólevél feltöltése is. Maximum 5 MB fájlonként.
+        </p>
+        {attachments.length > 0 && (
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {attachments.map((a) => (
+              <li key={a.id} className="flex items-center gap-3 rounded-md border border-border p-2">
+                {a.mimeType.startsWith("image/") ? (
+                  <img
+                    src={a.dataUrl}
+                    alt={`${ATTACHMENT_KIND_LABELS[a.kind]} – ${a.name}`}
+                    className="size-12 rounded object-cover"
+                  />
+                ) : (
+                  <span className="grid size-12 place-items-center rounded bg-secondary">
+                    <Paperclip className="size-4" aria-hidden="true" />
+                  </span>
+                )}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-xs font-medium">{a.name}</span>
+                  <span className="block text-xs text-muted-foreground">
+                    {ATTACHMENT_KIND_LABELS[a.kind]} · {formatSize(a.sizeBytes)} · {a.uploadedAt}
+                  </span>
+                </span>
+                <a
+                  href={a.dataUrl}
+                  download={a.name}
+                  className="text-xs font-medium text-primary underline"
+                >
+                  Megnyitás
+                </a>
+                {canAct && !done && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    aria-label="Csatolmány törlése"
+                    onClick={() =>
+                      store.updateHandover(
+                        handover.id,
+                        { attachments: attachments.filter((x) => x.id !== a.id) },
+                        `Csatolmány törölve: ${a.name}`,
+                      )
+                    }
+                  >
+                    <Trash2 className="size-4" aria-hidden="true" />
+                  </Button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+        {canAct && !done && (
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor={`kind-${handover.id}`}>Csatolmány típusa</Label>
+              <Select
+                value={attachKind}
+                onValueChange={(v) => setAttachKind(v as HandoverAttachmentKind)}
+              >
+                <SelectTrigger id={`kind-${handover.id}`} className="w-64">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(ATTACHMENT_KIND_LABELS).map(([k, label]) => (
+                    <SelectItem key={k} value={k}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor={`file-${handover.id}`}>Fájl kiválasztása</Label>
+              <Input
+                id={`file-${handover.id}`}
+                type="file"
+                accept="image/*,application/pdf"
+                disabled={uploading}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!file) return;
+                  if (file.size > MAX_FILE_BYTES) {
+                    toast.error("A fájl mérete meghaladja az 5 MB-ot.");
+                    return;
+                  }
+                  setUploading(true);
+                  try {
+                    const dataUrl = await fileToDataUrl(file);
+                    const att: HandoverAttachment = {
+                      id: `att-${Date.now()}`,
+                      kind: attachKind,
+                      name: file.name,
+                      mimeType: file.type || "application/octet-stream",
+                      sizeBytes: file.size,
+                      dataUrl,
+                      uploadedBy: store.currentUser.id,
+                      uploadedAt: new Date().toISOString().slice(0, 10),
+                    };
+                    store.updateHandover(
+                      handover.id,
+                      { attachments: [...attachments, att] },
+                      `Csatolmány feltöltve: ${ATTACHMENT_KIND_LABELS[att.kind]} – ${file.name}`,
+                    );
+                    toast.success("Csatolmány feltöltve");
+                  } catch {
+                    toast.error("A fájl feltöltése nem sikerült.");
+                  } finally {
+                    setUploading(false);
+                  }
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </section>
+
       {spec && (
         <p className="text-xs text-muted-foreground">
           Telepített rendszer: {spec.os} {spec.osVersion} · {spec.cpu} · {spec.ram}
@@ -269,7 +443,7 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
           </Button>
           <Button
             size="sm"
-            disabled={!serial || !inventoryNo || !modelKey}
+            disabled={!serial || !inventoryNo || !modelKey || !requiredDone || !hasPhoto}
             onClick={() => {
               save("Átadási adatok rögzítve");
               store.handOverToUser(handover.id, note || undefined);
@@ -278,9 +452,11 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
           >
             Átadás az igénylőnek
           </Button>
-          {(!serial || !inventoryNo || !modelKey) && (
+          {(!serial || !inventoryNo || !modelKey || !requiredDone || !hasPhoto) && (
             <span className="self-center text-xs text-muted-foreground">
-              Az átadáshoz modell, gyári szám és leltárkód szükséges.
+              Az átadáshoz kötelező: modell, gyári szám, leltárkód, minden kötelező checklist-lépés
+              {!requiredDone ? ` (hiányzik: ${missingRequired.length})` : ""} és legalább egy fénykép
+              csatolása.
             </span>
           )}
         </div>
