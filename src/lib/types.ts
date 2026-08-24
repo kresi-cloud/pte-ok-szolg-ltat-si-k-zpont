@@ -432,4 +432,108 @@ export interface AssetHandover {
   /** a létrejött személyi leltártétel azonosítója */
   inventoryItemId?: string | undefined;
   history: HandoverEvent[];
+  /** telepítési checklist: lépéskulcs → teljesítve */
+  checklist?: Record<string, boolean> | undefined;
+  /** csatolt fényképek és dokumentumok (átvételi jegyzőkönyv, számla, fotó) */
+  attachments?: HandoverAttachment[] | undefined;
 }
+
+/** Helyi IT referens telepítési checklist lépése. */
+export interface ChecklistStep {
+  key: string;
+  label: string;
+  hint: string;
+  /** kötelező-e az átadáshoz */
+  required: boolean;
+}
+
+export const HANDOVER_CHECKLIST: ChecklistStep[] = [
+  {
+    key: "kicsomagolas",
+    label: "Kicsomagolás és sértetlenség ellenőrzése",
+    hint: "Fizikai sérülés, hiányzó tartozék, szállítási kár ellenőrzése.",
+    required: true,
+  },
+  {
+    key: "gyari_szam",
+    label: "Gyári szám egyeztetése a szállítólevéllel",
+    hint: "A készüléken lévő szériaszám megegyezik a beszerzési dokumentummal.",
+    required: true,
+  },
+  {
+    key: "leltarkod",
+    label: "PTE leltárkód felragasztása",
+    hint: "Az intézményi vonalkódos leltárcímke felhelyezve és leolvasható.",
+    required: true,
+  },
+  {
+    key: "os_telepites",
+    label: "Operációs rendszer telepítése és frissítése",
+    hint: "Kari image telepítve, minden elérhető frissítés telepítve.",
+    required: true,
+  },
+  {
+    key: "domain",
+    label: "Tartományba léptetés és felhasználói profil beállítása",
+    hint: "AD-csatlakozás, felhasználói fiók és jogosultságok beállítva.",
+    required: true,
+  },
+  {
+    key: "halozat",
+    label: "Hálózati hozzáférés ellenőrzése (vezetékes/Wi-Fi/VPN)",
+    hint: "Kari hálózat, eduroam és szükség esetén VPN-kapcsolat tesztelve.",
+    required: true,
+  },
+  {
+    key: "vedelem",
+    label: "Végpontvédelem és titkosítás bekapcsolása",
+    hint: "Vírusvédelem aktív, lemeztitkosítás (BitLocker/FileVault) engedélyezve.",
+    required: true,
+  },
+  {
+    key: "mentes",
+    label: "Mentés és felhőszolgáltatás beállítása",
+    hint: "OneDrive/hálózati meghajtó és mentési házirend beállítva.",
+    required: false,
+  },
+  {
+    key: "szoftverek",
+    label: "Munkakörhöz szükséges szoftverek telepítése",
+    hint: "Office, szakmai és licencelt alkalmazások telepítve, licenc rögzítve.",
+    required: false,
+  },
+  {
+    key: "adatatvitel",
+    label: "Adatátvitel a korábbi eszközről",
+    hint: "Felhasználói adatok, profil és beállítások átmásolva, ellenőrizve.",
+    required: false,
+  },
+  {
+    key: "oktatas",
+    label: "Rövid felhasználói tájékoztatás",
+    hint: "Bejelentkezés, mentés, támogatási csatorna ismertetve az átvevővel.",
+    required: false,
+  },
+];
+
+export type HandoverAttachmentKind = "fenykep" | "jegyzokonyv" | "szallitolevel" | "egyeb";
+
+export const ATTACHMENT_KIND_LABELS: Record<HandoverAttachmentKind, string> = {
+  fenykep: "Fénykép az eszközről / leltárcímkéről",
+  jegyzokonyv: "Átadás-átvételi jegyzőkönyv",
+  szallitolevel: "Szállítólevél / számla",
+  egyeb: "Egyéb dokumentum",
+};
+
+export interface HandoverAttachment {
+  id: string;
+  kind: HandoverAttachmentKind;
+  name: string;
+  mimeType: string;
+  sizeBytes: number;
+  /** data URL (prototípus: böngészőben tárolva) */
+  dataUrl: string;
+  uploadedBy: string;
+  uploadedAt: string;
+}
+
