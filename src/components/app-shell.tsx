@@ -62,7 +62,6 @@ const ALL: RoleKey[] = [
 
 const NAV: NavItem[] = [
   { to: "/", label: "Kezdőlap", icon: Home, roles: ALL },
-  { to: "/uj-igeny", label: "Új igény", icon: Plus, roles: ALL },
   { to: "/igenyeim", label: "Igényeim", icon: ClipboardList, roles: ALL },
   { to: "/leltar", label: "Személyi leltár", icon: Laptop, roles: ALL },
   { to: "/eszkozkataszter", label: "Eszközkataszter", icon: Boxes, roles: ["eszkozmenedzser", "it_referens", "beszerzo", "gazdasagi_vezeto", "vezeto", "dekan", "admin"] },
