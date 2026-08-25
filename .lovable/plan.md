@@ -1,23 +1,17 @@
-# Hol induljon az igénylés? – javaslat
+# Egyetlen indítópont: a nyitóoldali csempe
 
-## Rövid válasz
-Mindkettő kell, de eltérő szereppel: a **nyitóoldal az elsődleges indítópont** (döntéstámogató belépő), a menüsáv **„+ Új igény”** pedig gyorsgomb azoknak, akik már tudják, mit akarnak. Ez a bevált mintázat az önkiszolgáló szolgáltatási portáloknál (ServiceNow, Jira SM, Zendesk): "guided catalog on the landing page + persistent quick action".
+Egyetértek: alacsony igénylési gyakoriság mellett a két párhuzamos belépő inkább zavaró. A menüsávból kikerül a „+ Új igény”, az igénylés kizárólag a nyitóoldali csempéről indul.
 
-## Miért a nyitóoldal az elsődleges
-- Az alkalmi felhasználó (évente 1-2 igény) nem menüből tájékozódik, hanem a nyitóoldalon látott csempéből. A kontextus (mit lehet igényelni, mi nem érhető el) itt magyarázható el.
-- A nyitóoldalon a döntési út első lépése (termékkör) már látható, így kevesebb kattintás és kevesebb megszakadt igénylés.
-- A teendők, hírek és a folyamatban lévő igények ugyanitt vannak – az igénylés természetes folytatása ennek a felületnek.
+Egy dolgot érdemes megtartani: maga az igénylési varázsló oldala (`/uj-igeny`) megmarad, mert ez a csempe célja – csak menüpontként nem jelenik meg többé. Így a folyamat és a mélylinkek (pl. e-mail értesítésből) sértetlenek maradnak.
 
-## Miért maradjon a menüpont
-- A visszatérő felhasználók (IT referens, eszközmenedzser, gyakori igénylők) minden aloldalról egy kattintással indítanak.
-- Mélylinkelhető, megosztható belépési pont (`/uj-igeny`).
-
-## Konkrét változtatások
-1. **Nyitóoldal**: az „Informatikai eszköz” csempe hangsúlyos elsődleges CTA-vá válik (nagyobb, teljes szélességű blokk a felső sávban, „Igénylés indítása” gombbal); a többi, jelenleg nem elérhető terület kisebb, halvány másodlagos csempeként marad alatta.
-2. **Menüpont**: a „+ Új igény” megmarad, de a jelenlegi redundáns első lépés (terület kiválasztása) kimarad – mivel egyetlen terület aktív, a varázsló rögtön a termékkör-választással indul, ugyanúgy, mint a nyitóoldalról érkezve.
-3. **Konzisztens visszatérés**: a varázsló megszakítása („Mégse”) a nyitóoldalra visz, hogy a felhasználó lássa a teendőit.
+## Változtatások
+1. **Menüsáv**: a „+ Új igény” menüpont törlése minden szerepkörnél.
+2. **Nyitóoldal**: az „Informatikai eszköz” csempe hangsúlyos elsődleges belépővé válik (kiemelt keret, „Igénylés indítása” gomb), hogy egyértelmű legyen: itt indul a folyamat. A többi terület halvány, nem választható marad.
+3. **Varázsló**: a megszakítás/„Mégse” és a sikeres beadás után a felhasználó a nyitóoldalra vagy az igény adatlapjára kerül – nincs zsákutca, mivel menüből már nem érhető el az oldal.
+4. **Egyéb hivatkozások**: ahol szövegesen „Új igény menüpont” szerepel (pl. Segítség oldal), a megfogalmazás a nyitóoldali csempére utal.
 
 ## Technikai megjegyzések
-- `src/routes/index.tsx`: kiemelt hero-jellegű CTA blokk az aktív doménhez, a letiltott csempék másodlagos sorba.
-- `src/routes/uj-igeny.tsx`: ha csak egy engedélyezett domén van, a `domain` lépés automatikusan kitöltődik és kimarad a lépéssorból (`stepKeys`, `stepLabels`, kezdő `step`), a Vissza gomb ennek megfelelően viselkedik.
-- Nincs adatmodell- vagy jogosultsági változás.
+- `src/components/app-shell.tsx`: `/uj-igeny` NAV bejegyzés törlése (a route marad).
+- `src/routes/index.tsx`: kiemelt CTA-csempe az aktív doménhez.
+- `src/routes/uj-igeny.tsx`: navigációs visszalépések ellenőrzése, egyetlen aktív domén esetén a terület-választó lépés kihagyása.
+- `src/routes/segitseg.tsx` és egyéb szöveges említések frissítése, a magyar–angol szótár kiegészítése.
