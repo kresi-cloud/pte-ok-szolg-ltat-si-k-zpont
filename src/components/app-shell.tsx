@@ -15,7 +15,6 @@ import {
   ShoppingCart,
   TrendingUp,
   Trash2,
-  Plus,
   Search,
   Settings2,
   UserRound,
