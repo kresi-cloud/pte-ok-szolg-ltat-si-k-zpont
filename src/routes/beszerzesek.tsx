@@ -482,6 +482,7 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
 
 function BuyerWorkspace() {
   const store = useStore();
+  const viewOnly = useViewOnly("beszerzesek");
   const allowed = [
     "beszerzo",
     "eszkozmenedzser",

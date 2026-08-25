@@ -52,6 +52,7 @@ export const Route = createFileRoute("/adminisztracio")({
 
 function Admin() {
   const { resetDemo, inventory, decideInventoryItem } = useStore();
+  const viewOnly = useViewOnly("adminisztracio");
   const [comments, setComments] = useState<Record<string, string>>({});
   const pending = inventory.filter((i) => i.status === "jovahagyasra_var");
   const decided = inventory.filter((i) => i.status !== "jovahagyasra_var");

@@ -45,6 +45,7 @@ function assetLabel(a: Asset) {
 
 function ScrapPage() {
   const store = useStore();
+  const viewOnly = useViewOnly("selejtezes");
   const role = store.activeRole;
   const isPlanner = role === "eszkozmenedzser";
   const isFinance = role === "gazdasagi_vezeto";

@@ -55,6 +55,7 @@ const QUARTERS: Quarter[] = ["Q1", "Q2", "Q3", "Q4"];
 
 function ProcurementPage() {
   const store = useStore();
+  const viewOnly = useViewOnly("beszerzesi-terv");
   const items = store.planItems.filter((p) => p.planYear === NEXT_FINANCIAL_YEAR);
 
   const candidates = useMemo(

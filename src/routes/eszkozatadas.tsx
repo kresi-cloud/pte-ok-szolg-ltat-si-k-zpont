@@ -469,6 +469,7 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
 
 function HandoverWorkspace() {
   const store = useStore();
+  const viewOnly = useViewOnly("eszkozatadas");
   const role = store.activeRole;
   const allowed = ["it_referens", "eszkozmenedzser", "beszerzo", "dekan"].includes(
     role,
