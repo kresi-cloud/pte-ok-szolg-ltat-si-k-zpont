@@ -26,6 +26,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Paperclip, Trash2 } from "lucide-react";
 import { PageHeading } from "@/components/page-heading";
+import { useViewOnly } from "@/lib/access";
+import { ViewOnlyNotice } from "@/components/view-only-notice";
 import { StatTile } from "@/components/asset-bits";
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;

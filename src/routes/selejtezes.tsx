@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PageHeading } from "@/components/page-heading";
+import { useViewOnly } from "@/lib/access";
+import { ViewOnlyNotice } from "@/components/view-only-notice";
 import { StatTile } from "@/components/asset-bits";
 import { useStore, lookup } from "@/lib/store";
 import { assetLookup, huf, lifecycleStatus, yearsSince } from "@/lib/asset-logic";

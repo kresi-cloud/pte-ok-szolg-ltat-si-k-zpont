@@ -25,6 +25,8 @@ import { DOMAINS, TEAMS, USERS, lookup, useStore } from "@/lib/store";
 import { STATUS_LABELS, type StatusKey } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { PageHeading } from "@/components/page-heading";
+import { useViewOnly } from "@/lib/access";
+import { ViewOnlyNotice } from "@/components/view-only-notice";
 
 export const Route = createFileRoute("/munkater")({
   head: () => ({

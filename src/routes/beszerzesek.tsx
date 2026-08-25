@@ -27,6 +27,8 @@ import {
 } from "@/lib/asset-types";
 import { daysUntil } from "@/lib/plan-approvals";
 import { PageHeading } from "@/components/page-heading";
+import { useViewOnly } from "@/lib/access";
+import { ViewOnlyNotice } from "@/components/view-only-notice";
 import { StatTile } from "@/components/asset-bits";
 
 export const Route = createFileRoute("/beszerzesek")({
