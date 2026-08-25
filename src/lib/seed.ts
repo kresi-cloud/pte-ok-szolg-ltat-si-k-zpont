@@ -36,8 +36,8 @@ export const DOMAINS: ServiceDomain[] = [
   },
   {
     key: "hardver",
-    name: "Hardver",
-    short: "Eszközök és perifériák",
+    name: "Informatikai eszköz",
+    short: "Informatikai eszközök és perifériák",
     description:
       "Számítógép, notebook, monitor, periféria, nyomtató, eszközcsere vagy bővítés.",
     examples: [
