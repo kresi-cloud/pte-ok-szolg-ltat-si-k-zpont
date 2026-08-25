@@ -218,7 +218,7 @@ function Wizard() {
               {i < step ? <Check className="size-3.5" aria-hidden="true" /> : i + 1}
             </span>
             <span className={cn(i === step ? "font-semibold" : "text-muted-foreground")}>{s}</span>
-            {i < STEPS.length - 1 && <span className="text-border" aria-hidden="true">—</span>}
+            {i < stepLabels.length - 1 && <span className="text-border" aria-hidden="true">—</span>}
           </li>
         ))}
       </ol>
