@@ -240,7 +240,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         // A megszűnt superuser szerepkör / demó felhasználó kitisztítása a mentett állapotból.
         const legacyRole = (merged.activeRole as string) === "superuser";
         if (legacyRole || merged.currentUserId === "u-superuser") {
-          merged.currentUserId = "u-nemeth";
+          merged.currentUserId = "u-molnar";
           merged.activeRole = "admin";
         }
         if (merged.roleOverrides) {

@@ -191,7 +191,7 @@ export const USERS: User[] = [
   {
     id: "u-molnar",
     name: "Tarczali J.",
-    title: "rendszeradminisztrátor",
+    title: "admin",
     email: "molnar.julia@aok.pte.hu",
     employeeId: "PTE-115502",
     orgUnitId: "ou-dekani",
