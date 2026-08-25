@@ -223,7 +223,7 @@ function Wizard() {
         ))}
       </ol>
 
-      {step === 0 && (
+      {key === "domain" && (
         <section>
           <h1 className="font-display text-2xl font-semibold">Miben segíthetünk?</h1>
           <p className="mt-2 text-muted-foreground">Válassza ki, melyik területhez kapcsolódik az igény.</p>
@@ -256,7 +256,7 @@ function Wizard() {
         </section>
       )}
 
-      {step === 1 && (
+      {key === "goal" && (
         <section className="space-y-5">
           <div>
             <h1 className="font-display text-2xl font-semibold">Mit szeretne elérni?</h1>
@@ -310,7 +310,7 @@ function Wizard() {
         </section>
       )}
 
-      {step === 2 && (
+      {key === "details" && (
         <section className="space-y-6">
           <div>
             <h1 className="font-display text-2xl font-semibold">Néhány pontosító kérdés</h1>
@@ -453,7 +453,7 @@ function Wizard() {
         </section>
       )}
 
-      {step === 3 && (
+      {key === "summary" && (
         <section className="space-y-6">
           <div>
             <h1 className="font-display text-2xl font-semibold">Igény összegzése</h1>
@@ -505,8 +505,8 @@ function Wizard() {
         >
           <ArrowLeft className="size-4" /> Vissza
         </Button>
-        {step < 3 && (
-          <Button onClick={() => setStep((s) => Math.min(3, s + 1))} disabled={!canNext}>
+        {step < lastStep && (
+          <Button onClick={() => setStep((s) => Math.min(lastStep, s + 1))} disabled={!canNext}>
             Tovább <ArrowRight className="size-4" />
           </Button>
         )}
