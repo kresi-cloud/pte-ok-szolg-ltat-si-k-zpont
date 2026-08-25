@@ -88,6 +88,7 @@ function ProcurementPage() {
           title={`Beszerzési terv – ${NEXT_FINANCIAL_YEAR}. gazdasági év`}
           description="A tervezés az életciklus-adatokból automatikusan javasolt cserejelöltekből indul, de minden tétel felülvizsgálható, átütemezhető és indoklással módosítható. A költségbecslés referenciaárakkal, árváltozási feltételezéssel, mennyiségi kedvezménnyel és tartalékkerettel számol – a becslés soha nem tekinthető kötelezettségvállalásnak."
         />
+        {viewOnly && <ViewOnlyNotice />}
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

@@ -531,6 +531,7 @@ function BuyerWorkspace() {
           title="Beszerzői munkatér"
           description={`Jóváhagyott eseti beszerzések, valamint a ${NEXT_FINANCIAL_YEAR}. évi negyedéves és éves beszerzési terv jóváhagyási státusza.`}
         />
+        {viewOnly && <ViewOnlyNotice />}
       </header>
 
       <div className="grid gap-4 sm:grid-cols-3">

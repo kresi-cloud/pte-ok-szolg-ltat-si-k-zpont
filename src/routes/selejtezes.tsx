@@ -100,6 +100,7 @@ function ScrapPage() {
           title="Selejtezési javaslat"
           description={`Az IT eszközmenedzser éves selejtezési javaslatot állít össze az életciklus végét elért eszközökből, amelyet a gazdasági vezető hagy jóvá. Tervezési év: ${NEXT_FINANCIAL_YEAR}.`}
         />
+        {viewOnly && <ViewOnlyNotice />}
       </header>
 
       <div className="grid gap-4 sm:grid-cols-3">

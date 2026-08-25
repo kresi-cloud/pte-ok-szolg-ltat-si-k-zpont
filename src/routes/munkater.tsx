@@ -107,6 +107,7 @@ function Workbench() {
                 : ""}
               munkasor, besorolás és kapacitás.
             </>
+        {viewOnly && <ViewOnlyNotice />}
           }
         />
       </div>

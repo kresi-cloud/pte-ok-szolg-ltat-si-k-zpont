@@ -62,6 +62,7 @@ function Admin() {
           title="Adminisztráció"
           description="Törzsadatok és a portál működését szabályozó beállítások."
         />
+        {viewOnly && <ViewOnlyNotice />}
       </div>
 
       <Tabs defaultValue="felhasznalok">
