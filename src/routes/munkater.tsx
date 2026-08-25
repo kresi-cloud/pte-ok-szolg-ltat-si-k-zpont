@@ -59,6 +59,7 @@ const OPEN: StatusKey[] = [
 
 function Workbench() {
   const store = useStore();
+  const viewOnly = useViewOnly("munkater");
   const [q, setQ] = useState("");
   const [domain, setDomain] = useState("mind");
   const [status, setStatus] = useState("mind");
@@ -216,6 +217,7 @@ function Workbench() {
                     </TableCell>
                     <TableCell>
                       <Select
+                        disabled={viewOnly}
                         value={r.assigneeId ?? "nincs"}
                         onValueChange={(v) => {
                           store.updateRequest(
@@ -292,6 +294,7 @@ function Workbench() {
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button
                   size="sm"
+                  disabled={viewOnly}
                   onClick={() => {
                     store.setStatus(r.id, "jovahagyasra_var");
                     toast.success("Besorolás elfogadva, jóváhagyásra küldve.");
@@ -302,6 +305,7 @@ function Workbench() {
                 <Button
                   size="sm"
                   variant="outline"
+                  disabled={viewOnly}
                   onClick={() => {
                     store.setStatus(r.id, "pontositas");
                     toast.info("Pontosítás kérve az igénylőtől.");
