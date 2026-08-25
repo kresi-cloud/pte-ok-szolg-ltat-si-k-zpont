@@ -191,7 +191,7 @@ interface StoreValue extends PersistedState {
 // already-rendered provider and a freshly-imported useStore use different
 // contexts and the hook throws "must be used inside StoreProvider".
 const globalScope = globalThis as unknown as {
-  __dszpStoreContext?: React.Context<StoreValue | null>;
+  __dszpStoreContext?: Context<StoreValue | null>;
 };
 const StoreContext =
   globalScope.__dszpStoreContext ??
