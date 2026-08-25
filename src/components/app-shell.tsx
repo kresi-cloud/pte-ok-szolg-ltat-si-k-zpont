@@ -125,7 +125,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               className="hidden w-72 items-center gap-2 rounded-sm border border-white/25 bg-white/10 px-3 py-2 text-left text-sm text-white/75 transition-colors hover:bg-white/20 lg:flex"
             >
               <Search className="size-4" aria-hidden="true" />
-              <span className="truncate">Keresés szolgáltatások, igények és projektek között…</span>
+              <span className="truncate">Keresés igények és eszközök között…</span>
             </button>
             <Button
               variant="ghost"

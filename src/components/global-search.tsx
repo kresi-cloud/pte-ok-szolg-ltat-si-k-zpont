@@ -27,7 +27,7 @@ export function GlobalSearch({
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandInput placeholder="Keresés szolgáltatások, igények és projektek között…" />
+      <CommandInput placeholder="Keresés igények és eszközök között…" />
       <CommandList>
         <CommandEmpty>Nincs találat.</CommandEmpty>
         <CommandGroup heading="Igények">

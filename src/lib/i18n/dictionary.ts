@@ -1,5 +1,11 @@
 // Auto-generated Hungarian -> English UI dictionary.
 export const EN_DICT: Record<string, string> = {
+  "Informatikai eszköz": "IT equipment",
+  "Informatikai eszközök és perifériák": "IT equipment and peripherals",
+  "Mit szeretne igényelni?": "What would you like to request?",
+  "Jelenleg informatikai eszköz igénylése indítható – a rendszer végigvezeti a termékkörökön és a választható modelleken.": "Currently only IT equipment requests can be submitted \u2013 the system guides you through the product categories and available models.",
+  "Hamarosan elérhető": "Coming soon",
+  "Keresés igények és eszközök között…": "Search requests and devices\u2026",
   "A demó szolgáltatási igények listázása és szűrése domain, státusz, prioritás vagy szabadszavas keresés alapján. Összefoglaló adatokat ad vissza (cím, cél, státusz, határidő, szervezeti egység).": "Lists and filters demo service requests by domain, status, priority or free-text search. Returns summary data (title, goal, status, deadline, organizational unit).",
   "Keresés a PTE ÁOK IT szolgáltatáskatalógusában (szoftver, hardver, web, digitalizáció). Visszaadja a szolgáltatás nevét, leírását, igénylési feltételeit, jóváhagyási lépcsőit és SLA-ját.": "Search in the PTE Medical School IT service catalog (software, hardware, web, digitalization). Returns the service name, description, request conditions, approval steps, and SLA.",
   "A hétvégi karbantartás ideje alatt (szombat 08:00–14:00) a Neptun és a kari VPN időszakosan nem lesz elérhető. A portálon beadott igények feldolgozása a karbantartás után folytatódik.": "During the weekend maintenance (Saturday 08:00–14:00), Neptun and the faculty VPN will be temporarily unavailable. Processing of requests submitted on the portal will continue after the maintenance.",
