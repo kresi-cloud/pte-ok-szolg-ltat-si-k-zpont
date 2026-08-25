@@ -29,6 +29,7 @@ import { daysUntil } from "@/lib/plan-approvals";
 import { PageHeading } from "@/components/page-heading";
 import { useViewOnly } from "@/lib/access";
 import { ViewOnlyNotice } from "@/components/view-only-notice";
+import { ProductCatalogAdmin } from "@/components/product-catalog-admin";
 import { StatTile } from "@/components/asset-bits";
 
 export const Route = createFileRoute("/beszerzesek")({
@@ -546,6 +547,7 @@ function BuyerWorkspace() {
           <TabsTrigger value="eseti">Eseti beszerzések</TabsTrigger>
           <TabsTrigger value="negyedeves">Negyedéves terv</TabsTrigger>
           <TabsTrigger value="eves">Éves terv</TabsTrigger>
+          <TabsTrigger value="katalogus">Termékkatalógus</TabsTrigger>
         </TabsList>
 
         <TabsContent value="eseti" className="mt-4 space-y-3">
@@ -639,6 +641,15 @@ function BuyerWorkspace() {
               Beszerzési terv
             </Link>
           </p>
+        </TabsContent>
+
+        <TabsContent value="katalogus" className="mt-4 space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Termékkörök és konkrét eszközmodellek kezelése. A modellekhez megadott technikai
+            adatlap jelenik meg az igénylőnek, az elérhetőség pedig a munkavállalói besorolás
+            szerint szűkül.
+          </p>
+          <ProductCatalogAdmin readOnly={viewOnly} />
         </TabsContent>
       </Tabs>
     </div>

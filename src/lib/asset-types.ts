@@ -537,7 +537,16 @@ export interface AssetAuditEvent {
   id: string;
   at: string;
   actorId: string;
-  entity: "asset" | "licenc" | "beszerzes" | "leltar" | "dontes" | "kozlemeny";
+  entity:
+    | "asset"
+    | "licenc"
+    | "beszerzes"
+    | "leltar"
+    | "dontes"
+    | "kozlemeny"
+    | "termekkor"
+    | "termek"
+    | "jogosultsag";
   entityId: string;
   action: string;
   detail: string;

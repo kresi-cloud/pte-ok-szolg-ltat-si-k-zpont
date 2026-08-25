@@ -66,7 +66,7 @@ export function planItemFromRequest(r: ServiceRequest): Omit<ProcurementPlanItem
     REFERENCE_PRICES.find((p) => p.id === standard.referencePriceId) ??
     REFERENCE_PRICES.find((p) => p.categoryKey === standard.categoryKey) ??
     REFERENCE_PRICES[0]!;
-  const quantity = pickQuantity(text);
+  const quantity = r.quantity && r.quantity > 0 ? r.quantity : pickQuantity(text);
 
   return {
     planYear: NEXT_FINANCIAL_YEAR,
