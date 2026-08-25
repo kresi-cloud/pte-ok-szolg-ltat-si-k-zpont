@@ -371,6 +371,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         updatedAt: today(),
         dueDate: input.dueDate,
         estimatedCost: input.estimatedCost ?? 0,
+        productCategoryId: input.productCategoryId,
+        productId: input.productId,
+        quantity: input.quantity,
         effortDays: 5,
         nextStep: draft
           ? "Piszkozat – beküldésre vár."
