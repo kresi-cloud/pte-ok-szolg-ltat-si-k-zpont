@@ -628,7 +628,7 @@ function Wizard() {
               ["Cél", isHw ? form.goal || "Nincs megadva" : form.goal],
               ["Érintett szervezeti egység", lookup.unit(currentUser.orgUnitId)],
               ["Felhasználók", [form.users, form.userCount].filter(Boolean).join(" · ") || "Nincs megadva"],
-              ["Kívánt eredmény", form.title],
+              ["Kívánt eredmény", isHw ? hwTitle : form.title],
               ["Határidő", form.deadline || "Nincs megadva"],
               ["Adatkezelési érintettség", form.personalData === "igen" ? "Igen – adatvédelmi vizsgálat szükséges" : form.personalData === "bizonytalan" ? "Bizonytalan – a szolgáltatási csapat megvizsgálja" : "Nem"],
               ["Integráció", form.integration || "Nem szükséges"],
@@ -649,10 +649,10 @@ function Wizard() {
             </p>
           </AiBadge>
           <div className="flex flex-wrap gap-3">
-            <Button size="lg" onClick={() => submit(false)} disabled={!form.title || !form.goal}>
+            <Button size="lg" onClick={() => submit(false)} disabled={isHw ? !selectedProduct : !form.title || !form.goal}>
               Igény beküldése
             </Button>
-            <Button size="lg" variant="outline" onClick={() => submit(true)} disabled={!form.title}>
+            <Button size="lg" variant="outline" onClick={() => submit(true)} disabled={isHw ? !selectedProduct : !form.title}>
               Mentés piszkozatként
             </Button>
           </div>
