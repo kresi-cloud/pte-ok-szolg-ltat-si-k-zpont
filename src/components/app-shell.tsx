@@ -2,14 +2,11 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode } from "react";
 import {
   Bell,
-  Building2,
   ClipboardList,
   GaugeCircle,
-  Grid2x2,
   CheckCheck,
   KeyRound,
   Home,
-  LayoutList,
   LifeBuoy,
   LogOut,
   Laptop,
@@ -19,10 +16,8 @@ import {
   TrendingUp,
   Trash2,
   Plus,
-  Rocket,
   Search,
   Settings2,
-  ShieldCheck,
   UserRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
