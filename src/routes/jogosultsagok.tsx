@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { lookup, useStore } from "@/lib/store";
 import { ROLE_DESCRIPTIONS, ROLE_LABELS, type RoleKey } from "@/lib/types";
+import { TIERS, TIER_LABELS } from "@/lib/product-catalog";
 import { PageHeading } from "@/components/page-heading";
 import { useViewOnly } from "@/lib/access";
 import { ViewOnlyNotice } from "@/components/view-only-notice";
@@ -206,6 +207,29 @@ function Permissions() {
                 </li>
               ))}
             </ul>
+
+            <div className="mt-6 border-t border-border pt-5">
+              <span className="block text-sm font-medium">Munkavállalói besorolás</span>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Meghatározza, mely termékcsomagból igényelhet eszközt. Az igénylési felületen nem
+                jelenik meg.
+              </p>
+              <div className="mt-3 space-y-2">
+                {TIERS.map((t) => (
+                  <label key={t} className="flex cursor-pointer items-center gap-2 text-sm">
+                    <input
+                      type="radio"
+                      name="employee-tier"
+                      className="size-4 accent-[hsl(var(--primary))]"
+                      disabled={!canManage}
+                      checked={(selected.employeeTier ?? "alkalmazotti") === t}
+                      onChange={() => store.setUserTier(selected.id, t, reason.trim() || undefined)}
+                    />
+                    {TIER_LABELS[t]}
+                  </label>
+                ))}
+              </div>
+            </div>
 
             <label htmlFor="reason" className="mt-5 block text-sm font-medium">
               Módosítás indoklása

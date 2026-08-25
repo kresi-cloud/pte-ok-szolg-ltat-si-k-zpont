@@ -25,7 +25,10 @@ import type {
   Announcement,
   AppNotification,
   AssetHandover,
+  EmployeeTier,
   InventoryItem,
+  Product,
+  ProductCategory,
   Project,
   RequestMessage,
   RoleKey,
@@ -34,6 +37,7 @@ import type {
   StatusKey,
   User,
 } from "./types";
+import { INITIAL_PRODUCTS, INITIAL_PRODUCT_CATEGORIES } from "./product-catalog";
 import { INVENTORY, specForModel } from "./inventory-data";
 import { modelKeyForStandard, standardLabel } from "./handover-mapping";
 import type {
@@ -90,6 +94,9 @@ interface PersistedState {
   loggedIn: boolean;
   roleOverrides: Record<string, RoleKey[]>;
   roleAudit: RoleAuditEvent[];
+  productCategories: ProductCategory[];
+  products: Product[];
+  tierOverrides: Record<string, EmployeeTier>;
 }
 
 const initialState: PersistedState = {
@@ -114,6 +121,9 @@ const initialState: PersistedState = {
   loggedIn: false,
   roleOverrides: {},
   roleAudit: [],
+  productCategories: INITIAL_PRODUCT_CATEGORIES,
+  products: INITIAL_PRODUCTS,
+  tierOverrides: {},
 };
 
 interface StoreValue extends PersistedState {
@@ -179,6 +189,14 @@ interface StoreValue extends PersistedState {
   ) => void;
 
   setUserRoles: (userId: string, roles: RoleKey[], reason: string) => void;
+  /** Munkavállalói besorolás módosítása (jogosultságkezelés). */
+  setUserTier: (userId: string, tier: EmployeeTier, reason?: string) => void;
+  addProductCategory: (input: Omit<ProductCategory, "id">) => string;
+  updateProductCategory: (id: string, patch: Partial<ProductCategory>) => void;
+  removeProductCategory: (id: string) => void;
+  addProduct: (input: Omit<Product, "id">) => string;
+  updateProduct: (id: string, patch: Partial<Product>) => void;
+  removeProduct: (id: string) => void;
   activeAnnouncements: Announcement[];
   addAnnouncement: (input: Omit<Announcement, "id" | "publishedAt" | "createdBy">) => string;
   updateAnnouncement: (id: string, patch: Partial<Announcement>) => void;
@@ -199,6 +217,14 @@ const StoreContext =
 
 
 const today = () => new Date().toISOString().slice(0, 10);
+
+/** Alapértelmezett munkavállalói besorolás a szerepkörök alapján. */
+function defaultTierFor(u: User): EmployeeTier {
+  if (u.roles.includes("dekan")) return "felsovezetoi";
+  if (u.roles.some((r) => ["vezeto", "gazdasagi_vezeto", "szolgaltatasgazda"].includes(r)))
+    return "vezetoi";
+  return "alkalmazotti";
+}
 
 /**
  * Jóváhagyott igény bekötése a beszerzési tervbe: ha az igény beszerzést
@@ -283,10 +309,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const effectiveUsers = useMemo(
     () =>
-      USERS.map((u) =>
-        state.roleOverrides[u.id] ? { ...u, roles: state.roleOverrides[u.id]! } : u,
-      ),
-    [state.roleOverrides],
+      USERS.map((u) => {
+        const roles = state.roleOverrides[u.id];
+        const tier = (state.tierOverrides ?? {})[u.id] ?? u.employeeTier ?? defaultTierFor(u);
+        return { ...u, ...(roles ? { roles } : {}), employeeTier: tier };
+      }),
+    [state.roleOverrides, state.tierOverrides],
   );
 
   const currentUser = useMemo(
@@ -1549,6 +1577,112 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           roleAudit: [...events, ...s.roleAudit],
         };
       }),
+
+    setUserTier: (userId, tier, reason) =>
+      setState((s) => ({
+        ...s,
+        tierOverrides: { ...(s.tierOverrides ?? {}), [userId]: tier },
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: s.currentUserId,
+            entity: "jogosultsag",
+            entityId: userId,
+            action: "Munkavállalói besorolás módosítása",
+            detail: `${tier}${reason ? ` · ${reason}` : ""}`,
+          },
+          ...s.assetAudit,
+        ],
+      })),
+
+    addProductCategory: (input) => {
+      const id = `pc-${Date.now()}`;
+      setState((s) => ({
+        ...s,
+        productCategories: [...(s.productCategories ?? []), { ...input, id }],
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: s.currentUserId,
+            entity: "termekkor",
+            entityId: id,
+            action: "Termékkör létrehozása",
+            detail: input.name,
+          },
+          ...s.assetAudit,
+        ],
+      }));
+      return id;
+    },
+    updateProductCategory: (id, patch) =>
+      setState((s) => ({
+        ...s,
+        productCategories: (s.productCategories ?? []).map((c) =>
+          c.id === id ? { ...c, ...patch } : c,
+        ),
+      })),
+    removeProductCategory: (id) =>
+      setState((s) => ({
+        ...s,
+        productCategories: (s.productCategories ?? []).filter((c) => c.id !== id),
+        products: (s.products ?? []).filter((p) => p.categoryId !== id),
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: s.currentUserId,
+            entity: "termekkor",
+            entityId: id,
+            action: "Termékkör törlése",
+            detail: "A termékkör és a hozzá tartozó modellek törölve.",
+          },
+          ...s.assetAudit,
+        ],
+      })),
+    addProduct: (input) => {
+      const id = `prod-${Date.now()}`;
+      setState((s) => ({
+        ...s,
+        products: [...(s.products ?? []), { ...input, id }],
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: s.currentUserId,
+            entity: "termek",
+            entityId: id,
+            action: "Termék felvétele a katalógusba",
+            detail: `${input.name} · ${input.tier}`,
+          },
+          ...s.assetAudit,
+        ],
+      }));
+      return id;
+    },
+    updateProduct: (id, patch) =>
+      setState((s) => ({
+        ...s,
+        products: (s.products ?? []).map((p) => (p.id === id ? { ...p, ...patch } : p)),
+      })),
+    removeProduct: (id) =>
+      setState((s) => ({
+        ...s,
+        products: (s.products ?? []).filter((p) => p.id !== id),
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: s.currentUserId,
+            entity: "termek",
+            entityId: id,
+            action: "Termék törlése a katalógusból",
+            detail: "A korábbi igényeken az adatok megmaradnak.",
+          },
+          ...s.assetAudit,
+        ],
+      })),
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

@@ -13,6 +13,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AiBadge } from "@/components/status-badge";
 import { CATALOG, DOMAINS, lookup, useStore } from "@/lib/store";
 import type { DomainKey } from "@/lib/types";
+import { tierOf, visibleCategories, visibleProducts } from "@/lib/product-catalog";
 import { cn } from "@/lib/utils";
 
 const searchSchema = z.object({
@@ -48,10 +49,14 @@ const ICONS: Record<DomainKey, typeof Boxes> = {
 };
 
 const STEPS = ["Terület", "Cél", "Részletek", "Összegzés"];
+const HW_STEPS = ["Terület", "Termékkör", "Eszköz", "Részletek", "Összegzés"];
 
 interface FormState {
   domain: DomainKey | "";
   catalogItemId: string;
+  productCategoryId: string;
+  productId: string;
+  quantity: string;
   title: string;
   goal: string;
   users: string;
@@ -70,6 +75,9 @@ interface FormState {
 const empty: FormState = {
   domain: "",
   catalogItemId: "",
+  productCategoryId: "",
+  productId: "",
+  quantity: "1",
   title: "",
   goal: "",
   users: "",
@@ -88,7 +96,7 @@ const empty: FormState = {
 function Wizard() {
   const search = Route.useSearch();
   const navigate = useNavigate();
-  const { createRequest, currentUser } = useStore();
+  const { createRequest, currentUser, productCategories, products } = useStore();
   const preset = CATALOG.find((c) => c.id === search['service']);
   const [step, setStep] = useState(search['domain'] ? 1 : 0);
   const [form, setForm] = useState<FormState>({
@@ -103,18 +111,62 @@ function Wizard() {
 
   const questions = useMemo(() => contextQuestions(form.domain), [form.domain]);
 
+  const isHw = form.domain === "hardver";
+  const stepLabels = isHw ? HW_STEPS : STEPS;
+  const stepKeys: string[] = isHw
+    ? ["domain", "category", "product", "details", "summary"]
+    : ["domain", "goal", "details", "summary"];
+  const lastStep = stepKeys.length - 1;
+  const key = stepKeys[Math.min(step, lastStep)]!;
+
+  const tier = tierOf(currentUser);
+  const cats = useMemo(
+    () => visibleCategories(productCategories, products, tier),
+    [productCategories, products, tier],
+  );
+  const catProducts = useMemo(
+    () =>
+      visibleProducts(products, tier).filter((p) => p.categoryId === form.productCategoryId),
+    [products, tier, form.productCategoryId],
+  );
+  const selectedProduct = products.find((p) => p.id === form.productId);
+  const selectedCategory = productCategories.find((c) => c.id === form.productCategoryId);
+
   const canNext =
-    (step === 0 && !!form.domain) ||
-    (step === 1 && form.goal.trim().length > 20 && form.title.trim().length > 3) ||
-    step === 2 ||
-    step === 3;
+    (key === "domain" && !!form.domain) ||
+    (key === "category" && !!form.productCategoryId) ||
+    (key === "product" && !!form.productId) ||
+    (key === "goal" && form.goal.trim().length > 20 && form.title.trim().length > 3) ||
+    key === "details" ||
+    key === "summary";
+
+
+  const qty = Math.max(1, Number(form.quantity) || 1);
+  const hwTitle = selectedProduct
+    ? `${selectedCategory?.name ?? "Eszköz"} igénylés – ${selectedProduct.name}${qty > 1 ? ` (${qty} db)` : ""}`
+    : "";
+  const hwGoal = selectedProduct
+    ? [
+        `Igényelt eszköz: ${selectedProduct.name} (${selectedProduct.vendor}), ${qty} db.`,
+        `Termékkör: ${selectedCategory?.name ?? "—"}.`,
+        `Konfiguráció: ${selectedProduct.spec.cpu} · ${selectedProduct.spec.ram} · ${selectedProduct.spec.storage} · ${selectedProduct.spec.os} ${selectedProduct.spec.osVersion}.`,
+        form.goal.trim() ? `Indoklás: ${form.goal.trim()}` : "",
+        form.device.trim() ? `Használat helye: ${form.device.trim()}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n")
+    : form.goal;
 
   const submit = (draft: boolean) => {
     const id = createRequest({
-      title: form.title,
+      title: isHw ? hwTitle : form.title,
       domain: form.domain as DomainKey,
-      goal: form.goal,
+      goal: isHw ? hwGoal : form.goal,
       catalogItemId: form.catalogItemId || undefined,
+      productCategoryId: form.productCategoryId || undefined,
+      productId: form.productId || undefined,
+      quantity: isHw ? qty : undefined,
+      estimatedCost: isHw && selectedProduct ? selectedProduct.referencePrice * qty : undefined,
       status: draft ? "piszkozat" : "bekuldve",
       users: form.users,
       userCount: form.userCount,

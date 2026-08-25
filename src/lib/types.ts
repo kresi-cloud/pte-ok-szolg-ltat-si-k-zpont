@@ -85,6 +85,49 @@ export interface User {
   managerId?: string | undefined;
   teamId?: string | undefined;
   initials: string;
+  /** Munkavállalói besorolás – meghatározza, mely termékcsomagból igényelhet. */
+  employeeTier?: EmployeeTier | undefined;
+}
+
+/** Munkavállalói kategóriák a termékkatalógus elérhetőségéhez. */
+export type EmployeeTier = "alkalmazotti" | "vezetoi" | "felsovezetoi";
+
+/** Beszerző által kezelt termékkör (kategória). */
+export interface ProductCategory {
+  id: string;
+  name: string;
+  description: string;
+  active: boolean;
+}
+
+/** Termék technikai adatlapja. */
+export interface ProductSpec {
+  os: string;
+  osVersion: string;
+  cpu: string;
+  ram: string;
+  storage: string;
+  display?: string | undefined;
+  battery?: string | undefined;
+  ports?: string | undefined;
+  warranty?: string | undefined;
+  features: string[];
+}
+
+/** Beszerző által kezelt konkrét eszközmodell. */
+export interface Product {
+  id: string;
+  categoryId: string;
+  name: string;
+  vendor: string;
+  /** Ettől a besorolástól felfelé érhető el a termék. */
+  tier: EmployeeTier;
+  referencePrice: number;
+  active: boolean;
+  note?: string | undefined;
+  /** Kapcsolat a leltári eszközfelismerési modellhez, ha van. */
+  modelKey?: string | undefined;
+  spec: ProductSpec;
 }
 
 export interface ServiceTeam {
@@ -248,6 +291,12 @@ export interface ServiceRequest {
     dataProtection: string;
   } | undefined;
   rating?: number | undefined;
+  /** Termékkatalógusból választott termékkör azonosítója. */
+  productCategoryId?: string | undefined;
+  /** Termékkatalógusból választott konkrét termék azonosítója. */
+  productId?: string | undefined;
+  /** Igényelt darabszám. */
+  quantity?: number | undefined;
 }
 
 export type ProjectStage =
