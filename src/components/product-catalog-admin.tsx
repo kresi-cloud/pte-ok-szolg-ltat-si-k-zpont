@@ -280,7 +280,7 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="secondary">{TIER_LABELS[p.tier]}től elérhető</Badge>
+                        <Badge variant="secondary">{TIER_LABELS[p.tier]} kategóriától</Badge>
                         <Button
                           size="sm"
                           variant="outline"
