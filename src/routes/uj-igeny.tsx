@@ -256,6 +256,127 @@ function Wizard() {
         </section>
       )}
 
+      {key === "category" && (
+        <section>
+          <h1 className="font-display text-2xl font-semibold">Milyen eszközre van szüksége?</h1>
+          <p className="mt-2 text-muted-foreground">
+            Válassza ki az eszköz típusát – a következő lépésben a konkrét modellek közül
+            választhat.
+          </p>
+          {cats.length === 0 ? (
+            <p className="card-surface mt-6 p-6 text-sm text-muted-foreground">
+              Jelenleg nincs igényelhető eszköztípus. Kérjük, vegye fel a kapcsolatot a beszerzéssel.
+            </p>
+          ) : (
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {cats.map((c) => {
+                const selected = form.productCategoryId === c.id;
+                const count = visibleProducts(products, tier).filter(
+                  (p) => p.categoryId === c.id,
+                ).length;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => set({ productCategoryId: c.id, productId: "" })}
+                    className={cn(
+                      "card-surface p-5 text-left transition-colors",
+                      selected ? "border-primary ring-2 ring-primary/25" : "hover:bg-secondary/60",
+                    )}
+                  >
+                    <span className="block font-display font-semibold">{c.name}</span>
+                    <span className="mt-1 block text-sm text-muted-foreground">{c.description}</span>
+                    <span className="mt-2 block text-xs text-muted-foreground">
+                      {count} választható modell
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </section>
+      )}
+
+      {key === "product" && (
+        <section>
+          <h1 className="font-display text-2xl font-semibold">
+            {selectedCategory?.name ?? "Eszköz"} – válasszon modellt
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            A kiválasztott modell technikai adatlapja azonnal megjelenik.
+          </p>
+          {catProducts.length === 0 ? (
+            <p className="card-surface mt-6 p-6 text-sm text-muted-foreground">
+              Ehhez a termékkörhöz jelenleg nincs elérhető modell.
+            </p>
+          ) : (
+            <div className="mt-6 space-y-3">
+              {catProducts.map((p) => {
+                const selected = form.productId === p.id;
+                return (
+                  <div key={p.id} className="space-y-0">
+                    <button
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => set({ productId: p.id })}
+                      className={cn(
+                        "card-surface w-full p-5 text-left transition-colors",
+                        selected ? "border-primary ring-2 ring-primary/25" : "hover:bg-secondary/60",
+                      )}
+                    >
+                      <span className="block font-display font-semibold">{p.name}</span>
+                      <span className="mt-1 block text-sm text-muted-foreground">
+                        {p.vendor} · {p.spec.cpu} · {p.spec.ram} · {p.spec.storage}
+                      </span>
+                    </button>
+                    {selected && (
+                      <div className="card-surface mt-2 p-5">
+                        <h2 className="font-display text-base font-semibold">Technikai adatlap</h2>
+                        <dl className="mt-3 grid gap-x-6 gap-y-2 sm:grid-cols-2">
+                          {(
+                            [
+                              ["Operációs rendszer", `${p.spec.os} ${p.spec.osVersion}`],
+                              ["Processzor", p.spec.cpu],
+                              ["Memória", p.spec.ram],
+                              ["Tároló", p.spec.storage],
+                              ["Kijelző", p.spec.display],
+                              ["Akkumulátor", p.spec.battery],
+                              ["Csatlakozók", p.spec.ports],
+                              ["Garancia", p.spec.warranty],
+                            ] as [string, string | undefined][]
+                          )
+                            .filter(([, v]) => !!v)
+                            .map(([k, v]) => (
+                              <div key={k} className="text-sm">
+                                <dt className="text-muted-foreground">{k}</dt>
+                                <dd>{v}</dd>
+                              </div>
+                            ))}
+                        </dl>
+                        {p.spec.features.length > 0 && (
+                          <ul className="mt-4 flex flex-wrap gap-2">
+                            {p.spec.features.map((f) => (
+                              <li
+                                key={f}
+                                className="rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground"
+                              >
+                                {f}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {p.note && <p className="mt-3 text-sm text-muted-foreground">{p.note}</p>}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+      )}
+
       {key === "goal" && (
         <section className="space-y-5">
           <div>
