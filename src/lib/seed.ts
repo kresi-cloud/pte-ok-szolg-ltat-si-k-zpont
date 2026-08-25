@@ -39,13 +39,13 @@ export const DOMAINS: ServiceDomain[] = [
     name: "Informatikai eszköz",
     short: "Informatikai eszközök és perifériák",
     description:
-      "Számítógép, notebook, monitor, periféria, nyomtató, eszközcsere vagy bővítés.",
+      "Számítógép, notebook, okostelefon, mobiltelefon, periféria, eszközcsere vagy bővítés.",
     examples: [
       "számítógép",
       "notebook",
-      "monitor",
+      "okostelefon",
+      "mobiltelefon",
       "periféria",
-      "nyomtató",
       "eszközcsere",
       "bővítés",
     ],
@@ -365,7 +365,7 @@ export const TEAMS: ServiceTeam[] = [
   },
 ];
 
-export const CATALOG: CatalogItem[] = [
+const ALL_CATALOG: CatalogItem[] = [
   {
     id: "c-m365",
     name: "Microsoft 365 hozzáférés",
@@ -1170,9 +1170,13 @@ function buildRequest(s: Seed): ServiceRequest {
   };
 }
 
-export const REQUESTS: ServiceRequest[] = seeds.map(buildRequest);
+export const CATALOG: CatalogItem[] = ALL_CATALOG.filter((c) => c.domain === "hardver");
 
-export const PROJECTS: Project[] = [
+export const REQUESTS: ServiceRequest[] = seeds
+  .filter((s) => s.domain === "hardver")
+  .map(buildRequest);
+
+const ALL_PROJECTS: Project[] = [
   {
     id: "p-jelentkezes",
     name: "Hallgatói jelentkezési folyamat digitalizálása",
@@ -1294,6 +1298,10 @@ export const PROJECTS: Project[] = [
   },
 ];
 
+// A portál jelenleg csak informatikai eszközbeszerzést kezel,
+// ezért nem informatikai fejlesztési projektek nem jelennek meg.
+export const PROJECTS: Project[] = ALL_PROJECTS.filter(() => false);
+
 export const RESPONSIBILITIES: ResponsibilityRow[] = [
   {
     service: "Microsoft 365 hozzáférés",
@@ -1390,29 +1398,29 @@ export const RESPONSIBILITIES: ResponsibilityRow[] = [
 export const NOTIFICATIONS: AppNotification[] = [
   {
     id: "n-1",
-    requestId: "DIG-2026-0031",
-    text: "DIG-2026-0031 – új ügyintézői üzenet",
+    requestId: "HW-2026-0210",
+    text: "HW-2026-0210 – új ügyintézői üzenet",
     at: "2026-08-09",
     read: false,
   },
   {
     id: "n-2",
-    requestId: "SW-2026-0087",
-    text: "SW-2026-0087 – vezetői jóváhagyás szükséges",
+    requestId: "HW-2026-0233",
+    text: "HW-2026-0233 – vezetői jóváhagyás szükséges",
     at: "2026-08-06",
     read: false,
   },
   {
     id: "n-3",
-    requestId: "WEB-2026-0142",
-    text: "WEB-2026-0142 – az ügyintéző további információt kért",
+    requestId: "HW-2026-0198",
+    text: "HW-2026-0198 – az ügyintéző további információt kért",
     at: "2026-08-08",
     read: false,
   },
   {
     id: "n-4",
-    requestId: "SW-2026-0115",
-    text: "SW-2026-0115 – a feladat elkészült, átvételre vár",
+    requestId: "HW-2026-0221",
+    text: "HW-2026-0221 – a feladat elkészült, átvételre vár",
     at: "2026-08-08",
     read: true,
   },
