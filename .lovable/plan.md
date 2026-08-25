@@ -2,7 +2,7 @@
 
 ## Cél
 
-A „Superuser (jogosultságkezelő)” szerepkör megszűnik, feladatköre (szerepkörök kiosztása, visszavonása, jogosultsági napló) a **Rendszeradminisztrátor**hoz kerül. Emellett minden szerepkör csak azokat az aloldalakat látja, amelyek a feladatköréhez tartoznak; a vezetők látják az áttekintő felületeket, a dékán mindent.
+A „Superuser (jogosultságkezelő)” szerepkör megszűnik, feladatköre (szerepkörök kiosztása, visszavonása, jogosultsági napló) az **Admin**hoz kerül. A szerepkör megjelenő neve „Rendszeradminisztrátor” helyett mindenhol **Admin**. Emellett minden szerepkör csak azokat az aloldalakat látja, amelyek a feladatköréhez tartoznak; a vezetők látják az áttekintő felületeket, a dékán mindent.
 
 ## 1. Superuser kivezetése
 
