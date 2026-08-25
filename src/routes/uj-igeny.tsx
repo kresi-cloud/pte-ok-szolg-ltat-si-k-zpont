@@ -663,13 +663,15 @@ function Wizard() {
       )}
 
       <div className="mt-10 flex items-center justify-between border-t border-border pt-6">
-        <Button
-          variant="ghost"
-          onClick={() => setStep((s) => Math.max(0, s - 1))}
-          disabled={step === 0}
-        >
-          <ArrowLeft className="size-4" /> Vissza
-        </Button>
+        {step === 0 ? (
+          <Button variant="ghost" onClick={() => navigate({ to: "/" })}>
+            <ArrowLeft className="size-4" /> Mégse
+          </Button>
+        ) : (
+          <Button variant="ghost" onClick={() => setStep((s) => Math.max(0, s - 1))}>
+            <ArrowLeft className="size-4" /> Vissza
+          </Button>
+        )}
         {step < lastStep && (
           <Button onClick={() => setStep((s) => Math.min(lastStep, s + 1))} disabled={!canNext}>
             Tovább <ArrowRight className="size-4" />
