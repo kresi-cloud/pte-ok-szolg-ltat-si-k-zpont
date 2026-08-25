@@ -66,6 +66,7 @@ function Admin() {
         {viewOnly && <ViewOnlyNotice />}
       </div>
 
+      <fieldset disabled={viewOnly} className="contents">
       <Tabs defaultValue="felhasznalok">
         <TabsList className="flex-wrap">
           <TabsTrigger value="felhasznalok">Felhasználók</TabsTrigger>
@@ -323,6 +324,7 @@ function Admin() {
           </section>
         </TabsContent>
       </Tabs>
+      </fieldset>
     </div>
   );
 }
