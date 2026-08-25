@@ -203,7 +203,7 @@ function Wizard() {
       </Link>
 
       <ol className="mb-8 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
-        {STEPS.map((s, i) => (
+        {stepLabels.map((s, i) => (
           <li key={s} className="flex items-center gap-2">
             <span
               className={cn(
