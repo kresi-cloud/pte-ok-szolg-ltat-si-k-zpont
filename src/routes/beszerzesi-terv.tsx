@@ -104,6 +104,7 @@ function ProcurementPage() {
         />
       </div>
 
+      <fieldset disabled={viewOnly} className="contents">
       <Tabs defaultValue="terv">
         <TabsList className="flex-wrap">
           <TabsTrigger value="terv">Negyedéves terv</TabsTrigger>
@@ -245,6 +246,7 @@ function ProcurementPage() {
           </section>
         </TabsContent>
       </Tabs>
+      </fieldset>
     </div>
   );
 }
