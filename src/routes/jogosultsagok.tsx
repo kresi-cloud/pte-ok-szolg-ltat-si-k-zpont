@@ -124,6 +124,8 @@ function Permissions() {
         </Badge>
       </header>
 
+      {!canManage && <ViewOnlyNotice />}
+
       <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
         <section className="rounded-md border border-border bg-card">
           <div className="border-b border-border p-4">

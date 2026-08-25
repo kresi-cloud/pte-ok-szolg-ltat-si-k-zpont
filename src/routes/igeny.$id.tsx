@@ -223,6 +223,8 @@ function RequestDetail() {
         )}
       </header>
 
+      {store.activeRole === "dekan" && !pendingApproval && <ViewOnlyNotice />}
+
       <Tabs defaultValue="attekintes">
         <TabsList className="flex-wrap">
           <TabsTrigger value="attekintes">Áttekintés</TabsTrigger>
