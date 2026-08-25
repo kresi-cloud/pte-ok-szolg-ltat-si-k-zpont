@@ -237,6 +237,22 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           if (Array.isArray(fallback) && !Array.isArray(value)) continue;
           (merged as unknown as Record<string, unknown>)[key] = value;
         }
+        // A megszűnt superuser szerepkör / demó felhasználó kitisztítása a mentett állapotból.
+        const legacyRole = (merged.activeRole as string) === "superuser";
+        if (legacyRole || merged.currentUserId === "u-superuser") {
+          merged.currentUserId = "u-molnar";
+          merged.activeRole = "admin";
+        }
+        if (merged.roleOverrides) {
+          merged.roleOverrides = Object.fromEntries(
+            Object.entries(merged.roleOverrides)
+              .filter(([userId]) => userId !== "u-superuser")
+              .map(([userId, roles]) => [
+                userId,
+                (roles as RoleKey[]).filter((r) => (r as string) !== "superuser"),
+              ]),
+          );
+        }
         setState(merged);
       }
     } catch {

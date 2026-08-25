@@ -46,7 +46,7 @@ function ScrapPage() {
   const role = store.activeRole;
   const isPlanner = role === "eszkozmenedzser";
   const isFinance = role === "gazdasagi_vezeto";
-  const allowed = ["eszkozmenedzser", "gazdasagi_vezeto", "dekan", "admin", "superuser"].includes(
+  const allowed = ["eszkozmenedzser", "gazdasagi_vezeto", "dekan"].includes(
     role,
   );
 

@@ -24,12 +24,12 @@ export const Route = createFileRoute("/jogosultsagok")({
       {
         name: "description",
         content:
-          "Superuser felület a felhasználói szerepkörök kiosztására, visszavonására és a jogosultsági napló áttekintésére.",
+          "Admin felület a felhasználói szerepkörök kiosztására, visszavonására és a jogosultsági napló áttekintésére.",
       },
       { property: "og:title", content: "Jogosultságkezelés – ÁOK Portál" },
       {
         property: "og:description",
-        content: "Szerepkörök kiosztása és naplózása superuser jogkörrel.",
+        content: "Szerepkörök kiosztása és naplózása admin jogkörrel.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -50,7 +50,6 @@ const ALL_ROLES: RoleKey[] = [
   "eszkozmenedzser",
   "gazdasagi_vezeto",
   "it_referens",
-  "superuser",
 ];
 
 function Permissions() {
@@ -60,7 +59,8 @@ function Permissions() {
   const [draft, setDraft] = useState<RoleKey[] | null>(null);
   const [reason, setReason] = useState("");
 
-  const superuser = store.activeRole === "superuser";
+  const canManage = store.activeRole === "admin";
+  const allowed = canManage || store.activeRole === "dekan";
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -85,22 +85,21 @@ function Permissions() {
   }
 
   function save() {
-    if (!dirty || reason.trim().length < 5) return;
+    if (!canManage || !dirty || reason.trim().length < 5) return;
     store.setUserRoles(selected.id, roles, reason.trim());
     setDraft(null);
     setReason("");
   }
 
-  if (!superuser) {
+  if (!allowed) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 lg:px-8">
         <div className="rounded-md border border-border bg-card p-8 text-center">
           <Lock className="mx-auto size-8 text-muted-foreground" aria-hidden="true" />
           <h1 className="mt-4 font-display text-2xl font-semibold">Korlátozott felület</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            A felhasználói jogosultságok kiosztása kizárólag <strong>superuser</strong> jogkörrel
-            végezhető. A rendszeradminisztrátor a szolgáltatási beállításokat kezeli, de
-            szerepkört nem oszthat.
+            A felhasználói jogosultságok kiosztása kizárólag <strong>admin</strong> jogkörrel
+            végezhető.
           </p>
         </div>
       </div>
@@ -114,11 +113,12 @@ function Permissions() {
           <PageHeading
             title="Jogosultságkezelés"
             titleClassName="font-display text-3xl font-semibold"
-            description="A szerepköröket a kar superuser jogosultságkezelője osztja ki. Minden módosítás indoklással, naplózva történik."
+            description="A szerepköröket a kar adminja osztja ki. Minden módosítás indoklással, naplózva történik."
           />
         </div>
         <Badge className="gap-1.5">
-          <ShieldCheck className="size-3.5" aria-hidden="true" /> Superuser jogkör aktív
+          <ShieldCheck className="size-3.5" aria-hidden="true" />{" "}
+          {canManage ? "Admin jogkör aktív" : "Dékáni betekintés (csak olvasható)"}
         </Badge>
       </header>
 
@@ -190,6 +190,7 @@ function Permissions() {
                   <Checkbox
                     id={`role-${r}`}
                     checked={roles.includes(r)}
+                    disabled={!canManage}
                     onCheckedChange={(v) => toggle(r, v === true)}
                   />
                   <label htmlFor={`role-${r}`} className="cursor-pointer">
@@ -207,13 +208,14 @@ function Permissions() {
             </label>
             <Input
               id="reason"
+              disabled={!canManage}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Pl. munkakörváltás, dékáni utasítás száma…"
               className="mt-1.5"
             />
             <div className="mt-4 flex gap-2">
-              <Button onClick={save} disabled={!dirty || reason.trim().length < 5}>
+              <Button onClick={save} disabled={!canManage || !dirty || reason.trim().length < 5}>
                 Jogosultság mentése
               </Button>
               <Button

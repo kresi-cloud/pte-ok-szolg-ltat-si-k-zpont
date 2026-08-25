@@ -191,7 +191,7 @@ export const USERS: User[] = [
   {
     id: "u-molnar",
     name: "Tarczali J.",
-    title: "rendszeradminisztrátor",
+    title: "admin",
     email: "molnar.julia@aok.pte.hu",
     employeeId: "PTE-115502",
     orgUnitId: "ou-dekani",
@@ -282,17 +282,6 @@ export const USERS: User[] = [
     orgUnitId: "ou-dekani",
     roles: ["dekan", "vezeto"],
     initials: "MÁ",
-  },
-  {
-    id: "u-superuser",
-    name: "Bogyay R.",
-    title: "jogosultságkezelő superuser",
-    email: "takacs.reka@aok.pte.hu",
-    employeeId: "PTE-100000",
-    orgUnitId: "ou-dekani",
-    roles: ["superuser"],
-    teamId: "t-it",
-    initials: "BR",
   },
   {
     id: "u-beszerzo",
