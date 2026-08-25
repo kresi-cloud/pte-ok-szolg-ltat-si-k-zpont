@@ -7,7 +7,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { CATALOG, ORG_UNITS, PROJECTS, useStore } from "@/lib/store";
+import { useStore } from "@/lib/store";
 import { STATUS_LABELS } from "@/lib/types";
 
 export function GlobalSearch({
