@@ -6,6 +6,8 @@ import {
   useMemo,
   useState,
   type ReactNode,
+  type Context,
+
 } from "react";
 import {
   CATALOG,
@@ -185,7 +187,16 @@ interface StoreValue extends PersistedState {
   resetDemo: () => void;
 }
 
-const StoreContext = createContext<StoreValue | null>(null);
+// Keep a single context instance across HMR module reloads, otherwise an
+// already-rendered provider and a freshly-imported useStore use different
+// contexts and the hook throws "must be used inside StoreProvider".
+const globalScope = globalThis as unknown as {
+  __dszpStoreContext?: Context<StoreValue | null>;
+};
+const StoreContext =
+  globalScope.__dszpStoreContext ??
+  (globalScope.__dszpStoreContext = createContext<StoreValue | null>(null));
+
 
 const today = () => new Date().toISOString().slice(0, 10);
 
