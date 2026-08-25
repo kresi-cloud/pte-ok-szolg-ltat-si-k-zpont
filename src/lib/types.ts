@@ -9,8 +9,7 @@ export type RoleKey =
   | "beszerzo"
   | "eszkozmenedzser"
   | "gazdasagi_vezeto"
-  | "it_referens"
-  | "superuser";
+  | "it_referens";
 
 export const ROLE_LABELS: Record<RoleKey, string> = {
   igenylo: "Igénylő",
@@ -19,12 +18,11 @@ export const ROLE_LABELS: Record<RoleKey, string> = {
   szolgaltatasgazda: "Szolgáltatásgazda",
   vezeto: "Kari vezető",
   dekan: "Dékán",
-  admin: "Rendszeradminisztrátor",
+  admin: "Admin",
   beszerzo: "Beszerző",
   eszkozmenedzser: "IT eszközmenedzser",
   gazdasagi_vezeto: "Gazdasági vezető",
   it_referens: "Helyi IT referens",
-  superuser: "Superuser (jogosultságkezelő)",
 };
 
 export const ROLE_DESCRIPTIONS: Record<RoleKey, string> = {
@@ -34,7 +32,8 @@ export const ROLE_DESCRIPTIONS: Record<RoleKey, string> = {
   szolgaltatasgazda: "Szolgáltatás- és portfóliófelelős, kapacitás és SLA.",
   vezeto: "Kari szintű mutatókat és portfóliót lát.",
   dekan: "Teljes kari rálátás, bármely ügy eset szintre bontható.",
-  admin: "Rendszerbeállítások, katalógus, leltárjóváhagyás.",
+  admin:
+    "Rendszerbeállítások, katalógus, leltárjóváhagyás és a felhasználói jogosultságok kiosztása.",
   beszerzo:
     "Megkapja a jóváhagyott eseti beszerzéseket, kezeli a negyedéves és éves beszerzési terveket.",
   eszkozmenedzser:
@@ -43,7 +42,6 @@ export const ROLE_DESCRIPTIONS: Record<RoleKey, string> = {
     "Ellenőrzi és módosítja az eszközmenedzser terveit, jóváhagyja az éves selejtezési javaslatot, majd dékáni jóváhagyásra küld.",
   it_referens:
     "A beérkezett eszközt telepíti, beállítja, rögzíti a gyári számot és a leltárkódot, majd átadja az igénylőnek.",
-  superuser: "Kizárólagos jog a felhasználói jogosultságok kiosztására.",
 };
 
 

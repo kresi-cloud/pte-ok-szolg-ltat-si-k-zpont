@@ -485,9 +485,6 @@ function BuyerWorkspace() {
     "eszkozmenedzser",
     "gazdasagi_vezeto",
     "dekan",
-    "admin",
-    "szolgaltatasgazda",
-    "superuser",
   ].includes(store.activeRole);
   const canSchedule =
     store.activeRole === "gazdasagi_vezeto" || store.activeRole === "eszkozmenedzser";

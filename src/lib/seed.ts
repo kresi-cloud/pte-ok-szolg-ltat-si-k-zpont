@@ -284,17 +284,6 @@ export const USERS: User[] = [
     initials: "MÁ",
   },
   {
-    id: "u-superuser",
-    name: "Bogyay R.",
-    title: "jogosultságkezelő superuser",
-    email: "takacs.reka@aok.pte.hu",
-    employeeId: "PTE-100000",
-    orgUnitId: "ou-dekani",
-    roles: ["superuser"],
-    teamId: "t-it",
-    initials: "BR",
-  },
-  {
     id: "u-beszerzo",
     name: "Csanaki G.",
     title: "beszerzési referens",

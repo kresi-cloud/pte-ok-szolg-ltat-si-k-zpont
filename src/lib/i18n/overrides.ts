@@ -81,7 +81,7 @@ export const EN_OVERRIDES: Record<string, string> = {
   "Érintett munkatárs neve": "Name of the staff member concerned",
   "Szervezeti egység": "Organizational unit",
   "Szükséges alkalmazások": "Required applications",
-  "Rendszeradminisztrátor": "System administrator",
+  "Admin": "Admin",
   "Szolgáltatásgazda": "Service owner",
   "Szolgáltatási ügyintéző": "Service administrator",
   "Beszerzés": "Procurement",
