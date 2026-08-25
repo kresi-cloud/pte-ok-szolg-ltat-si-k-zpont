@@ -98,7 +98,8 @@ function Wizard() {
   const navigate = useNavigate();
   const { createRequest, currentUser, productCategories, products } = useStore();
   const preset = CATALOG.find((c) => c.id === search['service']);
-  const [step, setStep] = useState(search['domain'] ? 1 : 0);
+  const skipDomain = !!search['domain'];
+  const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormState>({
     ...empty,
     domain: (search['domain'] as DomainKey) || (preset?.domain ?? ""),
@@ -112,10 +113,12 @@ function Wizard() {
   const questions = useMemo(() => contextQuestions(form.domain), [form.domain]);
 
   const isHw = form.domain === "hardver";
-  const stepLabels = isHw ? HW_STEPS : STEPS;
-  const stepKeys: string[] = isHw
+  const allLabels = isHw ? HW_STEPS : STEPS;
+  const allKeys: string[] = isHw
     ? ["domain", "category", "product", "details", "summary"]
     : ["domain", "goal", "details", "summary"];
+  const stepLabels = skipDomain ? allLabels.slice(1) : allLabels;
+  const stepKeys = skipDomain ? allKeys.slice(1) : allKeys;
   const lastStep = stepKeys.length - 1;
   const key = stepKeys[Math.min(step, lastStep)]!;
 
@@ -660,13 +663,15 @@ function Wizard() {
       )}
 
       <div className="mt-10 flex items-center justify-between border-t border-border pt-6">
-        <Button
-          variant="ghost"
-          onClick={() => setStep((s) => Math.max(0, s - 1))}
-          disabled={step === 0}
-        >
-          <ArrowLeft className="size-4" /> Vissza
-        </Button>
+        {step === 0 ? (
+          <Button variant="ghost" onClick={() => navigate({ to: "/" })}>
+            <ArrowLeft className="size-4" /> Mégse
+          </Button>
+        ) : (
+          <Button variant="ghost" onClick={() => setStep((s) => Math.max(0, s - 1))}>
+            <ArrowLeft className="size-4" /> Vissza
+          </Button>
+        )}
         {step < lastStep && (
           <Button onClick={() => setStep((s) => Math.min(lastStep, s + 1))} disabled={!canNext}>
             Tovább <ArrowRight className="size-4" />

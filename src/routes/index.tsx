@@ -31,9 +31,8 @@ const DOMAIN_ICONS: Record<DomainKey, typeof Boxes> = {
   digitalizacio: Workflow,
 };
 
-const ORDERED_DOMAINS = [...DOMAINS].sort((a, b) =>
-  a.key === "hardver" ? -1 : b.key === "hardver" ? 1 : 0,
-);
+const PRIMARY_DOMAIN = DOMAINS.find((d) => d.key === "hardver");
+const SECONDARY_DOMAINS = DOMAINS.filter((d) => d.key !== "hardver");
 
 function Home() {
   const { currentUser, requests } = useStore();
@@ -101,65 +100,57 @@ function Home() {
           Jelenleg informatikai eszköz igénylése indítható – a rendszer végigvezeti a
           termékkörökön és a választható modelleken.
         </p>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {ORDERED_DOMAINS.map((d) => {
+
+        {PRIMARY_DOMAIN && (
+          <Link
+            to="/uj-igeny"
+            search={{ domain: PRIMARY_DOMAIN.key }}
+            className="card-surface group flex flex-col gap-5 border-primary/40 bg-secondary/40 p-6 transition-colors hover:border-primary hover:bg-secondary/70 md:flex-row md:items-center"
+          >
+            <span className="grid size-14 shrink-0 place-items-center rounded-md bg-accent text-accent-foreground">
+              <Laptop className="size-7" aria-hidden="true" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-display text-xl font-semibold">
+                {PRIMARY_DOMAIN.name}
+              </span>
+              <span className="mt-1 block text-sm text-muted-foreground">
+                {PRIMARY_DOMAIN.description}
+              </span>
+              <span className="mt-3 block text-xs text-muted-foreground">
+                {PRIMARY_DOMAIN.examples.slice(0, 6).join(" · ")}
+              </span>
+            </span>
+            <span className="inline-flex shrink-0 items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">
+              Igénylés indítása <ArrowRight className="size-4" aria-hidden="true" />
+            </span>
+          </Link>
+        )}
+
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {SECONDARY_DOMAINS.map((d) => {
             const Icon = DOMAIN_ICONS[d.key];
-            const enabled = d.key === "hardver";
-            const inner = (
-              <>
-                <span
-                  className={
-                    enabled
-                      ? "grid size-10 place-items-center rounded-md bg-accent text-accent-foreground"
-                      : "grid size-10 place-items-center rounded-md bg-muted text-muted-foreground"
-                  }
-                >
-                  <Icon className="size-5" aria-hidden="true" />
+            return (
+              <div
+                key={d.key}
+                aria-disabled="true"
+                className="card-surface pointer-events-none flex items-start gap-3 p-4 opacity-50 select-none"
+              >
+                <span className="grid size-9 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground">
+                  <Icon className="size-4.5" aria-hidden="true" />
                 </span>
-                <h3 className="mt-4 font-display text-base font-semibold">{d.name}</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">{d.description}</p>
-                <ul className="mt-4 space-y-1 text-xs text-muted-foreground">
-                  {d.examples.slice(0, 4).map((e) => (
-                    <li key={e}>• {e}</li>
-                  ))}
-                </ul>
-                {enabled ? (
-                  <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
-                    Igény indítása <ArrowRight className="size-4" aria-hidden="true" />
-                  </span>
-                ) : (
-                  <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                <span className="min-w-0">
+                  <span className="block font-display text-sm font-semibold">{d.name}</span>
+                  <span className="mt-1 block text-xs text-muted-foreground">
                     Hamarosan elérhető
                   </span>
-                )}
-              </>
-            );
-
-            if (!enabled) {
-              return (
-                <div
-                  key={d.key}
-                  aria-disabled="true"
-                  className="card-surface pointer-events-none flex flex-col p-5 opacity-50 select-none"
-                >
-                  {inner}
-                </div>
-              );
-            }
-
-            return (
-              <Link
-                key={d.key}
-                to="/uj-igeny"
-                search={{ domain: d.key }}
-                className="group card-surface flex flex-col p-5 transition-colors hover:border-primary/40 hover:bg-secondary/60"
-              >
-                {inner}
-              </Link>
+                </span>
+              </div>
             );
           })}
         </div>
       </section>
+
 
 
       <section aria-labelledby="folyamatban">

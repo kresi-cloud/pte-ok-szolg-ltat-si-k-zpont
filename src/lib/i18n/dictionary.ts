@@ -1,5 +1,6 @@
 // Auto-generated Hungarian -> English UI dictionary.
 export const EN_DICT: Record<string, string> = {
+  "Mégse": "Cancel",
   "Informatikai eszköz": "IT equipment",
   "Informatikai eszközök és perifériák": "IT equipment and peripherals",
   "Mit szeretne igényelni?": "What would you like to request?",

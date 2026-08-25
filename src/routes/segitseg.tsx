@@ -37,9 +37,9 @@ function Help() {
         <AccordionItem value="a">
           <AccordionTrigger>Hogyan indítok új igényt?</AccordionTrigger>
           <AccordionContent>
-            Válassza az <Link to="/uj-igeny" className="text-primary underline">Új igény</Link>{" "}
-            menüpontot, majd a négy szolgáltatási terület egyikét. Ezután írja le saját szavaival,
-            mit szeretne elérni – technikai megoldást nem kell megadnia.
+            A <Link to="/" className="text-primary underline">kezdőlapon</Link> válassza az
+            „Informatikai eszköz” csempét, majd kövesse a termékkör- és modellválasztás lépéseit.
+            Technikai megoldást nem kell megadnia.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="b">
