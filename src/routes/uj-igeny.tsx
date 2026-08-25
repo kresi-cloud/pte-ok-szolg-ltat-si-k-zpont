@@ -610,7 +610,22 @@ function Wizard() {
           </div>
           <dl className="card-surface divide-y divide-border">
             {[
-              ["Cél", form.goal],
+              ...(isHw && selectedProduct
+                ? ([
+                    ["Termékkör", selectedCategory?.name ?? "—"],
+                    ["Kiválasztott eszköz", `${selectedProduct.name} (${selectedProduct.vendor})`],
+                    ["Darabszám", `${qty} db`],
+                    [
+                      "Konfiguráció",
+                      `${selectedProduct.spec.cpu} · ${selectedProduct.spec.ram} · ${selectedProduct.spec.storage} · ${selectedProduct.spec.os} ${selectedProduct.spec.osVersion}`,
+                    ],
+                    [
+                      "Becsült érték",
+                      `${(selectedProduct.referencePrice * qty).toLocaleString("hu-HU")} Ft`,
+                    ],
+                  ] as [string, string][])
+                : []),
+              ["Cél", isHw ? form.goal || "Nincs megadva" : form.goal],
               ["Érintett szervezeti egység", lookup.unit(currentUser.orgUnitId)],
               ["Felhasználók", [form.users, form.userCount].filter(Boolean).join(" · ") || "Nincs megadva"],
               ["Kívánt eredmény", form.title],
