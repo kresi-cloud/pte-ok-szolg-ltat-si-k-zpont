@@ -16,6 +16,8 @@ import {
 import { lookup, useStore } from "@/lib/store";
 import { ROLE_DESCRIPTIONS, ROLE_LABELS, type RoleKey } from "@/lib/types";
 import { PageHeading } from "@/components/page-heading";
+import { useViewOnly } from "@/lib/access";
+import { ViewOnlyNotice } from "@/components/view-only-notice";
 
 export const Route = createFileRoute("/jogosultsagok")({
   head: () => ({
@@ -121,6 +123,8 @@ function Permissions() {
           {canManage ? "Admin jogkör aktív" : "Dékáni betekintés (csak olvasható)"}
         </Badge>
       </header>
+
+      {!canManage && <ViewOnlyNotice />}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
         <section className="rounded-md border border-border bg-card">

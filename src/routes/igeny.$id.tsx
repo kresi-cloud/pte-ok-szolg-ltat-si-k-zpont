@@ -27,6 +27,7 @@ import { AiBadge, PriorityBadge, StatusBadge } from "@/components/status-badge";
 import { lookup, useStore } from "@/lib/store";
 import { STATUS_LABELS, STATUS_ORDER, type StatusKey } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { ViewOnlyNotice } from "@/components/view-only-notice";
 
 export const Route = createFileRoute("/igeny/$id")({
   head: ({ params }) => ({
@@ -222,6 +223,8 @@ function RequestDetail() {
           </div>
         )}
       </header>
+
+      {store.activeRole === "dekan" && !pendingApproval && <ViewOnlyNotice />}
 
       <Tabs defaultValue="attekintes">
         <TabsList className="flex-wrap">

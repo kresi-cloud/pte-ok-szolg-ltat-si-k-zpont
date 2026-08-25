@@ -27,6 +27,8 @@ import {
 } from "@/lib/asset-types";
 import { daysUntil } from "@/lib/plan-approvals";
 import { PageHeading } from "@/components/page-heading";
+import { useViewOnly } from "@/lib/access";
+import { ViewOnlyNotice } from "@/components/view-only-notice";
 import { StatTile } from "@/components/asset-bits";
 
 export const Route = createFileRoute("/beszerzesek")({
@@ -480,6 +482,7 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
 
 function BuyerWorkspace() {
   const store = useStore();
+  const viewOnly = useViewOnly("beszerzesek");
   const allowed = [
     "beszerzo",
     "eszkozmenedzser",
@@ -529,6 +532,7 @@ function BuyerWorkspace() {
           title="Beszerzői munkatér"
           description={`Jóváhagyott eseti beszerzések, valamint a ${NEXT_FINANCIAL_YEAR}. évi negyedéves és éves beszerzési terv jóváhagyási státusza.`}
         />
+        {viewOnly && <ViewOnlyNotice />}
       </header>
 
       <div className="grid gap-4 sm:grid-cols-3">

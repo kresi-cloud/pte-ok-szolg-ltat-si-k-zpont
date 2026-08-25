@@ -32,6 +32,8 @@ import {
 import { HARDWARE_MODELS } from "@/lib/inventory-data";
 import { SpecGrid } from "@/routes/leltar";
 import { PageHeading } from "@/components/page-heading";
+import { useViewOnly } from "@/lib/access";
+import { ViewOnlyNotice } from "@/components/view-only-notice";
 
 export const Route = createFileRoute("/adminisztracio")({
   head: () => ({
@@ -50,6 +52,7 @@ export const Route = createFileRoute("/adminisztracio")({
 
 function Admin() {
   const { resetDemo, inventory, decideInventoryItem } = useStore();
+  const viewOnly = useViewOnly("adminisztracio");
   const [comments, setComments] = useState<Record<string, string>>({});
   const pending = inventory.filter((i) => i.status === "jovahagyasra_var");
   const decided = inventory.filter((i) => i.status !== "jovahagyasra_var");
@@ -60,8 +63,10 @@ function Admin() {
           title="Adminisztráció"
           description="Törzsadatok és a portál működését szabályozó beállítások."
         />
+        {viewOnly && <ViewOnlyNotice />}
       </div>
 
+      <fieldset disabled={viewOnly} className="contents">
       <Tabs defaultValue="felhasznalok">
         <TabsList className="flex-wrap">
           <TabsTrigger value="felhasznalok">Felhasználók</TabsTrigger>
@@ -319,6 +324,7 @@ function Admin() {
           </section>
         </TabsContent>
       </Tabs>
+      </fieldset>
     </div>
   );
 }

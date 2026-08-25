@@ -26,6 +26,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Paperclip, Trash2 } from "lucide-react";
 import { PageHeading } from "@/components/page-heading";
+import { useViewOnly } from "@/lib/access";
+import { ViewOnlyNotice } from "@/components/view-only-notice";
 import { StatTile } from "@/components/asset-bits";
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -467,6 +469,7 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
 
 function HandoverWorkspace() {
   const store = useStore();
+  const viewOnly = useViewOnly("eszkozatadas");
   const role = store.activeRole;
   const allowed = ["it_referens", "eszkozmenedzser", "beszerzo", "dekan"].includes(
     role,
@@ -507,6 +510,7 @@ function HandoverWorkspace() {
         title="Eszközátadás"
         description="A beszerzésből beérkezett eszközök telepítése és beállítása, a gyári szám és a PTE leltárkód rögzítése, majd átadás az igénylőnek. Az igénylő átvételi visszaigazolása után az eszköz automatikusan bekerül a személyi leltárába."
       />
+      {viewOnly && <ViewOnlyNotice />}
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatTile label="Átadásra váró eszköz" value={String(open.length)} />

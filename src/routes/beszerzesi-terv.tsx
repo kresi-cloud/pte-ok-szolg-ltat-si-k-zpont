@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeading } from "@/components/page-heading";
+import { useViewOnly } from "@/lib/access";
+import { ViewOnlyNotice } from "@/components/view-only-notice";
 import { lookup, ORG_UNITS, useStore } from "@/lib/store";
 import { FUNDING_SOURCES, HARDWARE_STANDARDS, NEXT_FINANCIAL_YEAR, REFERENCE_PRICES } from "@/lib/asset-data";
 import {
@@ -53,6 +55,7 @@ const QUARTERS: Quarter[] = ["Q1", "Q2", "Q3", "Q4"];
 
 function ProcurementPage() {
   const store = useStore();
+  const viewOnly = useViewOnly("beszerzesi-terv");
   const items = store.planItems.filter((p) => p.planYear === NEXT_FINANCIAL_YEAR);
 
   const candidates = useMemo(
@@ -86,6 +89,7 @@ function ProcurementPage() {
           title={`Beszerzési terv – ${NEXT_FINANCIAL_YEAR}. gazdasági év`}
           description="A tervezés az életciklus-adatokból automatikusan javasolt cserejelöltekből indul, de minden tétel felülvizsgálható, átütemezhető és indoklással módosítható. A költségbecslés referenciaárakkal, árváltozási feltételezéssel, mennyiségi kedvezménnyel és tartalékkerettel számol – a becslés soha nem tekinthető kötelezettségvállalásnak."
         />
+        {viewOnly && <ViewOnlyNotice />}
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -100,6 +104,7 @@ function ProcurementPage() {
         />
       </div>
 
+      <fieldset disabled={viewOnly} className="contents">
       <Tabs defaultValue="terv">
         <TabsList className="flex-wrap">
           <TabsTrigger value="terv">Negyedéves terv</TabsTrigger>
@@ -241,6 +246,7 @@ function ProcurementPage() {
           </section>
         </TabsContent>
       </Tabs>
+      </fieldset>
     </div>
   );
 }
