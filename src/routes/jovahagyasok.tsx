@@ -48,7 +48,6 @@ const OPEN_RISK = ["lezarva", "elutasitva", "piszkozat"];
 
 function ApprovalQueue() {
   const store = useStore();
-  const viewOnly = useViewOnly("jovahagyasok");
   const [tab, setTab] = useState<TabKey>("sajat");
 
   const myPending = useMemo(
@@ -209,7 +208,6 @@ function ApprovalQueue() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            disabled={viewOnly}
                             onClick={() => {
                               store.setStatus(r.id, "pontositas");
                               toast.info("Pontosítást kért az igénylőtől.");
