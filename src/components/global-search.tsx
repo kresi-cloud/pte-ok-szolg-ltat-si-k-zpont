@@ -45,27 +45,6 @@ export function GlobalSearch({
             </CommandItem>
           ))}
         </CommandGroup>
-        <CommandGroup heading="Fejlesztési kezdeményezések">
-          {PROJECTS.map((p) => (
-            <CommandItem key={p.id} value={p.name} onSelect={() => go("/portfolio")}>
-              {p.name}
-            </CommandItem>
-          ))}
-        </CommandGroup>
-        <CommandGroup heading="Szolgáltatások">
-          {CATALOG.map((c) => (
-            <CommandItem key={c.id} value={c.name} onSelect={() => go("/szolgaltatasok")}>
-              {c.name}
-            </CommandItem>
-          ))}
-        </CommandGroup>
-        <CommandGroup heading="Szervezeti egységek">
-          {ORG_UNITS.map((o) => (
-            <CommandItem key={o.id} value={o.name} onSelect={() => go("/felelossegek")}>
-              {o.name}
-            </CommandItem>
-          ))}
-        </CommandGroup>
         <CommandGroup heading="Dokumentáció">
           <CommandItem value="segítség súgó folyamat" onSelect={() => go("/segitseg")}>
             Segítség és folyamatleírás
