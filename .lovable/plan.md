@@ -7,10 +7,10 @@ A „Superuser (jogosultságkezelő)” szerepkör megszűnik, feladatköre (sze
 ## 1. Superuser kivezetése
 
 - A `superuser` szerepkör törlése a szerepkör-listából, a címkékből és a leírásokból.
-- A Rendszeradminisztrátor leírása kiegészül: rendszerbeállítások, katalógus, leltárjóváhagyás **és felhasználói jogosultságok kiosztása**.
-- A „Jogosultságkezelés” oldal (`/jogosultsagok`) ezentúl `admin` (és megtekintésre `dekan`) jogkörrel érhető el; a korlátozó szövegek superuser helyett rendszeradminisztrátort említenek.
+- Az admin szerepkör címkéje „Admin”, leírása kiegészül: rendszerbeállítások, katalógus, leltárjóváhagyás **és felhasználói jogosultságok kiosztása**.
+- A „Jogosultságkezelés” oldal (`/jogosultsagok`) ezentúl `admin` (és megtekintésre `dekan`) jogkörrel érhető el; a korlátozó szövegek superuser helyett az admint említik.
 - Az Adminisztráció oldal utaló szövege is frissül.
-- A demó „superuser” felhasználó megszűnik a bejelentkező képernyőn és a felhasználóváltóban; a jogosultságkezelést a meglévő rendszeradminisztrátor demó felhasználó végzi.
+- A demó „superuser” felhasználó megszűnik a bejelentkező képernyőn és a felhasználóváltóban; a jogosultságkezelést a meglévő admin demó felhasználó végzi (beosztása is „admin”-ra frissül).
 - Az érintett magyar–angol szótári bejegyzések frissülnek.
 
 ## 2. Új hozzáférési mátrix
