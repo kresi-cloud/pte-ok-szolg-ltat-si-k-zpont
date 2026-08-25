@@ -31,9 +31,8 @@ const DOMAIN_ICONS: Record<DomainKey, typeof Boxes> = {
   digitalizacio: Workflow,
 };
 
-const ORDERED_DOMAINS = [...DOMAINS].sort((a, b) =>
-  a.key === "hardver" ? -1 : b.key === "hardver" ? 1 : 0,
-);
+const PRIMARY_DOMAIN = DOMAINS.find((d) => d.key === "hardver");
+const SECONDARY_DOMAINS = DOMAINS.filter((d) => d.key !== "hardver");
 
 function Home() {
   const { currentUser, requests } = useStore();
