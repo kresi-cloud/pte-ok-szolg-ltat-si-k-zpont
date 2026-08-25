@@ -1298,9 +1298,9 @@ const ALL_PROJECTS: Project[] = [
   },
 ];
 
-export const PROJECTS: Project[] = ALL_PROJECTS.filter(
-  (p) => p.domain === "hardver",
-);
+// A portál jelenleg csak informatikai eszközbeszerzést kezel,
+// ezért nem informatikai fejlesztési projektek nem jelennek meg.
+export const PROJECTS: Project[] = ALL_PROJECTS.filter(() => false);
 
 export const RESPONSIBILITIES: ResponsibilityRow[] = [
   {
