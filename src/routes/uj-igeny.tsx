@@ -98,7 +98,8 @@ function Wizard() {
   const navigate = useNavigate();
   const { createRequest, currentUser, productCategories, products } = useStore();
   const preset = CATALOG.find((c) => c.id === search['service']);
-  const [step, setStep] = useState(search['domain'] ? 1 : 0);
+  const skipDomain = !!search['domain'];
+  const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormState>({
     ...empty,
     domain: (search['domain'] as DomainKey) || (preset?.domain ?? ""),
