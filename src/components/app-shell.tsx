@@ -2,14 +2,11 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode } from "react";
 import {
   Bell,
-  Building2,
   ClipboardList,
   GaugeCircle,
-  Grid2x2,
   CheckCheck,
   KeyRound,
   Home,
-  LayoutList,
   LifeBuoy,
   LogOut,
   Laptop,
@@ -19,10 +16,8 @@ import {
   TrendingUp,
   Trash2,
   Plus,
-  Rocket,
   Search,
   Settings2,
-  ShieldCheck,
   UserRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -76,13 +71,8 @@ const NAV: NavItem[] = [
   { to: "/eszkozatadas", label: "Eszközátadás", icon: PackageCheck, roles: ["it_referens", "eszkozmenedzser", "beszerzo", "dekan"] },
   { to: "/selejtezes", label: "Selejtezési javaslat", icon: Trash2, roles: ["eszkozmenedzser", "gazdasagi_vezeto", "dekan"] },
   { to: "/eletciklus-elorejelzes", label: "Életciklus-előrejelzés", icon: TrendingUp, roles: ["eszkozmenedzser", "gazdasagi_vezeto", "szolgaltatasgazda", "vezeto", "dekan"] },
-  { to: "/szolgaltatasok", label: "Szolgáltatások", icon: LayoutList, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin"] },
-  { to: "/fejlesztesek", label: "Fejlesztések", icon: Rocket, roles: ["igenylo", "jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan", "admin"] },
   { to: "/jovahagyasok", label: "Jóváhagyási sor", icon: CheckCheck, roles: ["jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan"] },
-  { to: "/munkater", label: "Szolgáltatási munkatér", icon: Grid2x2, roles: ["ugyintezo", "szolgaltatasgazda", "dekan"] },
-  { to: "/portfolio", label: "Fejlesztési portfólió", icon: Building2, roles: ["ugyintezo", "szolgaltatasgazda", "vezeto", "dekan"] },
   { to: "/vezetoi-attekintes", label: "Vezetői áttekintés", icon: GaugeCircle, roles: ["vezeto", "dekan", "szolgaltatasgazda", "gazdasagi_vezeto"] },
-  { to: "/felelossegek", label: "Szolgáltatások és felelősségek", icon: ShieldCheck, roles: ["szolgaltatasgazda", "admin", "dekan"] },
   { to: "/adminisztracio", label: "Adminisztráció", icon: Settings2, roles: ["admin", "dekan"] },
   { to: "/jogosultsagok", label: "Jogosultságkezelés", icon: KeyRound, roles: ["admin", "dekan"] },
   { to: "/segitseg", label: "Segítség", icon: LifeBuoy, roles: ALL },
@@ -135,7 +125,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               className="hidden w-72 items-center gap-2 rounded-sm border border-white/25 bg-white/10 px-3 py-2 text-left text-sm text-white/75 transition-colors hover:bg-white/20 lg:flex"
             >
               <Search className="size-4" aria-hidden="true" />
-              <span className="truncate">Keresés szolgáltatások, igények és projektek között…</span>
+              <span className="truncate">Keresés igények és eszközök között…</span>
             </button>
             <Button
               variant="ghost"
