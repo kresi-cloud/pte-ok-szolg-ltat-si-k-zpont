@@ -77,6 +77,7 @@ const NAV: NavItem[] = [
   { to: "/selejtezes", label: "Selejtezési javaslat", icon: Trash2, roles: ["eszkozmenedzser", "gazdasagi_vezeto", "dekan"] },
   { to: "/eletciklus-elorejelzes", label: "Életciklus-előrejelzés", icon: TrendingUp, roles: ["eszkozmenedzser", "gazdasagi_vezeto", "szolgaltatasgazda", "vezeto", "dekan"] },
   { to: "/jovahagyasok", label: "Jóváhagyási sor", icon: CheckCheck, roles: ["jovahagyo", "ugyintezo", "szolgaltatasgazda", "vezeto", "dekan"] },
+  { to: "/vezetoi-attekintes", label: "Vezetői áttekintés", icon: GaugeCircle, roles: ["vezeto", "dekan", "szolgaltatasgazda", "gazdasagi_vezeto"] },
   { to: "/adminisztracio", label: "Adminisztráció", icon: Settings2, roles: ["admin", "dekan"] },
   { to: "/jogosultsagok", label: "Jogosultságkezelés", icon: KeyRound, roles: ["admin", "dekan"] },
   { to: "/segitseg", label: "Segítség", icon: LifeBuoy, roles: ALL },
