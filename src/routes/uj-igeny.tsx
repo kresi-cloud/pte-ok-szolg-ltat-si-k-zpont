@@ -113,10 +113,12 @@ function Wizard() {
   const questions = useMemo(() => contextQuestions(form.domain), [form.domain]);
 
   const isHw = form.domain === "hardver";
-  const stepLabels = isHw ? HW_STEPS : STEPS;
-  const stepKeys: string[] = isHw
+  const allLabels = isHw ? HW_STEPS : STEPS;
+  const allKeys: string[] = isHw
     ? ["domain", "category", "product", "details", "summary"]
     : ["domain", "goal", "details", "summary"];
+  const stepLabels = skipDomain ? allLabels.slice(1) : allLabels;
+  const stepKeys = skipDomain ? allKeys.slice(1) : allKeys;
   const lastStep = stepKeys.length - 1;
   const key = stepKeys[Math.min(step, lastStep)]!;
 
