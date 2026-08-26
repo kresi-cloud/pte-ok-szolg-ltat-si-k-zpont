@@ -184,6 +184,38 @@ function RequestDetail() {
           </p>
         )}
 
+        {pendingApproval && isPrimaryApprover && (
+          <div className="mt-4 space-y-2 rounded-md border border-border bg-secondary/40 p-4">
+            <Label htmlFor="budget-input" className="text-sm">
+              Költségkeret (bruttó Ft) – az elsődleges jóváhagyó adja meg
+            </Label>
+            <div className="flex flex-wrap items-center gap-2">
+              <Input
+                id="budget-input"
+                inputMode="numeric"
+                className="w-56"
+                value={budget}
+                onChange={(e) => setBudget(e.target.value.replace(/[^\d]/g, ""))}
+                placeholder="Pl. 450000"
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  store.updateRequest(
+                    request.id,
+                    { estimatedCost: Number(budget) || 0 },
+                    "Költségkeret rögzítése",
+                  );
+                  toast.success("Költségkeret mentve.");
+                }}
+              >
+                Mentés
+              </Button>
+            </div>
+          </div>
+        )}
+
         {pendingApproval && (
           <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-info/30 bg-info/5 p-4">
             <p className="text-sm">
