@@ -172,7 +172,7 @@ function RequestDetail() {
             ["Beküldés", request.createdAt],
             ["Tervezett befejezés", request.dueDate ?? "Nincs megadva"],
             [
-              "Becsült költség",
+              "Katalógus szerinti referenciaérték",
               request.estimatedCost
                 ? `${request.estimatedCost.toLocaleString("hu-HU")} Ft`
                 : "Nincs költségvonzat",
