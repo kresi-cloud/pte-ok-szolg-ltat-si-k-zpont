@@ -27,6 +27,8 @@ import {
 import { AiBadge, PriorityBadge, StatusBadge } from "@/components/status-badge";
 import { lookup, useStore } from "@/lib/store";
 import { STATUS_LABELS, STATUS_ORDER, type StatusKey } from "@/lib/types";
+import { similarAssetsFor } from "@/lib/similar-assets";
+import { SimilarAssetNotice } from "@/components/similar-asset-notice";
 import { cn } from "@/lib/utils";
 import { ViewOnlyNotice } from "@/components/view-only-notice";
 
