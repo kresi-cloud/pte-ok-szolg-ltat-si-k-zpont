@@ -172,7 +172,7 @@ function RequestDetail() {
             ["Beküldés", request.createdAt],
             ["Tervezett befejezés", request.dueDate ?? "Nincs megadva"],
             [
-              "Becsült költség",
+              "Katalógus szerinti referenciaérték",
               request.estimatedCost
                 ? `${request.estimatedCost.toLocaleString("hu-HU")} Ft`
                 : "Nincs költségvonzat",
@@ -229,9 +229,13 @@ function RequestDetail() {
                 size="sm"
                 variant="outline"
                 onClick={() => {
+                  const amount = Number(budget) || 0;
                   store.updateRequest(
                     request.id,
-                    { estimatedCost: Number(budget) || 0 },
+                    {
+                      estimatedCost: amount,
+                      budget: amount ? `${amount.toLocaleString("hu-HU")} Ft` : undefined,
+                    },
                     "Költségkeret rögzítése",
                   );
                   toast.success("Költségkeret mentve.");
@@ -307,7 +311,10 @@ function RequestDetail() {
                 ["Adatkezelési érintettség", request.personalData ? "Igen" : "Nem"],
                 ["Integráció", request.integration ?? "Nem szükséges"],
                 ["Jelleg", request.recurring ?? "—"],
-                ["Költségkeret", request.budget ?? "Nincs megadva"],
+                [
+                  "Költségkeret (jóváhagyó által rögzítve)",
+                  request.budget ?? "Nincs megadva",
+                ],
               ].map(([k, v]) => (
                 <div key={k}>
                   <dt className="text-xs text-muted-foreground">{k}</dt>

@@ -337,6 +337,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               ]),
           );
         }
+        // A „személyi használat” jelölés bevezetése előtt mentett termékkörök pótlása.
+        if (Array.isArray(merged.productCategories)) {
+          merged.productCategories = merged.productCategories.map((c) =>
+            c.personalUse === undefined
+              ? {
+                  ...c,
+                  personalUse:
+                    INITIAL_PRODUCT_CATEGORIES.find((i) => i.id === c.id)?.personalUse ?? false,
+                }
+              : c,
+          );
+        }
         setState(merged);
       }
     } catch {
