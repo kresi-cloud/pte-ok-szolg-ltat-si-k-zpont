@@ -259,8 +259,10 @@ function Permissions() {
                 variant="ghost"
                 onClick={() => {
                   setDraft(null);
+                  setTierDraft(null);
                   setReason("");
                 }}
+
                 disabled={!dirty}
               >
                 Elvetés
