@@ -98,6 +98,8 @@ export interface ProductCategory {
   name: string;
   description: string;
   active: boolean;
+  /** Személyi használatú eszközkör – ilyenkor nem kérdezünk célt és felhasználókat. */
+  personalUse?: boolean | undefined;
 }
 
 /** Termék technikai adatlapja. */
