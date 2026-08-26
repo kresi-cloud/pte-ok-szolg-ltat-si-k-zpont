@@ -60,6 +60,7 @@ function Permissions() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string>(store.users[0]!.id);
   const [draft, setDraft] = useState<RoleKey[] | null>(null);
+  const [tierDraft, setTierDraft] = useState<(typeof TIERS)[number] | null>(null);
   const [reason, setReason] = useState("");
 
   const canManage = store.activeRole === "admin";
@@ -78,9 +79,13 @@ function Permissions() {
 
   const selected = store.users.find((u) => u.id === selectedId) ?? store.users[0]!;
   const roles = draft ?? selected.roles;
-  const dirty =
+  const currentTier = selected.employeeTier ?? "alkalmazotti";
+  const tier = tierDraft ?? currentTier;
+  const rolesDirty =
     draft !== null &&
     (draft.length !== selected.roles.length || draft.some((r) => !selected.roles.includes(r)));
+  const tierDirty = tier !== currentTier;
+  const dirty = rolesDirty || tierDirty;
 
   function toggle(role: RoleKey, on: boolean) {
     const next = on ? [...roles, role] : roles.filter((r) => r !== role);
@@ -89,10 +94,13 @@ function Permissions() {
 
   function save() {
     if (!canManage || !dirty || reason.trim().length < 5) return;
-    store.setUserRoles(selected.id, roles, reason.trim());
+    if (rolesDirty) store.setUserRoles(selected.id, roles, reason.trim());
+    if (tierDirty) store.setUserTier(selected.id, tier, reason.trim());
     setDraft(null);
+    setTierDraft(null);
     setReason("");
   }
+
 
   if (!allowed) {
     return (
