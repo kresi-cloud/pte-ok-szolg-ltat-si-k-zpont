@@ -46,6 +46,17 @@ export function depreciationRate(categoryKey: AssetCategoryKey): number {
 
 const SMALL_ASSET_LIMIT = 200_000;
 
+/** Csak a hordozható eszközök kerülhetnek személyes használatba. */
+export const PORTABLE_CATEGORIES: AssetCategoryKey[] = ["notebook", "tablet", "mobil"];
+
+export function isPortable(categoryKey: AssetCategoryKey): boolean {
+  return PORTABLE_CATEGORIES.includes(categoryKey);
+}
+
+export function isPersonalUse(asset: Asset): boolean {
+  return asset.usage === "szemelyi" && isPortable(asset.categoryKey);
+}
+
 export function bookValue(
   asset: Asset,
   activationDate: string,
