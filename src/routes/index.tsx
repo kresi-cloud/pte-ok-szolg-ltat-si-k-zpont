@@ -118,7 +118,7 @@ function Home() {
                 {PRIMARY_DOMAIN.description}
               </span>
               <span className="mt-3 block text-xs text-muted-foreground">
-                {PRIMARY_DOMAIN.examples.slice(0, 6).join(" · ")}
+                {"\n"}
               </span>
             </span>
             <span className="inline-flex shrink-0 items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">
