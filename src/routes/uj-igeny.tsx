@@ -180,7 +180,7 @@ function Wizard() {
       userCount: form.userCount,
       personalData: form.personalData === "igen",
       integration: form.integration || "Nem szükséges",
-      recurring: form.recurring === "egyszeri" ? "Egyszeri igény" : "Tartós szolgáltatás",
+      recurring: isHw ? "Egyszeri igény" : "Tartós szolgáltatás",
       dueDate: form.deadline || undefined,
       priority: "kozepes",
       ai: {
