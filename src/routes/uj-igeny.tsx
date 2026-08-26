@@ -66,8 +66,6 @@ interface FormState {
   personalData: string;
   integration: string;
   recurring: string;
-  budget: string;
-  device: string;
   siteUrl: string;
   refined: boolean;
 }
@@ -87,8 +85,6 @@ const empty: FormState = {
   personalData: "nem",
   integration: "",
   recurring: "tartos",
-  budget: "",
-  device: "",
   siteUrl: "",
   refined: false,
 };
@@ -156,7 +152,6 @@ function Wizard() {
         `Termékkör: ${selectedCategory?.name ?? "—"}.`,
         `Konfiguráció: ${selectedProduct.spec.cpu} · ${selectedProduct.spec.ram} · ${selectedProduct.spec.storage} · ${selectedProduct.spec.os} ${selectedProduct.spec.osVersion}.`,
         form.goal.trim() ? `Indoklás: ${form.goal.trim()}` : "",
-        form.device.trim() ? `Használat helye: ${form.device.trim()}` : "",
       ]
         .filter(Boolean)
         .join("\n")
@@ -178,7 +173,6 @@ function Wizard() {
       personalData: form.personalData === "igen",
       integration: form.integration || "Nem szükséges",
       recurring: form.recurring === "egyszeri" ? "Egyszeri igény" : "Tartós szolgáltatás",
-      budget: form.budget || "Nincs megadva",
       dueDate: form.deadline || undefined,
       priority: "kozepes",
       ai: {
