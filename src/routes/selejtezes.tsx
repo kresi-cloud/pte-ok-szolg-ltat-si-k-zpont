@@ -13,7 +13,7 @@ import { useStore, lookup } from "@/lib/store";
 import { assetLookup, huf, lifecycleStatus, yearsSince } from "@/lib/asset-logic";
 import { NEXT_FINANCIAL_YEAR } from "@/lib/asset-data";
 import { LIFECYCLE_LABELS, SCRAP_STATUS_LABELS, type Asset, type ScrapProposal } from "@/lib/asset-types";
-import { buildScrapList, type ScrapListSummary } from "@/lib/scrap-list";
+import { buildScrapList, isPersonalUse, type ScrapListSummary } from "@/lib/scrap-list";
 import { FileSpreadsheet } from "lucide-react";
 
 export const Route = createFileRoute("/selejtezes")({
