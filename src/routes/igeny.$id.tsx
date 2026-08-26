@@ -311,7 +311,10 @@ function RequestDetail() {
                 ["Adatkezelési érintettség", request.personalData ? "Igen" : "Nem"],
                 ["Integráció", request.integration ?? "Nem szükséges"],
                 ["Jelleg", request.recurring ?? "—"],
-                ["Költségkeret", request.budget ?? "Nincs megadva"],
+                [
+                  "Költségkeret (jóváhagyó által rögzítve)",
+                  request.budget ?? "Nincs megadva",
+                ],
               ].map(([k, v]) => (
                 <div key={k}>
                   <dt className="text-xs text-muted-foreground">{k}</dt>
