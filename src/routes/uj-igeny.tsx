@@ -66,8 +66,6 @@ interface FormState {
   personalData: string;
   integration: string;
   recurring: string;
-  budget: string;
-  device: string;
   siteUrl: string;
   refined: boolean;
 }
@@ -87,8 +85,6 @@ const empty: FormState = {
   personalData: "nem",
   integration: "",
   recurring: "tartos",
-  budget: "",
-  device: "",
   siteUrl: "",
   refined: false,
 };
@@ -134,6 +130,8 @@ function Wizard() {
   );
   const selectedProduct = products.find((p) => p.id === form.productId);
   const selectedCategory = productCategories.find((c) => c.id === form.productCategoryId);
+  /** Személyi használatú termékkörnél nem kérdezünk célt és felhasználókat. */
+  const isPersonalUse = selectedCategory?.personalUse === true;
 
   const canNext =
     (key === "domain" && !!form.domain) ||
@@ -154,7 +152,6 @@ function Wizard() {
         `Termékkör: ${selectedCategory?.name ?? "—"}.`,
         `Konfiguráció: ${selectedProduct.spec.cpu} · ${selectedProduct.spec.ram} · ${selectedProduct.spec.storage} · ${selectedProduct.spec.os} ${selectedProduct.spec.osVersion}.`,
         form.goal.trim() ? `Indoklás: ${form.goal.trim()}` : "",
-        form.device.trim() ? `Használat helye: ${form.device.trim()}` : "",
       ]
         .filter(Boolean)
         .join("\n")
@@ -176,7 +173,6 @@ function Wizard() {
       personalData: form.personalData === "igen",
       integration: form.integration || "Nem szükséges",
       recurring: form.recurring === "egyszeri" ? "Egyszeri igény" : "Tartós szolgáltatás",
-      budget: form.budget || "Nincs megadva",
       dueDate: form.deadline || undefined,
       priority: "kozepes",
       ai: {
@@ -456,20 +452,22 @@ function Wizard() {
                   className="max-w-[160px]"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="hw-goal">Mire használná az eszközt?</Label>
-                <Textarea
-                  id="hw-goal"
-                  rows={4}
-                  value={form.goal}
-                  onChange={(e) => set({ goal: e.target.value })}
-                  placeholder="Pl. oktatói munka, terepi adatgyűjtés, laborvezérlés"
-                />
-              </div>
+              {!isPersonalUse && (
+                <div className="space-y-2">
+                  <Label htmlFor="hw-goal">Mire használná az eszközt?</Label>
+                  <Textarea
+                    id="hw-goal"
+                    rows={4}
+                    value={form.goal}
+                    onChange={(e) => set({ goal: e.target.value })}
+                    placeholder="Pl. oktatói munka, terepi adatgyűjtés, laborvezérlés"
+                  />
+                </div>
+              )}
             </>
           )}
 
-          {questions.includes("users") && (
+          {questions.includes("users") && !isPersonalUse && (
             <div className="space-y-2">
               <Label htmlFor="users">Kik fogják használni?</Label>
               <Input
@@ -488,17 +486,6 @@ function Wizard() {
                 value={form.userCount}
                 onChange={(e) => set({ userCount: e.target.value })}
                 placeholder="Pl. 50–200 fő"
-              />
-            </div>
-          )}
-          {questions.includes("device") && (
-            <div className="space-y-2">
-              <Label htmlFor="device">Milyen eszközről van szó és hol lesz használva?</Label>
-              <Input
-                id="device"
-                value={form.device}
-                onChange={(e) => set({ device: e.target.value })}
-                placeholder="Pl. notebook oktatói munkához, Élettani Intézet"
               />
             </div>
           )}
@@ -582,21 +569,12 @@ function Wizard() {
           </fieldset>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="deadline">Van kívánt határidő?</Label>
+              <Label htmlFor="deadline">Tervezett határidő</Label>
               <Input
                 id="deadline"
                 type="date"
                 value={form.deadline}
                 onChange={(e) => set({ deadline: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="budget">Van rendelkezésre álló költségkeret?</Label>
-              <Input
-                id="budget"
-                value={form.budget}
-                onChange={(e) => set({ budget: e.target.value })}
-                placeholder="Pl. 500 eFt intézeti keret"
               />
             </div>
           </div>
@@ -628,14 +606,24 @@ function Wizard() {
                     ],
                   ] as [string, string][])
                 : []),
-              ["Cél", isHw ? form.goal || "Nincs megadva" : form.goal],
+              ...(isPersonalUse && isHw
+                ? ([] as [string, string][])
+                : ([
+                    ["Cél", isHw ? form.goal || "Nincs megadva" : form.goal],
+                  ] as [string, string][])),
               ["Érintett szervezeti egység", lookup.unit(currentUser.orgUnitId)],
-              ["Felhasználók", [form.users, form.userCount].filter(Boolean).join(" · ") || "Nincs megadva"],
+              ...(isPersonalUse && isHw
+                ? ([] as [string, string][])
+                : ([
+                    [
+                      "Felhasználók",
+                      [form.users, form.userCount].filter(Boolean).join(" · ") || "Nincs megadva",
+                    ],
+                  ] as [string, string][])),
               ["Kívánt eredmény", isHw ? hwTitle : form.title],
-              ["Határidő", form.deadline || "Nincs megadva"],
+              ["Tervezett határidő", form.deadline || "Nincs megadva"],
               ["Adatkezelési érintettség", form.personalData === "igen" ? "Igen – adatvédelmi vizsgálat szükséges" : form.personalData === "bizonytalan" ? "Bizonytalan – a szolgáltatási csapat megvizsgálja" : "Nem"],
               ["Integráció", form.integration || "Nem szükséges"],
-              ["Költségkeret", form.budget || "Nincs megadva"],
               ["Becsült prioritás", form.deadline ? "Magas" : "Közepes"],
             ].map(([k, v]) => (
               <div key={k as string} className="grid gap-1 px-5 py-3 sm:grid-cols-[220px_1fr]">
@@ -687,7 +675,7 @@ function contextQuestions(domain: DomainKey | "") {
     case "szoftver":
       return ["users", "count", "existing", "integration", "data"];
     case "hardver":
-      return ["device", "users"];
+      return ["users"];
     case "web":
       return ["site", "users", "data"];
     case "digitalizacio":

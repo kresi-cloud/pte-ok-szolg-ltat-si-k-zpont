@@ -39,12 +39,12 @@ export function visibleCategories(
 }
 
 export const INITIAL_PRODUCT_CATEGORIES: ProductCategory[] = [
-  { id: "pc-notebook", name: "Notebook", description: "Hordozható munkaállomások oktatói és adminisztratív munkához.", active: true },
-  { id: "pc-desktop", name: "Asztali számítógép", description: "Rögzített munkahelyi konfigurációk.", active: true },
-  { id: "pc-workstation", name: "Workstation", description: "Kutatási, szimulációs és képfeldolgozási feladatokra.", active: true },
-  { id: "pc-okostelefon", name: "Okostelefon", description: "Intézményi mobilkommunikáció, mobilalkalmazások.", active: true },
-  { id: "pc-mobiltelefon", name: "Mobiltelefon", description: "Egyszerű hívás- és SMS-funkciók, terepi használat.", active: true },
-  { id: "pc-tablet", name: "Tablet", description: "Oktatási, betegágy melletti és vizitációs használat.", active: true },
+  { id: "pc-notebook", name: "Notebook", description: "Hordozható munkaállomások oktatói és adminisztratív munkához.", active: true, personalUse: true },
+  { id: "pc-desktop", name: "Asztali számítógép", description: "Rögzített munkahelyi konfigurációk.", active: true, personalUse: false },
+  { id: "pc-workstation", name: "Workstation", description: "Kutatási, szimulációs és képfeldolgozási feladatokra.", active: true, personalUse: false },
+  { id: "pc-okostelefon", name: "Okostelefon", description: "Intézményi mobilkommunikáció, mobilalkalmazások.", active: true, personalUse: true },
+  { id: "pc-mobiltelefon", name: "Mobiltelefon", description: "Egyszerű hívás- és SMS-funkciók, terepi használat.", active: true, personalUse: true },
+  { id: "pc-tablet", name: "Tablet", description: "Oktatási, betegágy melletti és vizitációs használat.", active: true, personalUse: true },
   { id: "pc-monitor", name: "Kijelző", description: "Monitorok egy- és kétmonitoros munkaállomásokhoz.", active: true },
   { id: "pc-projektor", name: "Projektor", description: "Tantermi és tárgyalótermi vetítés.", active: true },
   { id: "pc-periferia", name: "Perifériák", description: "Dokkolók, billentyűzetek, egerek, headsetek, webkamerák.", active: true },
