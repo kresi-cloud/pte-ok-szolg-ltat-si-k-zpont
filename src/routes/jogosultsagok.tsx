@@ -178,8 +178,10 @@ function Permissions() {
                       onClick={() => {
                         setSelectedId(u.id);
                         setDraft(null);
+                        setTierDraft(null);
                         setReason("");
                       }}
+
                     >
                       Kezelés
                     </Button>
