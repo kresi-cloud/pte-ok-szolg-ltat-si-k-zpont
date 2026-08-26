@@ -687,7 +687,7 @@ function contextQuestions(domain: DomainKey | "") {
     case "szoftver":
       return ["users", "count", "existing", "integration", "data"];
     case "hardver":
-      return ["device", "users"];
+      return ["users"];
     case "web":
       return ["site", "users", "data"];
     case "digitalizacio":
