@@ -14,6 +14,8 @@ import { AiBadge } from "@/components/status-badge";
 import { CATALOG, DOMAINS, lookup, useStore } from "@/lib/store";
 import type { DomainKey } from "@/lib/types";
 import { tierOf, visibleCategories, visibleProducts } from "@/lib/product-catalog";
+import { similarAssetsFor } from "@/lib/similar-assets";
+import { SimilarAssetNotice } from "@/components/similar-asset-notice";
 import { cn } from "@/lib/utils";
 
 const searchSchema = z.object({
