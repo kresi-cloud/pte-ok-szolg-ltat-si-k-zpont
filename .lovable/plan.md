@@ -22,7 +22,7 @@ A lista fejlécében: javaslat megnevezése, éve, jóváhagyó és a jóváhagy
 
 Lineáris (időarányos) leírás az aktiválás napjától a kivonás napjáig, a magyar társasági adóról szóló törvény 2. melléklete szerinti kulcsokkal:
 
-- számítástechnikai és ügyviteli gépek (notebook, asztali gép, munkaállomás, tablet, okostelefon, szerver, monitor, nyomtató, hálózati eszköz): **33%/év**
+- számítástechnikai és ügyviteli gépek (notebook, asztali gép, munkaállomás, tablet, okostelefon, szerver, monitor, nyomtató, hálózati eszköz): **20%/év**
 - egyéb gépek, berendezések (pl. projektor, prezentációtechnika): **14,5%/év**
 - 200 000 Ft alatti egyedi beszerzési érték: **egyösszegű leírás** (könyv szerinti érték azonnal 0)
 
