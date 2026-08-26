@@ -65,10 +65,57 @@ import {
   INITIAL_DISCREPANCIES,
   INITIAL_PROCUREMENT_ITEMS,
   INITIAL_REPLACEMENT_DECISIONS,
+  NEXT_FINANCIAL_YEAR,
   PERSONAL_LICENCES,
 } from "./asset-data";
+import { assetLookup, huf, lifecycleStatus, yearsSince } from "./asset-logic";
 import { needsProcurement, planItemFromRequest } from "./request-procurement";
 import { buildPlanApprovals } from "./plan-approvals";
+
+function seedScrapProposals(assets: Asset[]): ScrapProposal[] {
+  const candidates = assets
+    .filter((a) => a.active)
+    .filter((a) => {
+      const st = lifecycleStatus(a);
+      return (
+        st === "selejtezesre_var" ||
+        st === "tamogatasbol_kifutott" ||
+        st === "cserere_erett" ||
+        a.condition === "hibas"
+      );
+    });
+  if (candidates.length < 5) return [];
+  const picked = candidates.slice(0, 6);
+  return [
+    {
+      id: "sp-2027-001",
+      year: NEXT_FINANCIAL_YEAR,
+      title: "2027. évi selejtezési javaslat – 1. ütem",
+      reason: "Életciklus végét elért, gazdaságosan nem javítható IT eszközök selejtezése.",
+      assetIds: picked.map((a) => a.id),
+      status: "jovahagyva",
+      createdBy: "u-molnar",
+      createdAt: "2026-06-15",
+      submittedAt: "2026-06-20",
+      decidedBy: "u-szabo",
+      decidedAt: "2026-07-05",
+      history: [
+        { at: "2026-06-15", actorId: "u-molnar", action: "Javaslat összeállítása" },
+        {
+          at: "2026-06-20",
+          actorId: "u-molnar",
+          action: "Beküldés gazdasági vezetői jóváhagyásra",
+        },
+        {
+          at: "2026-07-05",
+          actorId: "u-szabo",
+          action: "Gazdasági vezetői jóváhagyás",
+          comment: "Elfogadva, selejtezési jegyzőkönyv készíthető.",
+        },
+      ],
+    },
+  ];
+}
 
 const STORAGE_KEY = "aok-portal-state-v2";
 
@@ -114,7 +161,7 @@ const initialState: PersistedState = {
   replacementDecisions: INITIAL_REPLACEMENT_DECISIONS,
   planItems: INITIAL_PROCUREMENT_ITEMS,
   planApprovals: buildPlanApprovals(),
-  scrapProposals: [],
+  scrapProposals: seedScrapProposals(ASSETS),
   handovers: [],
   currentUserId: "u-kovacs",
   activeRole: "igenylo",
