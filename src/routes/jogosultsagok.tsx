@@ -230,8 +230,9 @@ function Permissions() {
                       name="employee-tier"
                       className="size-4 accent-[hsl(var(--primary))]"
                       disabled={!canManage}
-                      checked={(selected.employeeTier ?? "alkalmazotti") === t}
-                      onChange={() => store.setUserTier(selected.id, t, reason.trim() || undefined)}
+                      checked={tier === t}
+                      onChange={() => setTierDraft(t)}
+
                     />
                     {TIER_LABELS[t]}
                   </label>
