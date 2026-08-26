@@ -399,6 +399,8 @@ function ScrapPage() {
                   <th className="px-3 py-2">Kor</th>
                   <th className="px-3 py-2">Állapot</th>
                   <th className="px-3 py-2">Szervezeti egység</th>
+                  <th className="px-3 py-2">Munkavállaló</th>
+                  <th className="px-3 py-2">Használat / helyiség</th>
                 </tr>
               </thead>
               <tbody>
