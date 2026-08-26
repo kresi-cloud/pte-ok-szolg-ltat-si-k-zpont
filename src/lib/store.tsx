@@ -559,6 +559,74 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ? applyProcurementLink(s, requests, updated)
           : { ...s, requests };
       }),
+    withdrawRequest: (id, reason) =>
+      setState((s) => {
+        const request = s.requests.find((r) => r.id === id);
+        if (!request) return s;
+        if (
+          !canWithdrawRequest(request, {
+            planItems: s.planItems,
+            planApprovals: s.planApprovals ?? [],
+            handovers: s.handovers ?? [],
+          })
+        )
+          return s;
+        const item = s.planItems.find((p) => p.sourceRequestId === id);
+        return {
+          ...s,
+          requests: s.requests.map((r) =>
+            r.id === id
+              ? {
+                  ...r,
+                  status: "visszavonva" as StatusKey,
+                  nextStep: "Az igénylő visszavonta az igényt.",
+                  updatedAt: today(),
+                  approvals: r.approvals.map((a) =>
+                    a.decision === "fuggoben"
+                      ? { ...a, decision: "elutasitva" as const, decidedAt: today(), comment: "Tárgytalan – az igénylő visszavonta az igényt." }
+                      : a,
+                  ),
+                  audit: [
+                    ...r.audit,
+                    {
+                      id: `a-${Date.now()}`,
+                      at: today(),
+                      actorId: currentUser.id,
+                      action: "Igény visszavonása",
+                      detail: reason ?? "",
+                    },
+                  ],
+                }
+              : r,
+          ),
+          planItems: item ? s.planItems.filter((p) => p.id !== item.id) : s.planItems,
+          notifications: [
+            {
+              id: `n-${Date.now()}`,
+              requestId: id,
+              at: today(),
+              text: `${id} – az igénylő visszavonta az igényt${item ? ", a beszerzési tervsor törlésre került" : ""}.`,
+              read: false,
+            },
+            ...s.notifications,
+          ],
+          assetAudit: item
+            ? [
+                {
+                  id: `aud-${Date.now()}`,
+                  at: today(),
+                  actorId: currentUser.id,
+                  entity: "beszerzes" as const,
+                  entityId: item.id,
+                  action: "Tervsor törlése visszavont igény miatt",
+                  detail: reason ?? "",
+                },
+                ...s.assetAudit,
+              ]
+            : s.assetAudit,
+        };
+      }),
+
     addMessage: (id, body, internal) => {
       const message: RequestMessage = {
         id: `m-${Date.now()}`,
