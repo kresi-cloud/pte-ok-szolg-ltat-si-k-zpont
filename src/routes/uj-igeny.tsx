@@ -135,6 +135,12 @@ function Wizard() {
   /** Személyi használatú termékkörnél nem kérdezünk célt és felhasználókat. */
   const isPersonalUse = selectedCategory?.personalUse === true;
 
+  /** Van-e már hasonló eszköz az igénylő leltárában? */
+  const similarAssets = useMemo(
+    () => similarAssetsFor(assets, currentUser.id, form.productCategoryId, isPersonalUse),
+    [assets, currentUser.id, form.productCategoryId, isPersonalUse],
+  );
+
   const canNext =
     (key === "domain" && !!form.domain) ||
     (key === "category" && !!form.productCategoryId) ||
