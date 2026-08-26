@@ -198,6 +198,18 @@ function RequestDetail() {
           {request.nextStep}
         </p>
 
+        {isRequester && request.status !== "piszkozat" && (
+          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-border bg-secondary/40 p-4">
+            <p className="text-sm">
+              Igényét a beszerzés gazdasági vezetői jóváhagyásáig bármikor visszavonhatja.
+            </p>
+            <div className="ml-auto">
+              <WithdrawRequestButton request={request} />
+            </div>
+          </div>
+        )}
+
+
         {planItem && (
           <p className="mt-4 rounded-md border border-accent/30 bg-accent/10 px-4 py-3 text-sm">
             <span className="font-medium">Beszerzési terv: </span>
