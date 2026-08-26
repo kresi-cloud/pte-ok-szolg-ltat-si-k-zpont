@@ -99,6 +99,14 @@ function RequestDetail() {
   /** Az igény elsődleges (szervezeti) jóváhagyója rögzíti a költségkeretet. */
   const isPrimaryApprover =
     !!pendingApproval && request.approvals[0]?.id === pendingApproval.id;
+  /** Az igénylő leltárában lévő, a kért termékkörhöz illeszkedő eszközök. */
+  const requestCategory = store.productCategories.find((c) => c.id === request.productCategoryId);
+  const similarAssets = similarAssetsFor(
+    store.assets,
+    request.requesterId,
+    request.productCategoryId,
+    requestCategory?.personalUse === true,
+  );
   const visibleMessages = request.messages.filter((m) => fullView || !m.internal);
   const currentIndex = TIMELINE.indexOf(request.status);
 
