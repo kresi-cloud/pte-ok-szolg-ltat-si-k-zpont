@@ -493,17 +493,6 @@ function Wizard() {
               />
             </div>
           )}
-          {questions.includes("device") && (
-            <div className="space-y-2">
-              <Label htmlFor="device">Milyen eszközről van szó és hol lesz használva?</Label>
-              <Input
-                id="device"
-                value={form.device}
-                onChange={(e) => set({ device: e.target.value })}
-                placeholder="Pl. notebook oktatói munkához, Élettani Intézet"
-              />
-            </div>
-          )}
           {questions.includes("site") && (
             <div className="space-y-2">
               <Label htmlFor="site">Melyik oldalt érinti?</Label>
