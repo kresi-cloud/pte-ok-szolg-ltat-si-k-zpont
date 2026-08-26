@@ -41,10 +41,11 @@ export const Route = createFileRoute("/selejtezes")({
 });
 
 function holderLabel(a: Asset) {
-  const id = a.usage === "szemelyi" ? a.assignedUserId : (a.custodianUserId ?? a.inventoryResponsibleId);
+  const personal = isPersonalUse(a);
+  const id = personal ? a.assignedUserId : (a.custodianUserId ?? a.inventoryResponsibleId ?? a.assignedUserId);
   const name = id ? lookup.user(id)?.name : undefined;
   if (!name) return "—";
-  return a.usage === "szemelyi" ? name : `${name} (leltárfelelős)`;
+  return personal ? name : `${name} (leltárfelelős)`;
 }
 
 function assetLabel(a: Asset) {
