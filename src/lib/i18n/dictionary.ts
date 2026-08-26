@@ -189,7 +189,7 @@ export const EN_DICT: Record<string, string> = {
   "Windows 10 támogatás megszűnése miatti asztali gépcsere": "Desktop replacement due to end of Windows 10 support",
   "Új munkatárs első napjára minden hozzáférés készen áll.": "All access is ready for the new employee's first day.",
   "A közlemény megjelenik minden felhasználó kezdőlapján.": "The announcement will appear on every user's homepage.",
-  "Egyszeri igényről vagy tartós szolgáltatásról van szó?": "Is this a one-time request or an ongoing service?",
+  
   "Elutasítva IT biztonsági okból, alternatíva javasolva.": "Rejected for IT security reasons, an alternative has been suggested.",
   "Igényeket nyújt be, követi a saját ügyeit és leltárát.": "Submits requests and tracks their own cases and inventory.",
   "Irodai felhasználás mellett 6 év tervezett élettartam.": "Planned lifespan of 6 years for office use.",
