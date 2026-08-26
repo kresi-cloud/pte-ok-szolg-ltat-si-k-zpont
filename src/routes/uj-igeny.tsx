@@ -610,14 +610,24 @@ function Wizard() {
                     ],
                   ] as [string, string][])
                 : []),
-              ["Cél", isHw ? form.goal || "Nincs megadva" : form.goal],
+              ...(isPersonalUse && isHw
+                ? ([] as [string, string][])
+                : ([
+                    ["Cél", isHw ? form.goal || "Nincs megadva" : form.goal],
+                  ] as [string, string][])),
               ["Érintett szervezeti egység", lookup.unit(currentUser.orgUnitId)],
-              ["Felhasználók", [form.users, form.userCount].filter(Boolean).join(" · ") || "Nincs megadva"],
+              ...(isPersonalUse && isHw
+                ? ([] as [string, string][])
+                : ([
+                    [
+                      "Felhasználók",
+                      [form.users, form.userCount].filter(Boolean).join(" · ") || "Nincs megadva",
+                    ],
+                  ] as [string, string][])),
               ["Kívánt eredmény", isHw ? hwTitle : form.title],
-              ["Határidő", form.deadline || "Nincs megadva"],
+              ["Tervezett határidő", form.deadline || "Nincs megadva"],
               ["Adatkezelési érintettség", form.personalData === "igen" ? "Igen – adatvédelmi vizsgálat szükséges" : form.personalData === "bizonytalan" ? "Bizonytalan – a szolgáltatási csapat megvizsgálja" : "Nem"],
               ["Integráció", form.integration || "Nem szükséges"],
-              ["Költségkeret", form.budget || "Nincs megadva"],
               ["Becsült prioritás", form.deadline ? "Magas" : "Közepes"],
             ].map(([k, v]) => (
               <div key={k as string} className="grid gap-1 px-5 py-3 sm:grid-cols-[220px_1fr]">
