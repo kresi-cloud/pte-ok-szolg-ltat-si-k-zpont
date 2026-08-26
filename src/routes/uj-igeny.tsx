@@ -65,7 +65,6 @@ interface FormState {
   goal: string;
   users: string;
   userCount: string;
-  deadline: string;
   existing: string;
   personalData: string;
   integration: string;
@@ -89,7 +88,6 @@ const empty: FormState = {
   goal: "",
   users: "",
   userCount: "",
-  deadline: "",
   existing: "",
   personalData: "nem",
   integration: "",
@@ -236,7 +234,6 @@ function Wizard() {
       personalData: form.personalData === "igen",
       integration: form.integration || "Nem szükséges",
       recurring: isHw ? "Egyszeri igény" : "Tartós szolgáltatás",
-      dueDate: form.deadline || undefined,
       ...(isHw && isPersonalUse
         ? {
             requestReason: (form.requestReason || undefined) as RequestReason | undefined,
@@ -740,17 +737,6 @@ function Wizard() {
               </RadioGroup>
             </fieldset>
           )}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="deadline">Tervezett határidő</Label>
-              <Input
-                id="deadline"
-                type="date"
-                value={form.deadline}
-                onChange={(e) => set({ deadline: e.target.value })}
-              />
-            </div>
-          </div>
         </section>
       )}
 
@@ -814,10 +800,10 @@ function Wizard() {
                     ],
                   ] as [string, string][])),
               ["Kívánt eredmény", isHw ? hwTitle : form.title],
-              ["Tervezett határidő", form.deadline || "Nincs megadva"],
               ["Adatkezelési érintettség", form.personalData === "igen" ? "Igen – adatvédelmi vizsgálat szükséges" : form.personalData === "bizonytalan" ? "Bizonytalan – a szolgáltatási csapat megvizsgálja" : "Nem"],
               ["Integráció", form.integration || "Nem szükséges"],
-              ["Becsült prioritás", form.deadline ? "Magas" : "Közepes"],
+              ["Becsült prioritás", "Közepes"],
+
             ].map(([k, v]) => (
               <div key={k as string} className="grid gap-1 px-5 py-3 sm:grid-cols-[220px_1fr]">
                 <dt className="text-sm text-muted-foreground">{k}</dt>
