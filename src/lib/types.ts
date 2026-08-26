@@ -166,7 +166,8 @@ export type StatusKey =
   | "teszteles"
   | "atadasra_var"
   | "lezarva"
-  | "elutasitva";
+  | "elutasitva"
+  | "visszavonva";
 
 export const STATUS_ORDER: StatusKey[] = [
   "piszkozat",
@@ -181,6 +182,7 @@ export const STATUS_ORDER: StatusKey[] = [
   "atadasra_var",
   "lezarva",
   "elutasitva",
+  "visszavonva",
 ];
 
 export const STATUS_LABELS: Record<StatusKey, string> = {
@@ -196,7 +198,9 @@ export const STATUS_LABELS: Record<StatusKey, string> = {
   atadasra_var: "Átadásra vár",
   lezarva: "Lezárva",
   elutasitva: "Elutasítva",
+  visszavonva: "Visszavonva",
 };
+
 
 export type Priority = "alacsony" | "kozepes" | "magas" | "kritikus";
 
