@@ -573,21 +573,12 @@ function Wizard() {
           </fieldset>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="deadline">Van kívánt határidő?</Label>
+              <Label htmlFor="deadline">Tervezett határidő</Label>
               <Input
                 id="deadline"
                 type="date"
                 value={form.deadline}
                 onChange={(e) => set({ deadline: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="budget">Van rendelkezésre álló költségkeret?</Label>
-              <Input
-                id="budget"
-                value={form.budget}
-                onChange={(e) => set({ budget: e.target.value })}
-                placeholder="Pl. 500 eFt intézeti keret"
               />
             </div>
           </div>
