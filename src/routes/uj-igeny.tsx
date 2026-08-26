@@ -278,7 +278,10 @@ function Wizard() {
                     key={c.id}
                     type="button"
                     aria-pressed={selected}
-                    onClick={() => set({ productCategoryId: c.id, productId: "" })}
+                    onClick={() => {
+                      set({ productCategoryId: c.id, productId: "" });
+                      setStep((s) => Math.min(lastStep, s + 1));
+                    }}
                     className={cn(
                       "card-surface p-5 text-left transition-colors",
                       selected ? "border-primary ring-2 ring-primary/25" : "hover:bg-secondary/60",
