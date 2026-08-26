@@ -97,8 +97,7 @@ function Home() {
           Mit szeretne igényelni?
         </h2>
         <p className="mb-4 text-sm text-muted-foreground">
-          Jelenleg informatikai eszköz igénylése indítható – a rendszer végigvezeti a
-          termékkörökön és a választható modelleken.
+          Jelenleg informatikai eszköz igénylése indítható
         </p>
 
         {PRIMARY_DOMAIN && (
