@@ -134,6 +134,8 @@ function Wizard() {
   );
   const selectedProduct = products.find((p) => p.id === form.productId);
   const selectedCategory = productCategories.find((c) => c.id === form.productCategoryId);
+  /** Személyi használatú termékkörnél nem kérdezünk célt és felhasználókat. */
+  const isPersonalUse = selectedCategory?.personalUse === true;
 
   const canNext =
     (key === "domain" && !!form.domain) ||
