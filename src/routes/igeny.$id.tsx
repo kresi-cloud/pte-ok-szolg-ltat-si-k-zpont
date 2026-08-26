@@ -229,9 +229,13 @@ function RequestDetail() {
                 size="sm"
                 variant="outline"
                 onClick={() => {
+                  const amount = Number(budget) || 0;
                   store.updateRequest(
                     request.id,
-                    { estimatedCost: Number(budget) || 0 },
+                    {
+                      estimatedCost: amount,
+                      budget: amount ? `${amount.toLocaleString("hu-HU")} Ft` : undefined,
+                    },
                     "Költségkeret rögzítése",
                   );
                   toast.success("Költségkeret mentve.");
