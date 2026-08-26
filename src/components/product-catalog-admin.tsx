@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -64,7 +65,7 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
   const products = store.products ?? [];
 
   const [selectedCat, setSelectedCat] = useState<string>(categories[0]?.id ?? "");
-  const [newCat, setNewCat] = useState({ name: "", description: "" });
+  const [newCat, setNewCat] = useState({ name: "", description: "", personalUse: false });
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [draft, setDraft] = useState<Draft>(emptyProduct);
@@ -138,7 +139,9 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                   )}
                 >
                   <span className="block font-medium">{c.name}</span>
-                  <span className="block text-xs text-muted-foreground">{count} modell</span>
+                  <span className="block text-xs text-muted-foreground">
+                    {count} modell{c.personalUse ? " · személyi használat" : ""}
+                  </span>
                 </button>
                 <Button
                   size="icon"
@@ -171,6 +174,16 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
             onChange={(e) => setNewCat({ ...newCat, description: e.target.value })}
             placeholder="Rövid leírás az igénylőknek"
           />
+          <div className="flex items-center justify-between gap-3">
+            <Label htmlFor="new-cat-personal" className="text-sm font-normal">
+              Személyi használatú eszközkör
+            </Label>
+            <Switch
+              id="new-cat-personal"
+              checked={newCat.personalUse}
+              onCheckedChange={(v) => setNewCat({ ...newCat, personalUse: v })}
+            />
+          </div>
           <Button
             size="sm"
             onClick={() => {
@@ -179,9 +192,10 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                 name: newCat.name.trim(),
                 description: newCat.description.trim(),
                 active: true,
+                personalUse: newCat.personalUse,
               });
               setSelectedCat(id);
-              setNewCat({ name: "", description: "" });
+              setNewCat({ name: "", description: "", personalUse: false });
               toast.success("Termékkör létrehozva");
             }}
           >
@@ -198,6 +212,21 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
               <div>
                 <h3 className="font-display text-lg font-semibold">{activeCat.name}</h3>
                 <p className="text-sm text-muted-foreground">{activeCat.description}</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <Switch
+                    id={`cat-personal-${activeCat.id}`}
+                    checked={activeCat.personalUse === true}
+                    onCheckedChange={(v) => {
+                      store.updateProductCategory(activeCat.id, { personalUse: v });
+                      toast.success(
+                        v ? "Személyi használatú eszközkör" : "Nem személyi használatú eszközkör",
+                      );
+                    }}
+                  />
+                  <Label htmlFor={`cat-personal-${activeCat.id}`} className="text-sm font-normal">
+                    Személyi használatú eszközkör
+                  </Label>
+                </div>
               </div>
               <Button
                 onClick={() => {
