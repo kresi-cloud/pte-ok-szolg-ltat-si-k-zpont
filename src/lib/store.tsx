@@ -70,6 +70,7 @@ import {
 } from "./asset-data";
 import { assetLookup, huf, lifecycleStatus, yearsSince } from "./asset-logic";
 import { needsProcurement, planItemFromRequest } from "./request-procurement";
+import { canWithdrawRequest } from "./withdraw";
 import { buildPlanApprovals } from "./plan-approvals";
 
 function seedScrapProposals(assets: Asset[]): ScrapProposal[] {
