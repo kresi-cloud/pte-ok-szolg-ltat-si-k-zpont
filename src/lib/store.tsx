@@ -184,6 +184,7 @@ interface StoreValue extends PersistedState {
   createRequest: (input: Partial<ServiceRequest> & { title: string; domain: ServiceRequest["domain"] }) => string;
   updateRequest: (id: string, patch: Partial<ServiceRequest>, auditLabel?: string) => void;
   setStatus: (id: string, status: StatusKey) => void;
+  withdrawRequest: (id: string, reason?: string) => void;
   addMessage: (id: string, body: string, internal: boolean) => void;
   decideApproval: (id: string, approvalId: string, decision: "jovahagyva" | "elutasitva", comment?: string) => void;
   markNotificationsRead: () => void;
