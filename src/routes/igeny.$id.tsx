@@ -36,6 +36,7 @@ import {
 import { ASSET_LOCATIONS, ASSET_MODELS } from "@/lib/asset-data";
 import { similarAssetsFor } from "@/lib/similar-assets";
 import { SimilarAssetNotice } from "@/components/similar-asset-notice";
+import { WithdrawRequestButton } from "@/components/withdraw-request-button";
 import { cn } from "@/lib/utils";
 import { ViewOnlyNotice } from "@/components/view-only-notice";
 
