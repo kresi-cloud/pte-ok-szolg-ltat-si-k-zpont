@@ -65,7 +65,6 @@ interface FormState {
   goal: string;
   users: string;
   userCount: string;
-  deadline: string;
   existing: string;
   personalData: string;
   integration: string;
@@ -89,7 +88,6 @@ const empty: FormState = {
   goal: "",
   users: "",
   userCount: "",
-  deadline: "",
   existing: "",
   personalData: "nem",
   integration: "",
@@ -236,7 +234,6 @@ function Wizard() {
       personalData: form.personalData === "igen",
       integration: form.integration || "Nem szükséges",
       recurring: isHw ? "Egyszeri igény" : "Tartós szolgáltatás",
-      dueDate: form.deadline || undefined,
       ...(isHw && isPersonalUse
         ? {
             requestReason: (form.requestReason || undefined) as RequestReason | undefined,
