@@ -36,6 +36,7 @@ import {
 import { ASSET_LOCATIONS, ASSET_MODELS } from "@/lib/asset-data";
 import { similarAssetsFor } from "@/lib/similar-assets";
 import { SimilarAssetNotice } from "@/components/similar-asset-notice";
+import { WithdrawRequestButton } from "@/components/withdraw-request-button";
 import { cn } from "@/lib/utils";
 import { ViewOnlyNotice } from "@/components/view-only-notice";
 
@@ -197,6 +198,18 @@ function RequestDetail() {
           <span className="font-medium">Következő lépés: </span>
           {request.nextStep}
         </p>
+
+        {isRequester && request.status !== "piszkozat" && (
+          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-border bg-secondary/40 p-4">
+            <p className="text-sm">
+              Igényét a beszerzés gazdasági vezetői jóváhagyásáig bármikor visszavonhatja.
+            </p>
+            <div className="ml-auto">
+              <WithdrawRequestButton request={request} />
+            </div>
+          </div>
+        )}
+
 
         {planItem && (
           <p className="mt-4 rounded-md border border-accent/30 bg-accent/10 px-4 py-3 text-sm">

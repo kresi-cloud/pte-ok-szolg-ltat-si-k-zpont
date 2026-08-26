@@ -12,6 +12,7 @@ import {
   Search,
   ShieldCheck,
   TestTube,
+  Undo2,
   XCircle,
 } from "lucide-react";
 
@@ -31,6 +32,7 @@ const STATUS_STYLE: Record<StatusKey, { cls: string; Icon: typeof Clock }> = {
   atadasra_var: { cls: "bg-warning/15 text-warning-foreground border-warning/40", Icon: PackageCheck },
   lezarva: { cls: "bg-success/12 text-success border-success/30", Icon: CheckCircle2 },
   elutasitva: { cls: "bg-destructive/10 text-destructive border-destructive/30", Icon: XCircle },
+  visszavonva: { cls: "bg-muted text-muted-foreground border-border", Icon: Undo2 },
 };
 
 export function StatusBadge({ status, className }: { status: StatusKey; className?: string }) {

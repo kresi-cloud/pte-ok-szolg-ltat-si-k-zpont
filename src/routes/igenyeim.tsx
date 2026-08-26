@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { PriorityBadge, StatusBadge } from "@/components/status-badge";
+import { WithdrawRequestButton } from "@/components/withdraw-request-button";
 import { Input } from "@/components/ui/input";
 import { lookup, useStore } from "@/lib/store";
 import { STATUS_LABELS } from "@/lib/types";
@@ -37,9 +38,10 @@ function MyRequests() {
   const mine = requests.filter((r) => r.requesterId === currentUser.id);
   const filtered = mine
     .filter((r) => {
-      if (tab === "aktiv") return !["lezarva", "elutasitva", "piszkozat"].includes(r.status);
+      if (tab === "aktiv")
+        return !["lezarva", "elutasitva", "piszkozat", "visszavonva"].includes(r.status);
       if (tab === "piszkozat") return r.status === "piszkozat";
-      if (tab === "lezart") return ["lezarva", "elutasitva"].includes(r.status);
+      if (tab === "lezart") return ["lezarva", "elutasitva", "visszavonva"].includes(r.status);
       return true;
     })
     .filter((r) => (q ? `${r.id} ${r.title}`.toLowerCase().includes(q.toLowerCase()) : true));
@@ -88,11 +90,11 @@ function MyRequests() {
       ) : (
         <ul className="space-y-3">
           {filtered.map((r) => (
-            <li key={r.id}>
+            <li key={r.id} className="card-surface flex flex-wrap items-center gap-2 p-2 transition-colors hover:border-primary/40">
               <Link
                 to="/igeny/$id"
                 params={{ id: r.id }}
-                className="card-surface flex flex-wrap items-center gap-4 p-4 transition-colors hover:border-primary/40"
+                className="flex flex-1 flex-wrap items-center gap-4 p-2"
               >
                 <span className="w-32 shrink-0 font-mono text-xs text-muted-foreground">{r.id}</span>
                 <span className="min-w-[240px] flex-1 font-medium">{r.title}</span>
@@ -101,6 +103,7 @@ function MyRequests() {
                 <StatusBadge status={r.status} />
                 <span className="w-24 text-right text-xs text-muted-foreground">{r.updatedAt}</span>
               </Link>
+              <WithdrawRequestButton request={r} showBlockReason={false} />
             </li>
           ))}
         </ul>
