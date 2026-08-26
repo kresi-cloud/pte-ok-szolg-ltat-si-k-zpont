@@ -310,7 +310,7 @@ function RequestDetail() {
                 ["Érintett felhasználószám", request.userCount ?? "Nincs megadva"],
                 ["Adatkezelési érintettség", request.personalData ? "Igen" : "Nem"],
                 ["Integráció", request.integration ?? "Nem szükséges"],
-                ["Jelleg", request.recurring ?? "—"],
+                ...(request.recurring ? [["Jelleg", request.recurring]] : []),
                 [
                   "Költségkeret (jóváhagyó által rögzítve)",
                   request.budget ?? "Nincs megadva",
