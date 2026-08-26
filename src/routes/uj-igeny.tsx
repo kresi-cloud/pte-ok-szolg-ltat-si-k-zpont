@@ -230,6 +230,12 @@ function Wizard() {
         ))}
       </ol>
 
+      {key !== "domain" && similarAssets.length > 0 && (
+        <div className="mb-6">
+          <SimilarAssetNotice items={similarAssets} audience="igenylo" />
+        </div>
+      )}
+
       {key === "domain" && (
         <section>
           <h1 className="font-display text-2xl font-semibold">Miben segíthetünk?</h1>
