@@ -40,6 +40,13 @@ export const Route = createFileRoute("/selejtezes")({
   component: ScrapPage,
 });
 
+function holderLabel(a: Asset) {
+  const id = a.usage === "szemelyi" ? a.assignedUserId : (a.custodianUserId ?? a.inventoryResponsibleId);
+  const name = id ? lookup.user(id)?.name : undefined;
+  if (!name) return "—";
+  return a.usage === "szemelyi" ? name : `${name} (leltárfelelős)`;
+}
+
 function assetLabel(a: Asset) {
   const m = assetLookup.model(a.modelKey);
   return `${m ? `${m.manufacturer} ${m.model}` : a.modelKey} · ${a.inventoryNo}`;
@@ -399,6 +406,8 @@ function ScrapPage() {
                   <th className="px-3 py-2">Kor</th>
                   <th className="px-3 py-2">Állapot</th>
                   <th className="px-3 py-2">Szervezeti egység</th>
+                  <th className="px-3 py-2">Munkavállaló</th>
+                  <th className="px-3 py-2">Használat / helyiség</th>
                 </tr>
               </thead>
               <tbody>
@@ -419,6 +428,12 @@ function ScrapPage() {
                     <td className="px-3 py-2">{yearsSince(a.purchaseDate).toFixed(1)} év</td>
                     <td className="px-3 py-2 text-xs">{LIFECYCLE_LABELS[lifecycleStatus(a)]}</td>
                     <td className="px-3 py-2 text-xs">{lookup.unit(a.orgUnitId)}</td>
+                    <td className="px-3 py-2 text-xs">{holderLabel(a)}</td>
+                    <td className="px-3 py-2 text-xs">
+                      {a.usage === "szemelyi"
+                        ? "Személyes használat"
+                        : assetLookup.locationLabel(a.locationId)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
