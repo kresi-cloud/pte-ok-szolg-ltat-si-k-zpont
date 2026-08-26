@@ -67,7 +67,7 @@ interface FormState {
   existing: string;
   personalData: string;
   integration: string;
-  recurring: string;
+  
   siteUrl: string;
   refined: boolean;
 }
