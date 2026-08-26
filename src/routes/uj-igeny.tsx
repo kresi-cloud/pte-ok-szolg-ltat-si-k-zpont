@@ -94,7 +94,7 @@ const empty: FormState = {
 function Wizard() {
   const search = Route.useSearch();
   const navigate = useNavigate();
-  const { createRequest, currentUser, productCategories, products } = useStore();
+  const { createRequest, currentUser, productCategories, products, assets } = useStore();
   const preset = CATALOG.find((c) => c.id === search['service']);
   const skipDomain = !!search['domain'];
   const [step, setStep] = useState(0);
