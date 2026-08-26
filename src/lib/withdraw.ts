@@ -1,9 +1,5 @@
-import type {
-  AssetHandover,
-  PlanApproval,
-  ProcurementPlanItem,
-} from "./asset-types";
-import type { ServiceRequest } from "./types";
+import type { PlanApproval, ProcurementPlanItem } from "./asset-types";
+import type { AssetHandover, ServiceRequest } from "./types";
 
 /** Terv-jóváhagyási állapotok, amelyekben a gazdasági vezető még nem küldte tovább a tervet. */
 const OPEN_PLAN_STATUSES = ["tervezes", "gazdasagi_ellenorzes", "visszakuldve"];
