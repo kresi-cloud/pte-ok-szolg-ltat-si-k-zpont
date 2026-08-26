@@ -201,6 +201,16 @@ function RequestDetail() {
           </p>
         )}
 
+        {pendingApproval && isPrimaryApprover && similarAssets.length > 0 && (
+          <div className="mt-4">
+            <SimilarAssetNotice
+              items={similarAssets}
+              audience="jovahagyo"
+              requesterName={lookup.userName(request.requesterId)}
+            />
+          </div>
+        )}
+
         {pendingApproval && isPrimaryApprover && (
           <div className="mt-4 space-y-2 rounded-md border border-border bg-secondary/40 p-4">
             <Label htmlFor="budget-input" className="text-sm">
