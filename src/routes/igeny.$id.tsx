@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -66,6 +67,9 @@ function RequestDetail() {
   const request = store.requests.find((r) => r.id === id);
   const [message, setMessage] = useState("");
   const [internalNote, setInternalNote] = useState("");
+  const [budget, setBudget] = useState(String(
+    store.requests.find((r) => r.id === id)?.estimatedCost || "",
+  ));
 
   if (!request) {
     return (
@@ -90,6 +94,9 @@ function RequestDetail() {
   const pendingApproval = request.approvals.find(
     (a) => a.decision === "fuggoben" && a.approverId === store.currentUser.id,
   );
+  /** Az igény elsődleges (szervezeti) jóváhagyója rögzíti a költségkeretet. */
+  const isPrimaryApprover =
+    !!pendingApproval && request.approvals[0]?.id === pendingApproval.id;
   const visibleMessages = request.messages.filter((m) => fullView || !m.internal);
   const currentIndex = TIMELINE.indexOf(request.status);
 
