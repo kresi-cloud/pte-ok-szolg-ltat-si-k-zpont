@@ -803,10 +803,10 @@ function Wizard() {
                     ],
                   ] as [string, string][])),
               ["Kívánt eredmény", isHw ? hwTitle : form.title],
-              ["Tervezett határidő", form.deadline || "Nincs megadva"],
               ["Adatkezelési érintettség", form.personalData === "igen" ? "Igen – adatvédelmi vizsgálat szükséges" : form.personalData === "bizonytalan" ? "Bizonytalan – a szolgáltatási csapat megvizsgálja" : "Nem"],
               ["Integráció", form.integration || "Nem szükséges"],
-              ["Becsült prioritás", form.deadline ? "Magas" : "Közepes"],
+              ["Becsült prioritás", "Közepes"],
+
             ].map(([k, v]) => (
               <div key={k as string} className="grid gap-1 px-5 py-3 sm:grid-cols-[220px_1fr]">
                 <dt className="text-sm text-muted-foreground">{k}</dt>
