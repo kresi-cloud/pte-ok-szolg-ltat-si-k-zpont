@@ -14,6 +14,8 @@ import { AiBadge } from "@/components/status-badge";
 import { CATALOG, DOMAINS, lookup, useStore } from "@/lib/store";
 import type { DomainKey } from "@/lib/types";
 import { tierOf, visibleCategories, visibleProducts } from "@/lib/product-catalog";
+import { similarAssetsFor } from "@/lib/similar-assets";
+import { SimilarAssetNotice } from "@/components/similar-asset-notice";
 import { cn } from "@/lib/utils";
 
 const searchSchema = z.object({
@@ -92,7 +94,7 @@ const empty: FormState = {
 function Wizard() {
   const search = Route.useSearch();
   const navigate = useNavigate();
-  const { createRequest, currentUser, productCategories, products } = useStore();
+  const { createRequest, currentUser, productCategories, products, assets } = useStore();
   const preset = CATALOG.find((c) => c.id === search['service']);
   const skipDomain = !!search['domain'];
   const [step, setStep] = useState(0);
@@ -132,6 +134,12 @@ function Wizard() {
   const selectedCategory = productCategories.find((c) => c.id === form.productCategoryId);
   /** Személyi használatú termékkörnél nem kérdezünk célt és felhasználókat. */
   const isPersonalUse = selectedCategory?.personalUse === true;
+
+  /** Van-e már hasonló eszköz az igénylő leltárában? */
+  const similarAssets = useMemo(
+    () => similarAssetsFor(assets, currentUser.id, form.productCategoryId, isPersonalUse),
+    [assets, currentUser.id, form.productCategoryId, isPersonalUse],
+  );
 
   const canNext =
     (key === "domain" && !!form.domain) ||
@@ -221,6 +229,12 @@ function Wizard() {
           </li>
         ))}
       </ol>
+
+      {key !== "domain" && similarAssets.length > 0 && (
+        <div className="mb-6">
+          <SimilarAssetNotice items={similarAssets} audience="igenylo" />
+        </div>
+      )}
 
       {key === "domain" && (
         <section>

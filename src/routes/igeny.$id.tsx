@@ -27,6 +27,8 @@ import {
 import { AiBadge, PriorityBadge, StatusBadge } from "@/components/status-badge";
 import { lookup, useStore } from "@/lib/store";
 import { STATUS_LABELS, STATUS_ORDER, type StatusKey } from "@/lib/types";
+import { similarAssetsFor } from "@/lib/similar-assets";
+import { SimilarAssetNotice } from "@/components/similar-asset-notice";
 import { cn } from "@/lib/utils";
 import { ViewOnlyNotice } from "@/components/view-only-notice";
 
@@ -97,6 +99,14 @@ function RequestDetail() {
   /** Az igény elsődleges (szervezeti) jóváhagyója rögzíti a költségkeretet. */
   const isPrimaryApprover =
     !!pendingApproval && request.approvals[0]?.id === pendingApproval.id;
+  /** Az igénylő leltárában lévő, a kért termékkörhöz illeszkedő eszközök. */
+  const requestCategory = store.productCategories.find((c) => c.id === request.productCategoryId);
+  const similarAssets = similarAssetsFor(
+    store.assets,
+    request.requesterId,
+    request.productCategoryId,
+    requestCategory?.personalUse === true,
+  );
   const visibleMessages = request.messages.filter((m) => fullView || !m.internal);
   const currentIndex = TIMELINE.indexOf(request.status);
 
@@ -189,6 +199,16 @@ function RequestDetail() {
               Beszerzési terv megnyitása
             </Link>
           </p>
+        )}
+
+        {pendingApproval && isPrimaryApprover && similarAssets.length > 0 && (
+          <div className="mt-4">
+            <SimilarAssetNotice
+              items={similarAssets}
+              audience="jovahagyo"
+              requesterName={lookup.userName(request.requesterId)}
+            />
+          </div>
         )}
 
         {pendingApproval && isPrimaryApprover && (
