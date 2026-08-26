@@ -565,25 +565,6 @@ function Wizard() {
               </RadioGroup>
             </fieldset>
           )}
-          <fieldset className="space-y-2">
-            <legend className="text-sm font-medium">
-              Egyszeri igényről vagy tartós szolgáltatásról van szó?
-            </legend>
-            <RadioGroup
-              value={form.recurring}
-              onValueChange={(v) => set({ recurring: v })}
-              className="flex gap-6"
-            >
-              <div className="flex items-center gap-2">
-                <RadioGroupItem value="egyszeri" id="r-e" />
-                <Label htmlFor="r-e" className="font-normal">Egyszeri</Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <RadioGroupItem value="tartos" id="r-t" />
-                <Label htmlFor="r-t" className="font-normal">Tartós</Label>
-              </div>
-            </RadioGroup>
-          </fieldset>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="deadline">Tervezett határidő</Label>
