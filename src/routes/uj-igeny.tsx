@@ -12,7 +12,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AiBadge } from "@/components/status-badge";
 import { CATALOG, DOMAINS, lookup, useStore } from "@/lib/store";
-import type { DomainKey } from "@/lib/types";
+import type { DomainKey, HandoverMode, RequestReason } from "@/lib/types";
+import { HANDOVER_MODE_LABELS, REQUEST_REASON_LABELS } from "@/lib/types";
+import { ASSET_LOCATIONS, ASSET_MODELS } from "@/lib/asset-data";
 import { tierOf, visibleCategories, visibleProducts } from "@/lib/product-catalog";
 import { similarAssetsFor } from "@/lib/similar-assets";
 import { SimilarAssetNotice } from "@/components/similar-asset-notice";
@@ -67,7 +69,12 @@ interface FormState {
   existing: string;
   personalData: string;
   integration: string;
-  
+  requestReason: string;
+  requestReasonNote: string;
+  replacedAssetId: string;
+  workLocationId: string;
+  handoverMode: string;
+  handoverLocationId: string;
   siteUrl: string;
   refined: boolean;
 }
@@ -86,7 +93,12 @@ const empty: FormState = {
   existing: "",
   personalData: "nem",
   integration: "",
-  
+  requestReason: "",
+  requestReasonNote: "",
+  replacedAssetId: "",
+  workLocationId: "",
+  handoverMode: "munkavegzes",
+  handoverLocationId: "",
   siteUrl: "",
   refined: false,
 };
@@ -141,16 +153,47 @@ function Wizard() {
     [assets, currentUser.id, form.productCategoryId, isPersonalUse],
   );
 
+  /** A leltár azon eszközei, amelyek cserére/hibára jelölhetők. */
+  const replaceableAssets = similarAssets.map((s) => s.asset);
+  const needsReplacedAsset =
+    form.requestReason === "csere" || form.requestReason === "meghibasodas";
+  /** Csere jelölése esetén tájékoztató, nem figyelmeztető hangnem. */
+  const noticeTone: "figyelmeztetes" | "tajekoztatas" = needsReplacedAsset
+    ? "tajekoztatas"
+    : "figyelmeztetes";
+
+  const personalDetailsOk =
+    !!form.requestReason &&
+    !!form.workLocationId &&
+    (form.handoverMode !== "eltero" || !!form.handoverLocationId);
+
   const canNext =
     (key === "domain" && !!form.domain) ||
     (key === "category" && !!form.productCategoryId) ||
     (key === "product" && !!form.productId) ||
     (key === "goal" && form.goal.trim().length > 20 && form.title.trim().length > 3) ||
-    key === "details" ||
+    (key === "details" && (!(isHw && isPersonalUse) || personalDetailsOk)) ||
     key === "summary";
 
+  const locationLabel = (id: string) => {
+    const l = ASSET_LOCATIONS.find((x) => x.id === id);
+    return l ? `${l.building} · ${l.room}` : "Nincs megadva";
+  };
+  const assetLabel = (id: string) => {
+    const a = replaceableAssets.find((x) => x.id === id);
+    if (!a) return "Nincs megadva";
+    const m = ASSET_MODELS.find((x) => x.key === a.modelKey);
+    return `${m ? `${m.manufacturer} ${m.model}` : a.deviceId} · ${a.inventoryNo}${a.serial ? ` · ${a.serial}` : ""}`;
+  };
+  const handoverLabel =
+    form.handoverMode === "eltero"
+      ? `${HANDOVER_MODE_LABELS.eltero} – ${locationLabel(form.handoverLocationId)}`
+      : form.handoverMode === "ugyfelszolgalat"
+        ? HANDOVER_MODE_LABELS.ugyfelszolgalat
+        : `${HANDOVER_MODE_LABELS.munkavegzes} – ${locationLabel(form.workLocationId)}`;
 
-  const qty = Math.max(1, Number(form.quantity) || 1);
+  /** Személyi használatú eszközből mindig egy darab igényelhető. */
+  const qty = isHw && isPersonalUse ? 1 : Math.max(1, Number(form.quantity) || 1);
   const hwTitle = selectedProduct
     ? `${selectedCategory?.name ?? "Eszköz"} igénylés – ${selectedProduct.name}${qty > 1 ? ` (${qty} db)` : ""}`
     : "";
@@ -159,7 +202,19 @@ function Wizard() {
         `Igényelt eszköz: ${selectedProduct.name} (${selectedProduct.vendor}), ${qty} db.`,
         `Termékkör: ${selectedCategory?.name ?? "—"}.`,
         `Konfiguráció: ${selectedProduct.spec.cpu} · ${selectedProduct.spec.ram} · ${selectedProduct.spec.storage} · ${selectedProduct.spec.os} ${selectedProduct.spec.osVersion}.`,
-        form.goal.trim() ? `Indoklás: ${form.goal.trim()}` : "",
+        ...(isPersonalUse
+          ? [
+              form.requestReason
+                ? `Igénylés indoka: ${REQUEST_REASON_LABELS[form.requestReason as RequestReason]}`
+                : "",
+              needsReplacedAsset && form.replacedAssetId
+                ? `Érintett meglévő eszköz: ${assetLabel(form.replacedAssetId)}`
+                : "",
+              form.requestReasonNote.trim() ? `Kiegészítés: ${form.requestReasonNote.trim()}` : "",
+              form.workLocationId ? `Munkavégzés helye: ${locationLabel(form.workLocationId)}` : "",
+              `Kért átvételi hely: ${handoverLabel}`,
+            ]
+          : [form.goal.trim() ? `Indoklás: ${form.goal.trim()}` : ""]),
       ]
         .filter(Boolean)
         .join("\n")
@@ -182,6 +237,17 @@ function Wizard() {
       integration: form.integration || "Nem szükséges",
       recurring: isHw ? "Egyszeri igény" : "Tartós szolgáltatás",
       dueDate: form.deadline || undefined,
+      ...(isHw && isPersonalUse
+        ? {
+            requestReason: (form.requestReason || undefined) as RequestReason | undefined,
+            requestReasonNote: form.requestReasonNote.trim() || undefined,
+            replacedAssetId: needsReplacedAsset ? form.replacedAssetId || undefined : undefined,
+            workLocationId: form.workLocationId || undefined,
+            handoverMode: form.handoverMode as HandoverMode,
+            handoverLocationId:
+              form.handoverMode === "eltero" ? form.handoverLocationId || undefined : undefined,
+          }
+        : {}),
       priority: "kozepes",
       ai: {
         category: domain?.name ?? "",
@@ -232,7 +298,7 @@ function Wizard() {
 
       {key !== "domain" && similarAssets.length > 0 && (
         <div className="mb-6">
-          <SimilarAssetNotice items={similarAssets} audience="igenylo" />
+          <SimilarAssetNotice items={similarAssets} audience="igenylo" tone={noticeTone} />
         </div>
       )}
 
@@ -456,7 +522,7 @@ function Wizard() {
             </p>
           </div>
 
-          {isHw && (
+          {isHw && !isPersonalUse && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="qty">Hány darabra van szükség?</Label>
@@ -469,18 +535,127 @@ function Wizard() {
                   className="max-w-[160px]"
                 />
               </div>
-              {!isPersonalUse && (
+              <div className="space-y-2">
+                <Label htmlFor="hw-goal">Mire használná az eszközt?</Label>
+                <Textarea
+                  id="hw-goal"
+                  rows={4}
+                  value={form.goal}
+                  onChange={(e) => set({ goal: e.target.value })}
+                  placeholder="Pl. oktatói munka, terepi adatgyűjtés, laborvezérlés"
+                />
+              </div>
+            </>
+          )}
+
+          {isHw && isPersonalUse && (
+            <>
+              <fieldset className="space-y-3">
+                <legend className="text-sm font-medium">Mi az igénylés indoka?</legend>
+                <RadioGroup
+                  value={form.requestReason}
+                  onValueChange={(v) => set({ requestReason: v, replacedAssetId: "" })}
+                  className="grid gap-2"
+                >
+                  {(Object.keys(REQUEST_REASON_LABELS) as RequestReason[]).map((r) => (
+                    <div key={r} className="flex items-center gap-2">
+                      <RadioGroupItem value={r} id={`reason-${r}`} />
+                      <Label htmlFor={`reason-${r}`} className="font-normal">
+                        {REQUEST_REASON_LABELS[r]}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </fieldset>
+
+              {needsReplacedAsset && (
                 <div className="space-y-2">
-                  <Label htmlFor="hw-goal">Mire használná az eszközt?</Label>
-                  <Textarea
-                    id="hw-goal"
-                    rows={4}
-                    value={form.goal}
-                    onChange={(e) => set({ goal: e.target.value })}
-                    placeholder="Pl. oktatói munka, terepi adatgyűjtés, laborvezérlés"
-                  />
+                  <Label htmlFor="replaced">Melyik meglévő eszközt érinti?</Label>
+                  {replaceableAssets.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      A leltárában jelenleg nincs ehhez a termékkörhöz tartozó eszköz.
+                    </p>
+                  ) : (
+                    <select
+                      id="replaced"
+                      value={form.replacedAssetId}
+                      onChange={(e) => set({ replacedAssetId: e.target.value })}
+                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      <option value="">Válasszon eszközt…</option>
+                      {replaceableAssets.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {assetLabel(a.id)}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               )}
+
+              <div className="space-y-2">
+                <Label htmlFor="reason-note">Kiegészítés az indokhoz (opcionális)</Label>
+                <Textarea
+                  id="reason-note"
+                  rows={3}
+                  value={form.requestReasonNote}
+                  onChange={(e) => set({ requestReasonNote: e.target.value })}
+                  placeholder="Pl. a jelenlegi gép akkumulátora nem tartja a töltést"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="work-loc">Munkavégzés helye</Label>
+                <select
+                  id="work-loc"
+                  value={form.workLocationId}
+                  onChange={(e) => set({ workLocationId: e.target.value })}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="">Válasszon épületet és helyiséget…</option>
+                  {ASSET_LOCATIONS.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.building} · {l.room}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground">
+                  Ez alapján kerül az eszköz a leltárba és ide szervezzük a telepítést.
+                </p>
+              </div>
+
+              <fieldset className="space-y-3">
+                <legend className="text-sm font-medium">Hol venné át az eszközt?</legend>
+                <RadioGroup
+                  value={form.handoverMode}
+                  onValueChange={(v) => set({ handoverMode: v })}
+                  className="grid gap-2"
+                >
+                  {(Object.keys(HANDOVER_MODE_LABELS) as HandoverMode[]).map((m) => (
+                    <div key={m} className="flex items-center gap-2">
+                      <RadioGroupItem value={m} id={`ho-${m}`} />
+                      <Label htmlFor={`ho-${m}`} className="font-normal">
+                        {HANDOVER_MODE_LABELS[m]}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+                {form.handoverMode === "eltero" && (
+                  <select
+                    aria-label="Átvételi helyszín"
+                    value={form.handoverLocationId}
+                    onChange={(e) => set({ handoverLocationId: e.target.value })}
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="">Válasszon átvételi helyszínt…</option>
+                    {ASSET_LOCATIONS.map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.building} · {l.room}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </fieldset>
             </>
           )}
 
@@ -593,7 +768,9 @@ function Wizard() {
                 ? ([
                     ["Termékkör", selectedCategory?.name ?? "—"],
                     ["Kiválasztott eszköz", `${selectedProduct.name} (${selectedProduct.vendor})`],
-                    ["Darabszám", `${qty} db`],
+                    ...(isPersonalUse
+                      ? ([] as [string, string][])
+                      : ([["Darabszám", `${qty} db`]] as [string, string][])),
                     [
                       "Konfiguráció",
                       `${selectedProduct.spec.cpu} · ${selectedProduct.spec.ram} · ${selectedProduct.spec.storage} · ${selectedProduct.spec.os} ${selectedProduct.spec.osVersion}`,
@@ -605,7 +782,25 @@ function Wizard() {
                   ] as [string, string][])
                 : []),
               ...(isPersonalUse && isHw
-                ? ([] as [string, string][])
+                ? ([
+                    [
+                      "Igénylés indoka",
+                      form.requestReason
+                        ? REQUEST_REASON_LABELS[form.requestReason as RequestReason]
+                        : "Nincs megadva",
+                    ],
+                    ...(needsReplacedAsset
+                      ? ([["Érintett meglévő eszköz", assetLabel(form.replacedAssetId)]] as [
+                          string,
+                          string,
+                        ][])
+                      : []),
+                    ...(form.requestReasonNote.trim()
+                      ? ([["Kiegészítés", form.requestReasonNote.trim()]] as [string, string][])
+                      : []),
+                    ["Munkavégzés helye", locationLabel(form.workLocationId)],
+                    ["Kért átvételi hely", handoverLabel],
+                  ] as [string, string][])
                 : ([
                     ["Cél", isHw ? form.goal || "Nincs megadva" : form.goal],
                   ] as [string, string][])),
