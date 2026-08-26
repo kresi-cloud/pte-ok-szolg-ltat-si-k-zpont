@@ -86,7 +86,7 @@ const empty: FormState = {
   existing: "",
   personalData: "nem",
   integration: "",
-  recurring: "tartos",
+  
   siteUrl: "",
   refined: false,
 };
