@@ -740,17 +740,6 @@ function Wizard() {
               </RadioGroup>
             </fieldset>
           )}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="deadline">Tervezett határidő</Label>
-              <Input
-                id="deadline"
-                type="date"
-                value={form.deadline}
-                onChange={(e) => set({ deadline: e.target.value })}
-              />
-            </div>
-          </div>
         </section>
       )}
 
