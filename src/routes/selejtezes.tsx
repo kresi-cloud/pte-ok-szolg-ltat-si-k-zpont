@@ -431,7 +431,7 @@ function ScrapPage() {
                     <td className="px-3 py-2 text-xs">{lookup.unit(a.orgUnitId)}</td>
                     <td className="px-3 py-2 text-xs">{holderLabel(a)}</td>
                     <td className="px-3 py-2 text-xs">
-                      {a.usage === "szemelyi"
+                      {isPersonalUse(a)
                         ? "Személyes használat"
                         : assetLookup.locationLabel(a.locationId)}
                     </td>
