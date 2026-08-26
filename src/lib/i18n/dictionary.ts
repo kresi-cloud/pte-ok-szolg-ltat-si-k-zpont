@@ -1171,6 +1171,8 @@ export const EN_DICT: Record<string, string> = {
   "Kommunikáció": "Communication",
   "Költséghatás": "Cost impact",
   "Költségkeret": "Budget",
+  "Költségkeret (jóváhagyó által rögzítve)": "Budget (set by approver)",
+  "Katalógus szerinti referenciaérték": "Catalogue reference value",
   "Leltári szám": "Inventory number",
   "Lezárt ügyek": "Closed cases",
   "Megtalálható": "Found",
