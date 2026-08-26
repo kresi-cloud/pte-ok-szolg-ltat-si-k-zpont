@@ -46,6 +46,17 @@ export function depreciationRate(categoryKey: AssetCategoryKey): number {
 
 const SMALL_ASSET_LIMIT = 200_000;
 
+/** Csak a hordozható eszközök kerülhetnek személyes használatba. */
+export const PORTABLE_CATEGORIES: AssetCategoryKey[] = ["notebook", "tablet", "mobil"];
+
+export function isPortable(categoryKey: AssetCategoryKey): boolean {
+  return PORTABLE_CATEGORIES.includes(categoryKey);
+}
+
+export function isPersonalUse(asset: Asset): boolean {
+  return asset.usage === "szemelyi" && isPortable(asset.categoryKey);
+}
+
 export function bookValue(
   asset: Asset,
   activationDate: string,
@@ -91,10 +102,11 @@ export function buildScrapList(
       const model = assetLookup.model(a.modelKey);
       const name = model ? `${model.manufacturer} ${model.model}` : a.modelKey;
 
-      const userId = a.usage === "szemelyi" ? a.assignedUserId : a.inventoryResponsibleId;
+      const personal = isPersonalUse(a);
+      const userId = personal ? a.assignedUserId : (a.inventoryResponsibleId ?? a.assignedUserId);
       const user = userId ? lookupUser(userId) : undefined;
       const employeeName = user?.name ?? "—";
-      const employeeLabel = a.usage === "szemelyi" ? employeeName : `${employeeName} (leltárfelelős)`;
+      const employeeLabel = personal ? employeeName : `${employeeName} (leltárfelelős)`;
 
       const { bookValue: bv, ratePct, fullyDepreciated, note } = bookValue(a, a.commissionDate, disposalDate);
 

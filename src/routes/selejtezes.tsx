@@ -13,7 +13,7 @@ import { useStore, lookup } from "@/lib/store";
 import { assetLookup, huf, lifecycleStatus, yearsSince } from "@/lib/asset-logic";
 import { NEXT_FINANCIAL_YEAR } from "@/lib/asset-data";
 import { LIFECYCLE_LABELS, SCRAP_STATUS_LABELS, type Asset, type ScrapProposal } from "@/lib/asset-types";
-import { buildScrapList, type ScrapListSummary } from "@/lib/scrap-list";
+import { buildScrapList, isPersonalUse, type ScrapListSummary } from "@/lib/scrap-list";
 import { FileSpreadsheet } from "lucide-react";
 
 export const Route = createFileRoute("/selejtezes")({
@@ -41,10 +41,11 @@ export const Route = createFileRoute("/selejtezes")({
 });
 
 function holderLabel(a: Asset) {
-  const id = a.usage === "szemelyi" ? a.assignedUserId : (a.custodianUserId ?? a.inventoryResponsibleId);
+  const personal = isPersonalUse(a);
+  const id = personal ? a.assignedUserId : (a.custodianUserId ?? a.inventoryResponsibleId ?? a.assignedUserId);
   const name = id ? lookup.user(id)?.name : undefined;
   if (!name) return "—";
-  return a.usage === "szemelyi" ? name : `${name} (leltárfelelős)`;
+  return personal ? name : `${name} (leltárfelelős)`;
 }
 
 function assetLabel(a: Asset) {
@@ -430,7 +431,7 @@ function ScrapPage() {
                     <td className="px-3 py-2 text-xs">{lookup.unit(a.orgUnitId)}</td>
                     <td className="px-3 py-2 text-xs">{holderLabel(a)}</td>
                     <td className="px-3 py-2 text-xs">
-                      {a.usage === "szemelyi"
+                      {isPersonalUse(a)
                         ? "Személyes használat"
                         : assetLookup.locationLabel(a.locationId)}
                     </td>
