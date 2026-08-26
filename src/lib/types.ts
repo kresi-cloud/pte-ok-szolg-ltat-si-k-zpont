@@ -299,7 +299,36 @@ export interface ServiceRequest {
   productId?: string | undefined;
   /** Igényelt darabszám. */
   quantity?: number | undefined;
+  /** Személyi használatú eszközigény indoka. */
+  requestReason?: RequestReason | undefined;
+  /** Az indok szabadszöveges pontosítása. */
+  requestReasonNote?: string | undefined;
+  /** Cserére/hibára jelölt meglévő leltári eszköz azonosítója. */
+  replacedAssetId?: string | undefined;
+  /** Munkavégzés helye (épület · helyiség). */
+  workLocationId?: string | undefined;
+  /** Kért átvételi hely módja. */
+  handoverMode?: HandoverMode | undefined;
+  /** Eltérő átvételi hely esetén a helyszín azonosítója. */
+  handoverLocationId?: string | undefined;
 }
+
+export type RequestReason = "uj_belepo" | "csere" | "meghibasodas" | "kiegeszito";
+
+export const REQUEST_REASON_LABELS: Record<RequestReason, string> = {
+  uj_belepo: "Új belépő / új munkakör",
+  csere: "Meglévő eszköz cseréje (elavult)",
+  meghibasodas: "Meghibásodás",
+  kiegeszito: "Kiegészítő eszköz meglévő mellé",
+};
+
+export type HandoverMode = "munkavegzes" | "eltero" | "ugyfelszolgalat";
+
+export const HANDOVER_MODE_LABELS: Record<HandoverMode, string> = {
+  munkavegzes: "A munkavégzés helyén",
+  eltero: "Eltérő helyszínen",
+  ugyfelszolgalat: "IT ügyfélszolgálaton veszem át",
+};
 
 export type ProjectStage =
   | "otlet"

@@ -26,7 +26,14 @@ import {
 } from "@/components/ui/select";
 import { AiBadge, PriorityBadge, StatusBadge } from "@/components/status-badge";
 import { lookup, useStore } from "@/lib/store";
-import { STATUS_LABELS, STATUS_ORDER, type StatusKey } from "@/lib/types";
+import {
+  HANDOVER_MODE_LABELS,
+  REQUEST_REASON_LABELS,
+  STATUS_LABELS,
+  STATUS_ORDER,
+  type StatusKey,
+} from "@/lib/types";
+import { ASSET_LOCATIONS, ASSET_MODELS } from "@/lib/asset-data";
 import { similarAssetsFor } from "@/lib/similar-assets";
 import { SimilarAssetNotice } from "@/components/similar-asset-notice";
 import { cn } from "@/lib/utils";
@@ -207,7 +214,13 @@ function RequestDetail() {
               items={similarAssets}
               audience="jovahagyo"
               requesterName={lookup.userName(request.requesterId)}
+              tone={
+                request.requestReason === "csere" || request.requestReason === "meghibasodas"
+                  ? "tajekoztatas"
+                  : "figyelmeztetes"
+              }
             />
+
           </div>
         )}
 
@@ -306,8 +319,29 @@ function RequestDetail() {
             <p className="mt-2 text-sm whitespace-pre-line">{request.goal}</p>
             <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2">
               {[
-                ["Felhasználók", request.users ?? "Nincs megadva"],
-                ["Érintett felhasználószám", request.userCount ?? "Nincs megadva"],
+                ...(request.requestReason
+                  ? [
+                      ["Igénylés indoka", REQUEST_REASON_LABELS[request.requestReason]],
+                      ...(request.replacedAssetId
+                        ? [["Érintett meglévő eszköz", assetLabelOf(store.assets, request.replacedAssetId)]]
+                        : []),
+                      ...(request.requestReasonNote
+                        ? [["Kiegészítés az indokhoz", request.requestReasonNote]]
+                        : []),
+                      ["Munkavégzés helye", locationLabelOf(request.workLocationId)],
+                      [
+                        "Kért átvételi hely",
+                        request.handoverMode === "eltero"
+                          ? `${HANDOVER_MODE_LABELS.eltero} – ${locationLabelOf(request.handoverLocationId)}`
+                          : request.handoverMode === "ugyfelszolgalat"
+                            ? HANDOVER_MODE_LABELS.ugyfelszolgalat
+                            : `${HANDOVER_MODE_LABELS.munkavegzes} – ${locationLabelOf(request.workLocationId)}`,
+                      ],
+                    ]
+                  : [
+                      ["Felhasználók", request.users ?? "Nincs megadva"],
+                      ["Érintett felhasználószám", request.userCount ?? "Nincs megadva"],
+                    ]),
                 ["Adatkezelési érintettség", request.personalData ? "Igen" : "Nem"],
                 ["Integráció", request.integration ?? "Nem szükséges"],
                 ...(request.recurring ? [["Jelleg", request.recurring]] : []),
@@ -687,4 +721,17 @@ function RequestDetail() {
       </Tabs>
     </div>
   );
+}
+/** Helyszín címke a leltári helyszínlistából. */
+function locationLabelOf(id?: string | undefined) {
+  const l = ASSET_LOCATIONS.find((x) => x.id === id);
+  return l ? `${l.building} · ${l.room}` : "Nincs megadva";
+}
+
+/** Cserére jelölt eszköz olvasható megnevezése. */
+function assetLabelOf(assets: { id: string; modelKey: string; deviceId: string; inventoryNo: string; serial?: string | undefined }[], id: string) {
+  const a = assets.find((x) => x.id === id);
+  if (!a) return "Nincs megadva";
+  const m = ASSET_MODELS.find((x) => x.key === a.modelKey);
+  return `${m ? `${m.manufacturer} ${m.model}` : a.deviceId} · ${a.inventoryNo}${a.serial ? ` · ${a.serial}` : ""}`;
 }
