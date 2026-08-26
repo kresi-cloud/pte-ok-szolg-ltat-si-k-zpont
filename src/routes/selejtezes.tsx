@@ -40,6 +40,13 @@ export const Route = createFileRoute("/selejtezes")({
   component: ScrapPage,
 });
 
+function holderLabel(a: Asset) {
+  const id = a.usage === "szemelyi" ? a.assignedUserId : (a.custodianUserId ?? a.inventoryResponsibleId);
+  const name = id ? lookup.user(id)?.name : undefined;
+  if (!name) return "—";
+  return a.usage === "szemelyi" ? name : `${name} (leltárfelelős)`;
+}
+
 function assetLabel(a: Asset) {
   const m = assetLookup.model(a.modelKey);
   return `${m ? `${m.manufacturer} ${m.model}` : a.modelKey} · ${a.inventoryNo}`;
