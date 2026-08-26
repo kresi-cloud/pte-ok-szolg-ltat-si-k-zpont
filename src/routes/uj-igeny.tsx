@@ -456,20 +456,22 @@ function Wizard() {
                   className="max-w-[160px]"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="hw-goal">Mire használná az eszközt?</Label>
-                <Textarea
-                  id="hw-goal"
-                  rows={4}
-                  value={form.goal}
-                  onChange={(e) => set({ goal: e.target.value })}
-                  placeholder="Pl. oktatói munka, terepi adatgyűjtés, laborvezérlés"
-                />
-              </div>
+              {!isPersonalUse && (
+                <div className="space-y-2">
+                  <Label htmlFor="hw-goal">Mire használná az eszközt?</Label>
+                  <Textarea
+                    id="hw-goal"
+                    rows={4}
+                    value={form.goal}
+                    onChange={(e) => set({ goal: e.target.value })}
+                    placeholder="Pl. oktatói munka, terepi adatgyűjtés, laborvezérlés"
+                  />
+                </div>
+              )}
             </>
           )}
 
-          {questions.includes("users") && (
+          {questions.includes("users") && !isPersonalUse && (
             <div className="space-y-2">
               <Label htmlFor="users">Kik fogják használni?</Label>
               <Input
