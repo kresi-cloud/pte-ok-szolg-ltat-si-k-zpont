@@ -37,6 +37,7 @@ import { ASSET_LOCATIONS, ASSET_MODELS } from "@/lib/asset-data";
 import { similarAssetsFor } from "@/lib/similar-assets";
 import { SimilarAssetNotice } from "@/components/similar-asset-notice";
 import { WithdrawRequestButton } from "@/components/withdraw-request-button";
+import { planApprovalForItem } from "@/lib/withdraw";
 import { cn } from "@/lib/utils";
 import { ViewOnlyNotice } from "@/components/view-only-notice";
 
@@ -117,6 +118,57 @@ function RequestDetail() {
   );
   const visibleMessages = request.messages.filter((m) => fullView || !m.internal);
   const currentIndex = TIMELINE.indexOf(request.status);
+
+  /** A beszerzési szakasz állapota: tervsor → tervjóváhagyás → beszerzés → átadás. */
+  const handover = (store.handovers ?? []).find(
+    (h) => h.requestId === request.id || (planItem && h.planItemId === planItem.id),
+  );
+  const planApproval = planItem
+    ? planApprovalForItem(planItem, store.planApprovals ?? [])
+    : undefined;
+  const planApproved =
+    !!planApproval && ["jovahagyva", "vegrehajtas", "lezarva"].includes(planApproval.status);
+  const pendingApprovers = request.approvals
+    .filter((a) => a.decision === "fuggoben")
+    .map((a) => `${a.step}. ${a.role} – ${lookup.userName(a.approverId)}`);
+  const procurementTrack = [
+    {
+      label: "Jóváhagyási lánc lezárva",
+      done: request.approvals.length > 0 && pendingApprovers.length === 0,
+      detail: pendingApprovers.length
+        ? `Döntésre vár: ${pendingApprovers.join(" · ")}`
+        : "Minden jóváhagyó döntött.",
+    },
+    {
+      label: "Beszerzési tervsor létrehozva",
+      done: !!planItem,
+      detail: planItem ? `${planItem.planYear} ${planItem.quarter} · ${planItem.quantity} db` : "",
+    },
+    {
+      label: "Beszerzési terv jóváhagyva (dékán)",
+      done: planApproved || !!planItem?.status.match(/beszerzes_alatt|teljesult/),
+      detail: planApproval ? `Ciklus: ${planApproval.id}` : "",
+    },
+    {
+      label: "Beszerzés folyamatban",
+      done: planItem ? ["beszerzes_alatt", "teljesult"].includes(planItem.status) : false,
+      detail: "",
+    },
+    {
+      label: "Eszköz beérkezett, telepítés és átadás",
+      done: !!handover,
+      detail: handover ? handover.deviceName : "",
+    },
+    {
+      label: "Átvétel visszaigazolva, leltárba került",
+      done: handover?.status === "atvetel_igazolva",
+      detail: "",
+    },
+  ];
+  const canCreatePlanItem =
+    ["ugyintezo", "szolgaltatasgazda", "admin", "beszerzo", "eszkozmenedzser"].includes(
+      store.activeRole,
+    ) && ["elfogadva", "folyamatban", "jovahagyasra_var"].includes(request.status);
 
   return (
     <div className="space-y-6">
@@ -526,8 +578,59 @@ function RequestDetail() {
                 Az igény elutasításra került, a folyamat lezárult.
               </p>
             )}
+
+            <h3 className="mt-8 font-display text-base font-semibold">Beszerzési szakasz</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              A jóváhagyás után az igény beszerzési tervsorrá válik, majd a terv dékáni
+              jóváhagyását követően indul a beszerzés, a telepítés és az átadás-átvétel.
+            </p>
+            <ol className="mt-4 space-y-2">
+              {procurementTrack.map((s) => (
+                <li key={s.label} className="flex items-start gap-3 text-sm">
+                  <span
+                    className={cn(
+                      "mt-0.5 grid size-6 shrink-0 place-items-center rounded-full border",
+                      s.done
+                        ? "border-success bg-success text-success-foreground"
+                        : "border-border bg-card text-muted-foreground",
+                    )}
+                  >
+                    {s.done ? (
+                      <CheckCircle2 className="size-3.5" aria-hidden="true" />
+                    ) : (
+                      <CircleDashed className="size-3.5" aria-hidden="true" />
+                    )}
+                  </span>
+                  <span>
+                    <span className={s.done ? "font-medium" : "text-muted-foreground"}>{s.label}</span>
+                    {s.detail && (
+                      <span className="block text-xs text-muted-foreground">{s.detail}</span>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ol>
+            {!planItem && canCreatePlanItem && (
+              <div className="mt-4 rounded-md border border-warning/40 bg-warning/10 p-4">
+                <p className="text-sm">
+                  Ehhez a jóváhagyott igényhez még nem tartozik beszerzési tervsor, ezért a folyamat
+                  nem tud továbblépni.
+                </p>
+                <Button
+                  className="mt-3"
+                  size="sm"
+                  onClick={() => {
+                    store.createPlanItemFromRequest(request.id);
+                    toast.success("Beszerzési tervsor létrehozva.");
+                  }}
+                >
+                  Beszerzési tervsor létrehozása
+                </Button>
+              </div>
+            )}
           </section>
         </TabsContent>
+
 
         <TabsContent value="kommunikacio">
           <section className="card-surface p-6">

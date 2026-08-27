@@ -374,6 +374,12 @@ export interface ProcurementPlanItem {
   kind: "csere" | "uj_kapacitas";
   /** ha jóváhagyott szolgáltatási igényből keletkezett */
   sourceRequestId?: string | undefined;
+  /** a katalógusból igényelt konkrét termék, ha van */
+  productId?: string | undefined;
+  /** a konkrét eszköz megnevezése (katalógustermék), ha ismert */
+  deviceName?: string | undefined;
+  /** eszközfelismerési modellkulcs a leltári műszaki adatokhoz */
+  modelKey?: string | undefined;
   /** gazdasági vezetői átütemezés nyoma */
   rescheduledBy?: string | undefined;
   rescheduledAt?: string | undefined;
