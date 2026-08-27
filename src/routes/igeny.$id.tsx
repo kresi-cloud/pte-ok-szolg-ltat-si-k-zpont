@@ -128,7 +128,17 @@ function RequestDetail() {
     : undefined;
   const planApproved =
     !!planApproval && ["jovahagyva", "vegrehajtas", "lezarva"].includes(planApproval.status);
+  const pendingApprovers = request.approvals
+    .filter((a) => a.decision === "fuggoben")
+    .map((a) => `${a.step}. ${a.role} – ${lookup.userName(a.approverId)}`);
   const procurementTrack = [
+    {
+      label: "Jóváhagyási lánc lezárva",
+      done: request.approvals.length > 0 && pendingApprovers.length === 0,
+      detail: pendingApprovers.length
+        ? `Döntésre vár: ${pendingApprovers.join(" · ")}`
+        : "Minden jóváhagyó döntött.",
+    },
     {
       label: "Beszerzési tervsor létrehozva",
       done: !!planItem,
