@@ -26,6 +26,7 @@ export const Route = createFileRoute("/igenyeim")({
 const TABS = [
   { key: "aktiv", label: "Folyamatban" },
   { key: "piszkozat", label: "Piszkozatok" },
+  { key: "visszavont", label: "Visszavont" },
   { key: "lezart", label: "Lezárt" },
   { key: "mind", label: "Mind" },
 ] as const;
@@ -41,7 +42,8 @@ function MyRequests() {
       if (tab === "aktiv")
         return !["lezarva", "elutasitva", "piszkozat", "visszavonva"].includes(r.status);
       if (tab === "piszkozat") return r.status === "piszkozat";
-      if (tab === "lezart") return ["lezarva", "elutasitva", "visszavonva"].includes(r.status);
+      if (tab === "visszavont") return r.status === "visszavonva";
+      if (tab === "lezart") return ["lezarva", "elutasitva"].includes(r.status);
       return true;
     })
     .filter((r) => (q ? `${r.id} ${r.title}`.toLowerCase().includes(q.toLowerCase()) : true));
