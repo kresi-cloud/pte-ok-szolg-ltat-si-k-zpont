@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AiBadge } from "@/components/status-badge";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 import { CATALOG, DOMAINS, lookup, useStore } from "@/lib/store";
 import type { DomainKey, HandoverMode, RequestReason } from "@/lib/types";
 import { HANDOVER_MODE_LABELS, REQUEST_REASON_LABELS } from "@/lib/types";
@@ -802,8 +802,6 @@ function Wizard() {
               ["Kívánt eredmény", isHw ? hwTitle : form.title],
               ["Adatkezelési érintettség", form.personalData === "igen" ? "Igen – adatvédelmi vizsgálat szükséges" : form.personalData === "bizonytalan" ? "Bizonytalan – a szolgáltatási csapat megvizsgálja" : "Nem"],
               ["Integráció", form.integration || "Nem szükséges"],
-              ["Becsült prioritás", "Közepes"],
-
             ].map(([k, v]) => (
               <div key={k as string} className="grid gap-1 px-5 py-3 sm:grid-cols-[220px_1fr]">
                 <dt className="text-sm text-muted-foreground">{k}</dt>
@@ -811,13 +809,6 @@ function Wizard() {
               </div>
             ))}
           </dl>
-          <AiBadge>
-            <p className="text-sm">
-              A rendszer előzetesen a(z) <strong>{domain?.name}</strong> szolgáltatási területhez
-              sorolta be az igényt. A végleges besorolást és a felelős csapatot a szolgáltatási
-              munkatárs erősíti meg.
-            </p>
-          </AiBadge>
           <div className="flex flex-wrap gap-3">
             <Button size="lg" onClick={() => submit(false)} disabled={isHw ? !selectedProduct : !form.title || !form.goal}>
               Igény beküldése
