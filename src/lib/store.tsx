@@ -60,6 +60,7 @@ import {
   ASSETS,
   ASSET_ASSIGNMENTS,
   ASSET_EVENTS,
+  ASSET_LOCATIONS,
   INITIAL_ASSET_AUDIT,
   INITIAL_CHECKS,
   INITIAL_DISCREPANCIES,
@@ -70,7 +71,7 @@ import {
 } from "./asset-data";
 import { assetLookup, huf, lifecycleStatus, yearsSince } from "./asset-logic";
 import { needsProcurement, planItemFromRequest } from "./request-procurement";
-import { canWithdrawRequest } from "./withdraw";
+import { canWithdrawRequest, planApprovalForItem } from "./withdraw";
 import { buildPlanApprovals } from "./plan-approvals";
 
 function seedScrapProposals(assets: Asset[]): ScrapProposal[] {
@@ -206,6 +207,8 @@ interface StoreValue extends PersistedState {
   decideReplacement: (assetId: string, decision: ReplacementDecisionKey, comment?: string) => void;
   markLicenceUnused: (licenceId: string, unused: boolean) => void;
   addPlanItem: (item: Omit<ProcurementPlanItem, "id">) => string;
+  /** Elfogadott igényhez utólag beszerzési tervsor létrehozása. */
+  createPlanItemFromRequest: (requestId: string) => void;
   updatePlanItem: (id: string, patch: Partial<ProcurementPlanItem>) => void;
   reschedulePlanItem: (
     id: string,
@@ -287,7 +290,10 @@ function applyProcurementLink(
   const already = s.planItems.some((p) => p.sourceRequestId === request.id);
   if (already || !needsProcurement(request)) return { ...s, requests };
   const item: ProcurementPlanItem = {
-    ...planItemFromRequest(request),
+    ...planItemFromRequest(request, {
+      products: s.products ?? [],
+      categories: s.productCategories ?? [],
+    }),
     id: `pp-req-${request.id}-${Date.now()}`,
   };
   return {
@@ -907,6 +913,45 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...s.assetAudit,
         ],
       })),
+    createPlanItemFromRequest: (requestId) =>
+      setState((s) => {
+        const request = s.requests.find((r) => r.id === requestId);
+        if (!request) return s;
+        if (s.planItems.some((p) => p.sourceRequestId === requestId)) return s;
+        const item: ProcurementPlanItem = {
+          ...planItemFromRequest(request, {
+            products: s.products ?? [],
+            categories: s.productCategories ?? [],
+          }),
+          id: `pp-req-${requestId}-${Date.now()}`,
+        };
+        return {
+          ...s,
+          planItems: [item, ...s.planItems],
+          assetAudit: [
+            {
+              id: `aud-${Date.now()}`,
+              at: today(),
+              actorId: currentUser.id,
+              entity: "beszerzes",
+              entityId: item.id,
+              action: "Beszerzési tervsor létrehozása igényből",
+              detail: `${requestId} · ${item.planYear} ${item.quarter}`,
+            },
+            ...s.assetAudit,
+          ],
+          notifications: [
+            {
+              id: `n-${Date.now()}`,
+              requestId,
+              at: today(),
+              read: false,
+              text: `${requestId} – az igény bekerült a ${item.planYear}. évi beszerzési tervbe (${item.quarter}).`,
+            },
+            ...s.notifications,
+          ],
+        };
+      }),
     addPlanItem: (item) => {
       const id = `pp-${Date.now()}`;
       setState((s) => ({
@@ -1250,14 +1295,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     startPlanExecution: (id) =>
       setState((s) => {
         const target = (s.planApprovals ?? []).find((p) => p.id === id);
-        const inScope = (p: (typeof s.planItems)[number]) =>
-          !!target &&
-          p.planYear === target.planYear &&
-          (target.scope === "eves"
-            ? true
-            : target.scope === "azonnali"
-              ? p.timing === "azonnali"
-              : p.quarter === target.quarter && p.timing !== "azonnali");
+        const inScope = (p: (typeof s.planItems)[number]) => {
+          if (!target) return false;
+          if (p.planYear !== target.planYear) return false;
+          if (target.scope === "eves") return true;
+          // A tételhez ténylegesen tartozó jóváhagyási ciklus dönt, hogy a
+          // dékáni jóváhagyás után beszerzésbe kerül-e.
+          const own = planApprovalForItem(p, s.planApprovals ?? []);
+          if (own) return own.id === target.id;
+          // Ütemezés nélküli tétel a saját negyedévének ciklusához tartozik.
+          return target.scope === "negyedeves" && p.quarter === target.quarter;
+        };
         return {
           ...s,
           planItems: s.planItems.map((p) =>
@@ -1374,8 +1422,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           recipientId,
           orgUnitId,
           referentId: referent?.id,
-          deviceName: standardLabel(item.standardKey),
-          modelKey: modelKeyForStandard(item.standardKey),
+          deviceName: item.deviceName ?? standardLabel(item.standardKey),
+          modelKey: item.modelKey ?? modelKeyForStandard(item.standardKey),
           status: "beerkezett",
           createdAt: today(),
           history: [
@@ -1533,9 +1581,48 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           decidedBy: h.referentId ?? currentUser.id,
           decisionComment: "Intézményi beszerzés és átadás-átvétel alapján automatikusan jóváhagyva.",
         };
+        // Az átvett eszköz az intézményi eszközkataszterbe is bekerül,
+        // különben a „Rám rendelt eszközök” nézetben nem jelenne meg.
+        const planItem = s.planItems.find((p) => p.id === h.planItemId);
+        const location =
+          ASSET_LOCATIONS.find(
+            (l) => (!h.building || l.building === h.building) && (!h.room || l.room === h.room),
+          ) ??
+          ASSET_LOCATIONS.find((l) => l.orgUnitId === h.orgUnitId) ??
+          ASSET_LOCATIONS[0]!;
+        const alreadyRegistered = s.assets.some((a) => a.note?.includes(h.id));
+        const assetId = `as-${Date.now()}`;
+        const newAsset: Asset = {
+          id: assetId,
+          inventoryNo: h.inventoryNo ?? `PTE-AOK-IT-${Date.now().toString().slice(-6)}`,
+          deviceId: h.serial ?? assetId,
+          categoryKey: planItem?.categoryKey ?? "egyeb",
+          modelKey: h.modelKey ?? "",
+          serial: h.serial ?? "",
+          usage: "szemelyi",
+          assignedUserId: h.recipientId,
+          inventoryResponsibleId: h.referentId ?? h.recipientId,
+          orgUnitId: h.orgUnitId,
+          locationId: location.id,
+          purpose: h.deviceName,
+          purchaseDate: today(),
+          commissionDate: today(),
+          purchaseValue: planItem?.unitPriceOverride ?? 0,
+          fundingSourceId: planItem?.fundingSourceId ?? "fs-kari",
+          costCenter: h.orgUnitId,
+          warrantyEnd: `${new Date().getUTCFullYear() + 3}-12-31`,
+          condition: "kifogastalan",
+          active: true,
+          reportedIssues: 0,
+          repairCount: 0,
+          businessCritical: false,
+          note: `Beszerzési átadásból (${h.id})`,
+        };
         return {
           ...s,
           inventory: [item, ...s.inventory],
+          assets: alreadyRegistered ? s.assets : [newAsset, ...s.assets],
+
           handovers: (s.handovers ?? []).map((x) =>
             x.id === id
               ? {

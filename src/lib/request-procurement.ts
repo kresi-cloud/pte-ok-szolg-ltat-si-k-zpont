@@ -1,11 +1,17 @@
 import { HARDWARE_STANDARDS, NEXT_FINANCIAL_YEAR, REFERENCE_PRICES } from "./asset-data";
-import type { ProcurementPlanItem, Quarter } from "./asset-types";
-import type { ServiceRequest } from "./types";
+import type { AssetCategoryKey, ProcurementPlanItem, Quarter } from "./asset-types";
+import type { Product, ProductCategory, ServiceRequest } from "./types";
 
 /**
  * Jóváhagyott igényből beszerzési tervsor-javaslat.
- * A leképezés kulcsszavak alapján választ hardverstandardot és referenciaárat.
+ * Termékkatalógusból indított igénynél a kiválasztott termék adatai az
+ * elsődlegesek; szabad szöveges igénynél kulcsszavas becslés a tartalék.
  */
+
+export interface CatalogContext {
+  products: Product[];
+  categories: ProductCategory[];
+}
 
 interface Rule {
   words: string[];
@@ -21,6 +27,40 @@ const RULES: Rule[] = [
   { words: ["dokkoló", "dokkolo", "dock"], standardKey: "std-dock" },
   { words: ["asztali", "pc", "desktop", "számítógép", "szamitogep"], standardKey: "std-office-desktop" },
 ];
+
+/** Termékkör → intézményi eszközkategória. */
+const CATEGORY_ID_TO_ASSET_KEY: Record<string, AssetCategoryKey> = {
+  "pc-notebook": "notebook",
+  "pc-desktop": "asztali",
+  "pc-workstation": "munkaallomas",
+  "pc-okostelefon": "mobil",
+  "pc-mobiltelefon": "mobil",
+  "pc-tablet": "tablet",
+  "pc-monitor": "monitor",
+  "pc-projektor": "egyeb",
+  "pc-periferia": "periferia",
+  "pc-nyomtato": "nyomtato",
+};
+
+const NAME_TO_ASSET_KEY: { words: string[]; key: AssetCategoryKey }[] = [
+  { words: ["notebook", "laptop"], key: "notebook" },
+  { words: ["workstation", "munkaállomás"], key: "munkaallomas" },
+  { words: ["asztali", "desktop"], key: "asztali" },
+  { words: ["telefon", "mobil"], key: "mobil" },
+  { words: ["tablet"], key: "tablet" },
+  { words: ["monitor", "kijelző"], key: "monitor" },
+  { words: ["nyomtat"], key: "nyomtato" },
+  { words: ["dokkol"], key: "dokkolo" },
+  { words: ["periféri", "periferi"], key: "periferia" },
+];
+
+function assetKeyForCategory(category?: ProductCategory): AssetCategoryKey {
+  if (!category) return "egyeb";
+  const mapped = CATEGORY_ID_TO_ASSET_KEY[category.id];
+  if (mapped) return mapped;
+  const name = category.name.toLowerCase();
+  return NAME_TO_ASSET_KEY.find((m) => m.words.some((w) => name.includes(w)))?.key ?? "egyeb";
+}
 
 function fallbackStandardKey(): string {
   return HARDWARE_STANDARDS[0]?.key ?? "std-office-notebook";
@@ -50,6 +90,8 @@ function quarterFor(priority: ServiceRequest["priority"]): Quarter {
 
 /** Beszerzést igénylő-e a jóváhagyott igény. */
 export function needsProcurement(r: ServiceRequest): boolean {
+  // Termékkatalógusból indított eszközigénylés mindig beszerzési tétel.
+  if (r.productId || r.productCategoryId) return true;
   if (r.internal?.procurement) return true;
   if (r.domain !== "hardver" && r.domain !== "szoftver") return false;
   const text = `${r.title} ${r.goal}`.toLowerCase();
@@ -58,27 +100,46 @@ export function needsProcurement(r: ServiceRequest): boolean {
   );
 }
 
-export function planItemFromRequest(r: ServiceRequest): Omit<ProcurementPlanItem, "id"> {
+export function planItemFromRequest(
+  r: ServiceRequest,
+  catalog?: CatalogContext,
+): Omit<ProcurementPlanItem, "id"> {
   const text = `${r.title} ${r.goal}`.toLowerCase();
-  const standardKey = pickStandardKey(text) ?? fallbackStandardKey();
-  const standard = HARDWARE_STANDARDS.find((s) => s.key === standardKey)!;
+  const product = catalog?.products.find((p) => p.id === r.productId);
+  const category =
+    catalog?.categories.find((c) => c.id === (product?.categoryId ?? r.productCategoryId)) ??
+    undefined;
+
+  const categoryKey = product || category ? assetKeyForCategory(category) : undefined;
+  const standard =
+    (categoryKey
+      ? HARDWARE_STANDARDS.find((s) => s.categoryKey === categoryKey)
+      : undefined) ??
+    HARDWARE_STANDARDS.find((s) => s.key === (pickStandardKey(text) ?? fallbackStandardKey()))!;
+
+  const resolvedCategoryKey = categoryKey ?? standard.categoryKey;
   const price =
+    REFERENCE_PRICES.find((p) => p.categoryKey === resolvedCategoryKey) ??
     REFERENCE_PRICES.find((p) => p.id === standard.referencePriceId) ??
-    REFERENCE_PRICES.find((p) => p.categoryKey === standard.categoryKey) ??
     REFERENCE_PRICES[0]!;
   const quantity = r.quantity && r.quantity > 0 ? r.quantity : pickQuantity(text);
+  const unitPrice = product
+    ? product.referencePrice
+    : r.estimatedCost && quantity > 0
+      ? Math.round(r.estimatedCost / quantity)
+      : undefined;
 
   return {
     planYear: NEXT_FINANCIAL_YEAR,
     quarter: quarterFor(r.priority),
     orgUnitId: r.orgUnitId,
-    replacedAssetIds: [],
+    replacedAssetIds: r.replacedAssetId ? [r.replacedAssetId] : [],
     reason: `Jóváhagyott igény (${r.id}): ${r.title}`,
-    categoryKey: standard.categoryKey,
+    categoryKey: resolvedCategoryKey,
     standardKey: standard.key,
     quantity,
     referencePriceId: price.id,
-    unitPriceOverride: r.estimatedCost && quantity > 0 ? Math.round(r.estimatedCost / quantity) : undefined,
+    unitPriceOverride: unitPrice,
     priceChangePct: 0,
     contingencyPct: 10,
     quantityDiscountPct: 0,
@@ -86,8 +147,13 @@ export function planItemFromRequest(r: ServiceRequest): Omit<ProcurementPlanItem
     priority: r.priority === "kritikus" ? "kritikus" : r.priority === "magas" ? "magas" : "kozepes",
     fundingSourceId: "fs-kari",
     status: "jovahagyasra_var",
-    comment: "Automatikusan generálva jóváhagyott szolgáltatási igényből; gazdasági felülvizsgálat szükséges.",
-    kind: "uj_kapacitas",
+    comment: product
+      ? `Katalógusból igényelt eszköz: ${product.name} (${product.vendor}).`
+      : "Automatikusan generálva jóváhagyott szolgáltatási igényből; gazdasági felülvizsgálat szükséges.",
+    kind: r.replacedAssetId ? "csere" : "uj_kapacitas",
     sourceRequestId: r.id,
+    productId: product?.id,
+    deviceName: product ? `${product.name} (${product.vendor})` : undefined,
+    modelKey: product?.modelKey,
   };
 }
