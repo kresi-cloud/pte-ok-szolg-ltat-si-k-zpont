@@ -317,13 +317,19 @@ export interface ServiceRequest {
   handoverLocationId?: string | undefined;
 }
 
-export type RequestReason = "uj_belepo" | "csere" | "meghibasodas" | "kiegeszito";
+export type RequestReason =
+  | "uj_belepo"
+  | "csere"
+  | "meghibasodas"
+  | "kiegeszito"
+  | "nincs_ilyen_eszkoz";
 
 export const REQUEST_REASON_LABELS: Record<RequestReason, string> = {
   uj_belepo: "Új belépő / új munkakör",
   csere: "Meglévő eszköz cseréje (elavult)",
   meghibasodas: "Meghibásodás",
   kiegeszito: "Kiegészítő eszköz meglévő mellé",
+  nincs_ilyen_eszkoz: "Jelenleg nincs ilyen eszköze",
 };
 
 export type HandoverMode = "munkavegzes" | "eltero" | "ugyfelszolgalat";

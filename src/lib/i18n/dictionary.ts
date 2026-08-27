@@ -1414,6 +1414,7 @@ export const EN_DICT: Record<string, string> = {
   "Meglévő eszköz cseréje (elavult)": "Replacement of existing device (obsolete)",
   "Meghibásodás": "Malfunction",
   "Kiegészítő eszköz meglévő mellé": "Additional device alongside existing one",
+  "Jelenleg nincs ilyen eszköze": "Currently has no such device",
   "Melyik meglévő eszközt érinti?": "Which existing device is affected?",
   "Válasszon eszközt…": "Select a device…",
   "A leltárában jelenleg nincs ehhez a termékkörhöz tartozó eszköz.": "Your inventory currently has no device in this product category.",
