@@ -103,9 +103,12 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
     requests: store.requests,
   };
   const defaultProduct = productForHandover(handover, catalogCtx);
+  const recipientLocations = locationsForUser(handover.recipientId);
+  const recipientLocation = recipientLocations[0];
   const [productId, setProductId] = useState(handover.productId ?? defaultProduct?.id ?? "");
-  const [building, setBuilding] = useState(handover.building ?? "");
-  const [room, setRoom] = useState(handover.room ?? "");
+  const [building, setBuilding] = useState(handover.building ?? recipientLocation?.building ?? "");
+  const [room, setRoom] = useState(handover.room ?? recipientLocation?.room ?? "");
+
   const [note, setNote] = useState(handover.note ?? "");
   const [attachKind, setAttachKind] = useState<HandoverAttachmentKind>("fenykep");
   const [uploading, setUploading] = useState(false);
