@@ -1930,7 +1930,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           },
           ...s.assetAudit,
         ],
-      })),
+        };
+      }),
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
