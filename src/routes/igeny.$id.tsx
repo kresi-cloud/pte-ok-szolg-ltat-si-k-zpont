@@ -136,13 +136,15 @@ function RequestDetail() {
   const pendingApprovers = request.approvals
     .filter((a) => a.decision === "fuggoben")
     .map((a) => `${a.step}. ${a.role} – ${lookup.userName(a.approverId)}`);
-  const procurementTrack = [
+  const buyerUser = store.users.find((u) => u.roles.includes("beszerzo"));
+  const procurementTrack: { label: string; done: boolean; detail: string; sensitive?: boolean }[] = [
     {
       label: "Jóváhagyási lánc lezárva",
       done: request.approvals.length > 0 && pendingApprovers.length === 0,
       detail: pendingApprovers.length
         ? `Döntésre vár: ${pendingApprovers.join(" · ")}`
         : "Minden jóváhagyó döntött.",
+      sensitive: pendingApprovers.length > 0,
     },
     {
       label: "Beszerzési tervsor létrehozva",
@@ -152,28 +154,143 @@ function RequestDetail() {
     {
       label: "Beszerzési terv jóváhagyva (dékán)",
       done: planApproved || !!planItem?.status.match(/beszerzes_alatt|teljesult/),
-      detail: planApproval ? `Ciklus: ${planApproval.id}` : "",
+      detail: planApproval ? PLAN_APPROVAL_STATUS_LABELS[planApproval.status] : "",
     },
     {
       label: "Beszerzés folyamatban",
       done: planItem ? ["beszerzes_alatt", "teljesult"].includes(planItem.status) : false,
-      detail: "",
+      detail: planItem && ["beszerzes_alatt"].includes(planItem.status) && buyerUser
+        ? `Felelős: ${buyerUser.name} – ${ROLE_LABELS.beszerzo}`
+        : "",
+      sensitive: true,
     },
     {
       label: "Eszköz beérkezett, telepítés és átadás",
       done: !!handover,
-      detail: handover ? handover.deviceName : "",
+      detail: handover
+        ? [
+            handover.deviceName,
+            handover.referentId
+              ? `Felelős: ${lookup.userName(handover.referentId)} – ${ROLE_LABELS.it_referens}`
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" · ")
+        : "",
+      sensitive: !!handover?.referentId,
     },
     {
       label: "Átvétel visszaigazolva, leltárba került",
       done: handover?.status === "atvetel_igazolva",
-      detail: "",
+      detail:
+        handover?.status === "atadva"
+          ? `Visszaigazolásra vár: ${lookup.userName(handover.recipientId)}`
+          : "",
+      sensitive: true,
     },
   ];
   const canCreatePlanItem =
     ["ugyintezo", "szolgaltatasgazda", "admin", "beszerzo", "eszkozmenedzser"].includes(
       store.activeRole,
     ) && ["elfogadva", "folyamatban", "jovahagyasra_var"].includes(request.status);
+
+  /** Az aktuális felelőst csak az ügy kezelésében érintett szerepkörök és vezetők láthatják. */
+  const canSeeOwner =
+    fullView ||
+    ["beszerzo", "eszkozmenedzser", "gazdasagi_vezeto", "it_referens"].includes(
+      store.activeRole,
+    ) ||
+    request.approvals.some((a) => a.approverId === store.currentUser.id);
+
+  /** Az ügy aktuális gazdája a folyamat szakaszától függően. */
+  type OwnerInfo =
+    | { kind: "people"; people: { name: string; role: string; note?: string }[] }
+    | { kind: "message"; text: string }
+    | { kind: "closed" };
+  const roleUser = (role: RoleKey) => store.users.find((u) => u.roles.includes(role));
+  const ownerInfo: OwnerInfo = (() => {
+    if (["lezarva", "elutasitva", "visszavonva"].includes(request.status)) {
+      return { kind: "closed" };
+    }
+    const pending = request.approvals.filter((a) => a.decision === "fuggoben");
+    if (pending.length > 0) {
+      return {
+        kind: "people",
+        people: pending.map((a) => ({
+          name: lookup.userName(a.approverId),
+          role: ROLE_LABELS[a.role as RoleKey] ?? a.role,
+          note: "Döntésre vár",
+        })),
+      };
+    }
+    if (!planItem) {
+      if (request.status === "piszkozat") return { kind: "message", text: "Az igény még nincs beküldve." };
+      return {
+        kind: "message",
+        text: "Szolgáltatási ügyintéző / beszerző – beszerzési tervsor létrehozására vár.",
+      };
+    }
+    if (!planApproved && planItem.status !== "beszerzes_alatt" && planItem.status !== "teljesult") {
+      if (!planApproval) {
+        const planner = roleUser("eszkozmenedzser");
+        return planner
+          ? { kind: "people", people: [{ name: planner.name, role: ROLE_LABELS.eszkozmenedzser, note: "Ütemezésre vár" }] }
+          : { kind: "message", text: "IT eszközmenedzser – ütemezésre vár." };
+      }
+      const st = planApproval.status;
+      if (st === "gazdasagi_ellenorzes") {
+        const u = roleUser("gazdasagi_vezeto");
+        return u
+          ? { kind: "people", people: [{ name: u.name, role: ROLE_LABELS.gazdasagi_vezeto, note: "Ellenőrzésre vár" }] }
+          : { kind: "message", text: "Gazdasági vezetői ellenőrzésre vár." };
+      }
+      if (st === "dekani_jovahagyas" || st === "jovahagyasra_var") {
+        const u = roleUser("dekan");
+        const days = daysUntil(planApproval.dueAt);
+        const note = days >= 0 ? `Jóváhagyási határidő: ${planApproval.dueAt} (még ${days} nap)` : `Jóváhagyási határidő lejárt: ${planApproval.dueAt}`;
+        return u
+          ? { kind: "people", people: [{ name: u.name, role: ROLE_LABELS.dekan, note }] }
+          : { kind: "message", text: `Dékáni jóváhagyásra vár. ${note}` };
+      }
+      // tervezes / visszakuldve: beszerzőnél van
+      return buyerUser
+        ? { kind: "people", people: [{ name: buyerUser.name, role: ROLE_LABELS.beszerzo, note: PLAN_APPROVAL_STATUS_LABELS[st] }] }
+        : { kind: "message", text: PLAN_APPROVAL_STATUS_LABELS[st] };
+    }
+    if (planItem.status === "beszerzes_alatt" && !handover) {
+      return buyerUser
+        ? { kind: "people", people: [{ name: buyerUser.name, role: ROLE_LABELS.beszerzo, note: "Beszerzés folyamatban" }] }
+        : { kind: "message", text: "Beszerzés folyamatban a beszerzőnél." };
+    }
+    if (handover && handover.status !== "atvetel_igazolva") {
+      if (handover.status === "atadva") {
+        return {
+          kind: "people",
+          people: [
+            {
+              name: lookup.userName(handover.recipientId),
+              role: "Igénylő",
+              note: "Átvételi visszaigazolásra vár",
+            },
+          ],
+        };
+      }
+      if (handover.referentId) {
+        return {
+          kind: "people",
+          people: [
+            {
+              name: lookup.userName(handover.referentId),
+              role: ROLE_LABELS.it_referens,
+              note: "Telepítés és átadás folyamatban",
+            },
+          ],
+        };
+      }
+      return { kind: "message", text: "IT referens kijelölésére vár." };
+    }
+    return { kind: "closed" };
+  })();
 
   return (
     <div className="space-y-6">
