@@ -42,9 +42,10 @@ A szakaszonkénti feloldási sorrend (az első teljesülő szabály nyer):
 5. **Átadás folyamatban** (`handover` létezik, de nem `atvetel_igazolva`): státusz szerint az IT referens (`handover.referentId`, telepítés/átadás) vagy az igénylő (`handover.recipientId`, átvételi visszaigazolásra vár).
 6. **Lezárva / elutasítva / visszavonva**: nincs aktív gazda – "Az ügy lezárult" jelzés.
 
-### 2. Beszerzési szakasz sorainak kiegészítése
+### 2. Beszerzési szakasz sorainak kiegészítése és takarása
 
-A meglévő `procurementTrack` sorok `detail` mezője minden szakasznál tartalmazza a felelős nevét (nem csak az első sornál), pl. "Beszerzés folyamatban – Beszerző neve", "Telepítés – IT referens neve".
+- A meglévő `procurementTrack` sorok `detail` mezője minden szakasznál tartalmazza a felelős nevét (nem csak az első sornál), pl. "Beszerzés folyamatban – Beszerző neve", "Telepítés – IT referens neve".
+- A felelősnevet tartalmazó részletsorok (beleértve a meglévő "Döntésre vár: …" sort is) csak a jogosult szerepköröknek renderelődnek; az igénylő a részletek nélküli, semleges listát látja.
 
 ### 3. Fordítások – `src/lib/i18n/dictionary.ts`
 
@@ -53,12 +54,15 @@ Az összes új felirat ("Az ügy jelenleg nála van", "döntésre vár", "átvé
 ## Technikai részletek
 
 - Csak `src/routes/igeny.$id.tsx` és `src/lib/i18n/dictionary.ts` módosul; segédfüggvény (pl. `currentOwnerOf(request, store)`) a komponensen belül vagy `src/lib/` segédmodulban.
+- A jogosultságot egy `canSeeOwner` feltétel adja: `fullView` (ügyintéző/szolgáltatásgazda/admin/vezető/dékán) vagy az aktív szerepkör `beszerzo`/`eszkozmenedzser`/`gazdasagi_vezeto`/`it_referens`, illetve a felhasználó szerepel az igény `approvals` listájában.
 - Névfeloldás a meglévő `lookup.userName()` / `lookup.unit()` segédekkel; a szerepkör-felhasználókat a `store.users` szerepkörlista alapján keressük (első találat elegendő a demóhoz).
 - Nincs adatmodell- vagy store-változás; a meglévő `approvals`, `planItems`, `planApprovals`, `handovers` adatok elegendők.
 
 ## Ellenőrzés
 
-- Beküldött, jóváhagyásra váró igénynél a jóváhagyó neve látszik.
-- Dékáni tervjóváhagyásra váró tételnél a dékán neve és a határidő látszik.
-- Átadás alatt álló eszköznél az IT referens, átvételre várva az igénylő neve látszik.
+- Igénylőként megnyitva az igényt: a Folyamat fülön nem jelenik meg sem a felelőspanel, sem nevet tartalmazó részletsor.
+- Ügyintéző/dékán/beszerző/IT referens szerepkörben a felelőspanel látszik:
+  - jóváhagyásra váró igénynél a jóváhagyó neve;
+  - dékáni tervjóváhagyásra váró tételnél a dékán neve és a határidő;
+  - átadás alatt álló eszköznél az IT referens, átvételre várva az igénylő neve.
 - Angol nyelvváltás után is helyes feliratok.
