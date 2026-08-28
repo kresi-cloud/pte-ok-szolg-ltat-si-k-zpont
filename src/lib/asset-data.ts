@@ -579,6 +579,18 @@ export const HARDWARE_STANDARDS: HardwareStandard[] = [
     userProfile: "Terepi adatgyűjtés, vezetői mobilitás",
     intendedUse: "Mobil adatrögzítés, prezentáció, kommunikáció.",
   },
+  {
+    key: "std-mobile-phone",
+    label: "Intézményi okostelefon",
+    categoryKey: "mobil",
+    minSpec: { cpuGeneration: 2023, cores: 6, ramGb: 6, storage: "128 GB" },
+    preferredSpec: { cpu: "Aktuális generációs mobil SoC", cores: 8, ramGb: 8, storage: "256 GB" },
+    lifecycleYears: 4,
+    referencePriceId: "rp-mobile-phone",
+    approvedModels: ["samsung-a54"],
+    userProfile: "Intézményi mobilkommunikáció",
+    intendedUse: "Hívás, e-mail, MDM-felügyelt mobilalkalmazások.",
+  },
 ];
 
 export const REFERENCE_PRICES: ReferencePrice[] = [
