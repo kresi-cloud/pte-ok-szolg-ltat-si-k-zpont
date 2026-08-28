@@ -1059,7 +1059,42 @@ const seeds: Seed[] = [
   },
 ];
 
+/** Eszközigénylés szövegei a termékkatalógus alapján – az űrlappal azonos formátumban. */
+function hwDetails(s: Seed) {
+  const product = INITIAL_PRODUCTS.find((p) => p.id === s.productId);
+  if (!product) return null;
+  const category = INITIAL_PRODUCT_CATEGORIES.find((c) => c.id === product.categoryId);
+  const personalUse = category?.personalUse === true;
+  const qty = personalUse ? 1 : Math.max(1, s.quantity ?? 1);
+  const loc = (id?: string) => {
+    const l = ASSET_LOCATIONS.find((x) => x.id === id);
+    return l ? `${l.building} · ${l.room}` : "Nincs megadva";
+  };
+  const handoverLabel =
+    s.handoverMode === "ugyfelszolgalat"
+      ? HANDOVER_MODE_LABELS.ugyfelszolgalat
+      : `${HANDOVER_MODE_LABELS.munkavegzes} – ${loc(s.workLocationId)}`;
+  const title = `${category?.name ?? "Eszköz"} igénylés – ${product.name}${qty > 1 ? ` (${qty} db)` : ""}`;
+  const goal = [
+    `Igényelt eszköz: ${product.name} (${product.vendor}), ${qty} db.`,
+    `Termékkör: ${category?.name ?? "—"}.`,
+    `Konfiguráció: ${product.spec.cpu} · ${product.spec.ram} · ${product.spec.storage} · ${product.spec.os} ${product.spec.osVersion}.`,
+    ...(personalUse
+      ? [
+          s.reason ? `Igénylés indoka: ${REQUEST_REASON_LABELS[s.reason]}` : "",
+          s.reasonNote ? `Kiegészítés: ${s.reasonNote}` : "",
+          s.workLocationId ? `Munkavégzés helye: ${loc(s.workLocationId)}` : "",
+          `Kért átvételi hely: ${handoverLabel}`,
+        ]
+      : [s.goal ? `Indoklás: ${s.goal}` : ""]),
+  ]
+    .filter(Boolean)
+    .join("\n");
+  return { product, category, personalUse, qty, title, goal, cost: product.referencePrice * qty };
+}
+
 function buildRequest(s: Seed): ServiceRequest {
+  const hw = hwDetails(s);
   const unit = ORG_UNITS.find((o) => o.id === s.orgUnitId)!;
   const approverId = unit.approverUserId ?? "u-nagy";
   const approvals: Approval[] = [];
