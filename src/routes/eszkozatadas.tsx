@@ -13,7 +13,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useStore, lookup } from "@/lib/store";
-import { HARDWARE_MODELS, isMobileModel, specForModel } from "@/lib/inventory-data";
+import { specForModel } from "@/lib/inventory-data";
+import {
+  categoryForHandover,
+  handoverProductOptions,
+  needsLocationForCategory,
+  productForHandover,
+  specFromProduct,
+} from "@/lib/handover-products";
 import { ASSET_LOCATIONS } from "@/lib/asset-data";
 import {
   ATTACHMENT_KIND_LABELS,
