@@ -40,6 +40,7 @@ import type {
 import { INITIAL_PRODUCTS, INITIAL_PRODUCT_CATEGORIES } from "./product-catalog";
 import { INVENTORY, specForModel } from "./inventory-data";
 import { modelKeyForStandard, standardLabel } from "./handover-mapping";
+import { productLockInfo } from "./product-lock";
 import type {
   Asset,
   AssetAuditEvent,
@@ -1423,6 +1424,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           orgUnitId,
           referentId: referent?.id,
           deviceName: item.deviceName ?? standardLabel(item.standardKey),
+          productId: item.productId ?? request?.productId,
           modelKey: item.modelKey ?? modelKeyForStandard(item.standardKey),
           status: "beerkezett",
           createdAt: today(),
@@ -1881,12 +1883,40 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       return id;
     },
     updateProduct: (id, patch) =>
-      setState((s) => ({
-        ...s,
-        products: (s.products ?? []).map((p) => (p.id === id ? { ...p, ...patch } : p)),
-      })),
+      setState((s) => {
+        // Aktív beszerzési folyamat mellett a tétel nem vehető ki a beszerezhetők közül.
+        const deactivating = patch.active === false;
+        if (
+          deactivating &&
+          productLockInfo(id, {
+            requests: s.requests,
+            planItems: s.planItems,
+            handovers: s.handovers ?? [],
+          }).locked
+        ) {
+          const { active: _ignored, ...rest } = patch;
+          return {
+            ...s,
+            products: (s.products ?? []).map((p) => (p.id === id ? { ...p, ...rest } : p)),
+          };
+        }
+        return {
+          ...s,
+          products: (s.products ?? []).map((p) => (p.id === id ? { ...p, ...patch } : p)),
+        };
+      }),
     removeProduct: (id) =>
-      setState((s) => ({
+      setState((s) => {
+        if (
+          productLockInfo(id, {
+            requests: s.requests,
+            planItems: s.planItems,
+            handovers: s.handovers ?? [],
+          }).locked
+        ) {
+          return s;
+        }
+        return {
         ...s,
         products: (s.products ?? []).filter((p) => p.id !== id),
         assetAudit: [
@@ -1901,7 +1931,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           },
           ...s.assetAudit,
         ],
-      })),
+        };
+      }),
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

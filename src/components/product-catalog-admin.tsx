@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useStore } from "@/lib/store";
 import { TIERS, TIER_LABELS } from "@/lib/product-catalog";
+import { productLockInfo } from "@/lib/product-lock";
 import type { EmployeeTier, Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -298,7 +299,13 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
               </p>
             ) : (
               <ul className="space-y-3">
-                {catProducts.map((p) => (
+                {catProducts.map((p) => {
+                  const lock = productLockInfo(p.id, {
+                    requests: store.requests,
+                    planItems: store.planItems,
+                    handovers: store.handovers ?? [],
+                  });
+                  return (
                   <li key={p.id} className="card-surface p-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
@@ -307,6 +314,9 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                           {p.vendor} · {p.referencePrice.toLocaleString("hu-HU")} Ft ·{" "}
                           {p.spec.cpu} · {p.spec.ram} · {p.spec.storage}
                         </span>
+                        {lock.locked && (
+                          <span className="mt-1 block text-xs text-amber-700">{lock.reason}</span>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary">{TIER_LABELS[p.tier]} kategóriától</Badge>
@@ -324,7 +334,13 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                         <Button
                           size="sm"
                           variant="ghost"
+                          disabled={lock.locked}
+                          title={lock.locked ? lock.reason : undefined}
                           onClick={() => {
+                            if (lock.locked) {
+                              toast.error(lock.reason ?? "A termék jelenleg nem távolítható el.");
+                              return;
+                            }
                             store.removeProduct(p.id);
                             toast.success("Termék törölve");
                           }}
@@ -334,7 +350,8 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                       </div>
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             )}
           </>

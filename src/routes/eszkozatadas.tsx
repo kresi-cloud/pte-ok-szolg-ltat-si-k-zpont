@@ -13,7 +13,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useStore, lookup } from "@/lib/store";
-import { HARDWARE_MODELS, isMobileModel, specForModel } from "@/lib/inventory-data";
+import { specForModel } from "@/lib/inventory-data";
+import {
+  categoryForHandover,
+  handoverProductOptions,
+  needsLocationForCategory,
+  productForHandover,
+  specFromProduct,
+} from "@/lib/handover-products";
 import { ASSET_LOCATIONS } from "@/lib/asset-data";
 import {
   ATTACHMENT_KIND_LABELS,
@@ -90,7 +97,13 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
   const store = useStore();
   const [serial, setSerial] = useState(handover.serial ?? "");
   const [inventoryNo, setInventoryNo] = useState(handover.inventoryNo ?? "");
-  const [modelKey, setModelKey] = useState(handover.modelKey ?? "");
+  const catalogCtx = {
+    products: store.products,
+    categories: store.productCategories,
+    requests: store.requests,
+  };
+  const defaultProduct = productForHandover(handover, catalogCtx);
+  const [productId, setProductId] = useState(handover.productId ?? defaultProduct?.id ?? "");
   const [building, setBuilding] = useState(handover.building ?? "");
   const [room, setRoom] = useState(handover.room ?? "");
   const [note, setNote] = useState(handover.note ?? "");
@@ -103,8 +116,16 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
   const hasPhoto = attachments.some((a) => a.kind === "fenykep");
   const requiredDone = missingRequired.length === 0;
 
-  const spec = modelKey ? specForModel(modelKey) : undefined;
-  const needsLocation = Boolean(modelKey) && !isMobileModel(modelKey);
+  const options = handoverProductOptions(handover, catalogCtx);
+  const category = categoryForHandover(handover, catalogCtx);
+  const selectedProduct = options.find((p) => p.id === productId);
+  const modelKey = selectedProduct?.modelKey ?? handover.modelKey ?? "";
+  const spec = selectedProduct
+    ? specFromProduct(selectedProduct)
+    : modelKey
+      ? specForModel(modelKey)
+      : undefined;
+  const needsLocation = Boolean(productId) && needsLocationForCategory(category);
   const buildings = [...new Set(ASSET_LOCATIONS.map((l) => l.building))];
   const rooms = ASSET_LOCATIONS.filter((l) => l.building === building).map((l) => l.room);
   const done = handover.status === "atadva" || handover.status === "atvetel_igazolva";
@@ -115,6 +136,7 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
       {
         serial: serial || undefined,
         inventoryNo: inventoryNo || undefined,
+        productId: productId || undefined,
         modelKey: modelKey || undefined,
         building: needsLocation ? building || undefined : undefined,
         room: needsLocation ? room || undefined : undefined,
@@ -153,15 +175,18 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
       {canAct && !done && (
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor={`model-${handover.id}`}>Eszközmodell (műszaki adatok forrása)</Label>
-            <Select value={modelKey} onValueChange={setModelKey}>
+            <Label htmlFor={`model-${handover.id}`}>
+              Eszközmodell (műszaki adatok forrása)
+              {category ? ` – ${category.name}` : ""}
+            </Label>
+            <Select value={productId} onValueChange={setProductId}>
               <SelectTrigger id={`model-${handover.id}`}>
                 <SelectValue placeholder="Válasszon modellt" />
               </SelectTrigger>
               <SelectContent>
-                {HARDWARE_MODELS.map((m) => (
-                  <SelectItem key={m.key} value={m.key}>
-                    {m.label}
+                {options.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name} ({p.vendor})
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -445,7 +470,7 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
           </Button>
           <Button
             size="sm"
-            disabled={!serial || !inventoryNo || !modelKey || !requiredDone || !hasPhoto}
+            disabled={!serial || !inventoryNo || !productId || !requiredDone || !hasPhoto}
             onClick={() => {
               save("Átadási adatok rögzítve");
               store.handOverToUser(handover.id, note || undefined);
@@ -454,7 +479,7 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
           >
             Átadás az igénylőnek
           </Button>
-          {(!serial || !inventoryNo || !modelKey || !requiredDone || !hasPhoto) && (
+          {(!serial || !inventoryNo || !productId || !requiredDone || !hasPhoto) && (
             <span className="self-center text-xs text-muted-foreground">
               Az átadáshoz kötelező: modell, gyári szám, leltárkód, minden kötelező checklist-lépés
               {!requiredDone ? ` (hiányzik: ${missingRequired.length})` : ""} és legalább egy fénykép
