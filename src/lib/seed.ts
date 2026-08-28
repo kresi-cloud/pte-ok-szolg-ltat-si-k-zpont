@@ -573,7 +573,15 @@ interface Seed {
   slaRisk?: boolean;
   projectId?: string;
   catalogItemId?: string;
+  /** Termékkatalógusból választott eszköz (eszközigénylésnél). */
+  productId?: string;
+  quantity?: number;
+  reason?: RequestReason;
+  reasonNote?: string;
+  workLocationId?: string;
+  handoverMode?: HandoverMode;
 }
+
 
 const seeds: Seed[] = [
   {
