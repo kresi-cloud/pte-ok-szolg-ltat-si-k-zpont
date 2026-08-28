@@ -333,7 +333,13 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                         <Button
                           size="sm"
                           variant="ghost"
+                          disabled={lock.locked}
+                          title={lock.locked ? lock.reason : undefined}
                           onClick={() => {
+                            if (lock.locked) {
+                              toast.error(lock.reason ?? "A termék jelenleg nem távolítható el.");
+                              return;
+                            }
                             store.removeProduct(p.id);
                             toast.success("Termék törölve");
                           }}
@@ -343,7 +349,8 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                       </div>
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             )}
           </>
