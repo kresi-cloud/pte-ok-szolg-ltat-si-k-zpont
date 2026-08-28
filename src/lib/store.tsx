@@ -359,6 +359,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               : c,
           );
         }
+        // Új katalógustételek pótlása a mentett állapotban (id alapján, meglévők érintetlenül).
+        if (Array.isArray(merged.products)) {
+          const known = new Set(merged.products.map((p) => p.id));
+          const missing = INITIAL_PRODUCTS.filter((p) => !known.has(p.id));
+          if (missing.length) merged.products = [...merged.products, ...missing];
+        }
+
         setState(merged);
       }
     } catch {
