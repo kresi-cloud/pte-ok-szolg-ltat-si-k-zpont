@@ -115,7 +115,9 @@ function Wizard() {
     domain: (search['domain'] as DomainKey) || (preset?.domain ?? ""),
     catalogItemId: preset?.id ?? "",
     title: preset?.name ?? "",
+    workLocationId: defaultLocationForUser(currentUser.id)?.id ?? "",
   });
+
 
   const set = (patch: Partial<FormState>) => setForm((f) => ({ ...f, ...patch }));
   const domain = form.domain ? lookup.domain(form.domain) : undefined;
