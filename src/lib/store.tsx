@@ -1423,6 +1423,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           orgUnitId,
           referentId: referent?.id,
           deviceName: item.deviceName ?? standardLabel(item.standardKey),
+          productId: item.productId ?? request?.productId,
           modelKey: item.modelKey ?? modelKeyForStandard(item.standardKey),
           status: "beerkezett",
           createdAt: today(),
