@@ -14,7 +14,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CATALOG, DOMAINS, lookup, useStore } from "@/lib/store";
 import type { DomainKey, HandoverMode, RequestReason } from "@/lib/types";
 import { HANDOVER_MODE_LABELS, REQUEST_REASON_LABELS } from "@/lib/types";
-import { ASSET_LOCATIONS, ASSET_MODELS } from "@/lib/asset-data";
+import { ASSET_MODELS } from "@/lib/asset-data";
+import { LOCATION_KIND_LABELS } from "@/lib/asset-types";
+import { defaultLocationForUser, locationsForUser } from "@/lib/asset-logic";
 import { tierOf, visibleCategories, visibleProducts } from "@/lib/product-catalog";
 import { similarAssetsFor } from "@/lib/similar-assets";
 import { SimilarAssetNotice } from "@/components/similar-asset-notice";
@@ -113,7 +115,9 @@ function Wizard() {
     domain: (search['domain'] as DomainKey) || (preset?.domain ?? ""),
     catalogItemId: preset?.id ?? "",
     title: preset?.name ?? "",
+    workLocationId: defaultLocationForUser(currentUser.id)?.id ?? "",
   });
+
 
   const set = (patch: Partial<FormState>) => setForm((f) => ({ ...f, ...patch }));
   const domain = form.domain ? lookup.domain(form.domain) : undefined;
@@ -131,6 +135,7 @@ function Wizard() {
   const key = stepKeys[Math.min(step, lastStep)]!;
 
   const tier = tierOf(currentUser);
+  const userLocations = locationsForUser(currentUser.id);
   const cats = useMemo(
     () => visibleCategories(productCategories, products, tier),
     [productCategories, products, tier],
@@ -174,7 +179,7 @@ function Wizard() {
     key === "summary";
 
   const locationLabel = (id: string) => {
-    const l = ASSET_LOCATIONS.find((x) => x.id === id);
+    const l = userLocations.find((x) => x.id === id);
     return l ? `${l.building} · ${l.room}` : "Nincs megadva";
   };
   const assetLabel = (id: string) => {
@@ -610,9 +615,9 @@ function Wizard() {
                   className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                 >
                   <option value="">Válasszon épületet és helyiséget…</option>
-                  {ASSET_LOCATIONS.map((l) => (
+                  {userLocations.map((l) => (
                     <option key={l.id} value={l.id}>
-                      {l.building} · {l.room}
+                      {l.building} · {l.room} ({LOCATION_KIND_LABELS[l.kind]})
                     </option>
                   ))}
                 </select>
@@ -645,9 +650,9 @@ function Wizard() {
                     className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                   >
                     <option value="">Válasszon átvételi helyszínt…</option>
-                    {ASSET_LOCATIONS.map((l) => (
+                    {userLocations.map((l) => (
                       <option key={l.id} value={l.id}>
-                        {l.building} · {l.room}
+                        {l.building} · {l.room} ({LOCATION_KIND_LABELS[l.kind]})
                       </option>
                     ))}
                   </select>

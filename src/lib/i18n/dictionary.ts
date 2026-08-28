@@ -1320,6 +1320,16 @@ export const EN_DICT: Record<string, string> = {
   "Használó": "User",
   "Határidő": "Deadline",
   "Helyiség": "Room",
+  "Helyiségek": "Rooms",
+  "Iroda": "Office",
+  "Műhely": "Workshop",
+  "Labor": "Laboratory",
+  "Munkatársak": "Staff",
+  
+  "Helyiségleltár: minden szervezeti egységhez tartozó iroda, műhely és labor, a hozzájuk rendelt munkatársakkal és az ott nyilvántartott eszközök számával.":
+    "Room inventory: every office, workshop and laboratory per organisational unit, with the assigned staff and the number of registered assets.",
+  "IT Szolgáltatási Egység": "IT Services Unit",
+
   "Helyszín": "Location",
   "Igényeim": "My requests",
   "Indoklás": "Justification",

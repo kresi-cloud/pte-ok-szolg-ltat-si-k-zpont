@@ -21,7 +21,8 @@ import {
   productForHandover,
   specFromProduct,
 } from "@/lib/handover-products";
-import { ASSET_LOCATIONS } from "@/lib/asset-data";
+import { LOCATION_KIND_LABELS } from "@/lib/asset-types";
+import { locationsForUser } from "@/lib/asset-logic";
 import {
   ATTACHMENT_KIND_LABELS,
   HANDOVER_CHECKLIST,
@@ -103,9 +104,12 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
     requests: store.requests,
   };
   const defaultProduct = productForHandover(handover, catalogCtx);
+  const recipientLocations = locationsForUser(handover.recipientId);
+  const recipientLocation = recipientLocations[0];
   const [productId, setProductId] = useState(handover.productId ?? defaultProduct?.id ?? "");
-  const [building, setBuilding] = useState(handover.building ?? "");
-  const [room, setRoom] = useState(handover.room ?? "");
+  const [building, setBuilding] = useState(handover.building ?? recipientLocation?.building ?? "");
+  const [room, setRoom] = useState(handover.room ?? recipientLocation?.room ?? "");
+
   const [note, setNote] = useState(handover.note ?? "");
   const [attachKind, setAttachKind] = useState<HandoverAttachmentKind>("fenykep");
   const [uploading, setUploading] = useState(false);
@@ -126,8 +130,9 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
       ? specForModel(modelKey)
       : undefined;
   const needsLocation = Boolean(productId) && needsLocationForCategory(category);
-  const buildings = [...new Set(ASSET_LOCATIONS.map((l) => l.building))];
-  const rooms = ASSET_LOCATIONS.filter((l) => l.building === building).map((l) => l.room);
+  const buildings = [...new Set(recipientLocations.map((l) => l.building))];
+  const rooms = recipientLocations.filter((l) => l.building === building);
+
   const done = handover.status === "atadva" || handover.status === "atvetel_igazolva";
 
   const save = (label: string, extra: Partial<AssetHandover> = {}) => {
@@ -235,10 +240,11 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
                   </SelectTrigger>
                   <SelectContent>
                     {rooms.map((r) => (
-                      <SelectItem key={r} value={r}>
-                        {r}
+                      <SelectItem key={r.id} value={r.room}>
+                        {r.room} ({LOCATION_KIND_LABELS[r.kind]})
                       </SelectItem>
                     ))}
+
                   </SelectContent>
                 </Select>
               </div>

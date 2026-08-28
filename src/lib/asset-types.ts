@@ -121,11 +121,22 @@ export const PRIORITY_LABELS: Record<ReplacementPriority, string> = {
 export type AssetUsageType = "szemelyi" | "kozos";
 
 /** AssetLocations */
+export type LocationKind = "iroda" | "muhely" | "labor";
+
+export const LOCATION_KIND_LABELS: Record<LocationKind, string> = {
+  iroda: "Iroda",
+  muhely: "Műhely",
+  labor: "Labor",
+};
+
 export interface AssetLocation {
   id: string;
   building: string;
   room: string;
+  kind: LocationKind;
   orgUnitId: string;
+  /** a helyiséghez tartósan rendelt munkatársak */
+  primaryUserIds?: string[] | undefined;
 }
 
 /** AssetAssignments – hozzárendelés-történet */

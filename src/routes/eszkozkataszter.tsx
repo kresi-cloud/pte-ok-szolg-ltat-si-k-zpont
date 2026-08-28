@@ -7,8 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeading } from "@/components/page-heading";
 import { lookup, useStore, ORG_UNITS } from "@/lib/store";
+import { LOCATION_KIND_LABELS } from "@/lib/asset-types";
 import {
   ASSET_CATEGORIES,
+  ASSET_LOCATIONS,
   ASSET_MODELS,
   ASSET_RESPONSIBILITIES,
   HARDWARE_STANDARDS,
@@ -114,6 +116,7 @@ function CataloguePage() {
           <TabsTrigger value="korfa">Korfa és megoszlás</TabsTrigger>
           <TabsTrigger value="standardok">Hardverstandardok</TabsTrigger>
           <TabsTrigger value="arak">Referenciaárak</TabsTrigger>
+          <TabsTrigger value="helyisegek">Helyiségek</TabsTrigger>
           <TabsTrigger value="felelossegek">Eszközfelelősségek</TabsTrigger>
         </TabsList>
 
@@ -375,6 +378,51 @@ function CataloguePage() {
               </tbody>
             </table>
           </section>
+        </TabsContent>
+
+        <TabsContent value="helyisegek" className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Helyiségleltár: minden szervezeti egységhez tartozó iroda, műhely és labor, a hozzájuk
+            rendelt munkatársakkal és az ott nyilvántartott eszközök számával.
+          </p>
+          <div className="card-surface overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2">Épület</th>
+                  <th className="px-3 py-2">Helyiség</th>
+                  <th className="px-3 py-2">Típus</th>
+                  <th className="px-3 py-2">Szervezeti egység</th>
+                  <th className="px-3 py-2">Munkatársak</th>
+                  <th className="px-3 py-2 text-right">Eszköz</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ASSET_LOCATIONS.map((l) => {
+                  const unit = ORG_UNITS.find((o) => o.id === l.orgUnitId);
+                  const count = assets.filter((a) => a.locationId === l.id).length;
+                  return (
+                    <tr key={l.id} className="border-t border-border/60">
+                      <td className="px-3 py-2">{l.building}</td>
+                      <td className="px-3 py-2 font-medium">{l.room}</td>
+                      <td className="px-3 py-2">
+                        <Badge variant="secondary" className="font-normal">
+                          {LOCATION_KIND_LABELS[l.kind]}
+                        </Badge>
+                      </td>
+                      <td className="px-3 py-2">{unit?.name ?? l.orgUnitId}</td>
+                      <td className="px-3 py-2">
+                        {(l.primaryUserIds ?? []).length === 0
+                          ? "—"
+                          : (l.primaryUserIds ?? []).map((u) => lookup.userName(u)).join(", ")}
+                      </td>
+                      <td className="px-3 py-2 text-right tabular-nums">{count}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </TabsContent>
 
         <TabsContent value="felelossegek" className="space-y-4">

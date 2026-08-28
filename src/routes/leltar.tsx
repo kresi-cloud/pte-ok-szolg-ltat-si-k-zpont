@@ -18,7 +18,8 @@ import {
 import { useStore } from "@/lib/store";
 import { HARDWARE_MODELS, SOFTWARE_SUGGESTIONS, isMobileModel, specForModel } from "@/lib/inventory-data";
 import { needsLocationForCategory, productModelLabel } from "@/lib/handover-products";
-import { ASSET_LOCATIONS } from "@/lib/asset-data";
+import { LOCATION_KIND_LABELS } from "@/lib/asset-types";
+import { locationsForUser } from "@/lib/asset-logic";
 import { INVENTORY_STATUS_LABELS, type InventoryItem } from "@/lib/types";
 import { MyAssets, MyLicences, SharedAssets } from "@/components/personal-assets";
 import { PageHeading } from "@/components/page-heading";
@@ -111,21 +112,26 @@ function Inventory() {
   const hardware = mine.filter((i) => i.kind === "hardver");
   const software = mine.filter((i) => i.kind === "szoftver");
 
+  const userLocations = locationsForUser(currentUser.id);
+  const ownLocation = userLocations[0];
+
   const [hw, setHw] = useState({
     name: "",
     modelKey: "",
     serial: "",
     inventoryNo: "",
-    building: "",
-    room: "",
+    building: ownLocation?.building ?? "",
+    room: ownLocation?.room ?? "",
     note: "",
   });
   const [sw, setSw] = useState({ name: "", version: "", licenseType: "", licenseKey: "", installedOn: "" });
 
   const preview = hw.modelKey ? specForModel(hw.modelKey) : null;
   const needsLocation = Boolean(hw.modelKey) && !isMobileModel(hw.modelKey);
-  const buildings = [...new Set(ASSET_LOCATIONS.map((l) => l.building))];
-  const rooms = ASSET_LOCATIONS.filter((l) => l.building === hw.building).map((l) => l.room);
+  const buildings = [...new Set(userLocations.map((l) => l.building))];
+  const rooms = userLocations.filter((l) => l.building === hw.building);
+
+
 
   return (
     <div className="space-y-6">
@@ -291,10 +297,11 @@ function Inventory() {
                       </SelectTrigger>
                       <SelectContent>
                         {rooms.map((r) => (
-                          <SelectItem key={r} value={r}>
-                            {r}
+                          <SelectItem key={r.id} value={r.room}>
+                            {r.room} ({LOCATION_KIND_LABELS[r.kind]})
                           </SelectItem>
                         ))}
+
                       </SelectContent>
                     </Select>
                   </div>
