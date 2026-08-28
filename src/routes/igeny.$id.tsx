@@ -354,7 +354,6 @@ function RequestDetail() {
             ["Igénylő", lookup.userName(request.requesterId)],
             ["Szervezeti egység", lookup.unit(request.orgUnitId)],
             ["Beküldés", request.createdAt],
-            ["Tervezett befejezés", request.dueDate ?? "Nincs megadva"],
             [
               "Katalógus szerinti referenciaérték",
               request.estimatedCost
@@ -374,6 +373,31 @@ function RequestDetail() {
           <span className="font-medium">Következő lépés: </span>
           {request.nextStep}
         </p>
+
+        {isRequester && handover?.status === "atadva" && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-md border-l-4 border-l-primary border border-border bg-secondary/40 p-4">
+            <div>
+              <p className="text-sm font-semibold">Átvételre váró eszköz: {handover.deviceName}</p>
+              <p className="text-xs text-muted-foreground">
+                {handover.serial ? `Gyári szám: ${handover.serial}` : ""}
+                {handover.serial && handover.inventoryNo ? " · " : ""}
+                {handover.inventoryNo ? `PTE leltárkód: ${handover.inventoryNo}` : ""}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Az átvétel visszaigazolásával az eszköz bekerül a személyi leltárába.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              onClick={() => {
+                store.confirmHandoverReceipt(handover.id);
+                toast.success("Átvétel visszaigazolva – az eszköz bekerült a leltárába");
+              }}
+            >
+              Átvétel visszaigazolása
+            </Button>
+          </div>
+        )}
 
         {isRequester && request.status !== "piszkozat" && (
           <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-border bg-secondary/40 p-4">
@@ -533,7 +557,6 @@ function RequestDetail() {
                     ]),
                 ["Adatkezelési érintettség", request.personalData ? "Igen" : "Nem"],
                 ["Integráció", request.integration ?? "Nem szükséges"],
-                ...(request.recurring ? [["Jelleg", request.recurring]] : []),
                 [
                   "Költségkeret (jóváhagyó által rögzítve)",
                   request.budget ?? "Nincs megadva",
