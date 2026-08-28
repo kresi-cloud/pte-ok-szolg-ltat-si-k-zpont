@@ -20,6 +20,30 @@ import type {
   ReferencePrice,
   ReplacementPriority,
 } from "./asset-types";
+import { LOCATION_KIND_LABELS } from "./asset-types";
+import { USERS } from "./seed";
+
+/** A felhasználó munkahelyéhez (szervezeti egység) tartozó helyiségek, saját iroda elöl. */
+export function locationsForUser(userId?: string) {
+  const user = USERS.find((u) => u.id === userId);
+  if (!user) return ASSET_LOCATIONS;
+  const own = ASSET_LOCATIONS.filter((l) => l.primaryUserIds?.includes(user.id));
+  const unit = ASSET_LOCATIONS.filter(
+    (l) => l.orgUnitId === user.orgUnitId && !own.includes(l),
+  );
+  const rest = ASSET_LOCATIONS.filter((l) => !own.includes(l) && !unit.includes(l));
+  return [...own, ...unit, ...rest];
+}
+
+/** A felhasználóhoz rendelt alapértelmezett helyiség (saját iroda/műhely/labor). */
+export function defaultLocationForUser(userId?: string) {
+  return locationsForUser(userId)[0];
+}
+
+export function locationOptionLabel(l: { building: string; room: string; kind: keyof typeof LOCATION_KIND_LABELS }) {
+  return `${l.building} · ${l.room} (${LOCATION_KIND_LABELS[l.kind]})`;
+}
+
 
 export const assetLookup = {
   model: (key: string): AssetModel | undefined => ASSET_MODELS.find((m) => m.key === key),
