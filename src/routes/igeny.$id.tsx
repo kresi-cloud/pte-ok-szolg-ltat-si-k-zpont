@@ -143,7 +143,9 @@ function RequestDetail() {
       done: request.approvals.length > 0 && pendingApprovers.length === 0,
       detail: pendingApprovers.length
         ? `Döntésre vár: ${pendingApprovers.join(" · ")}`
-        : "Minden jóváhagyó döntött.",
+        : request.approvals.length > 0
+          ? "Minden jóváhagyó döntött."
+          : "Még nincs jóváhagyási döntés.",
       sensitive: pendingApprovers.length > 0,
     },
     {
