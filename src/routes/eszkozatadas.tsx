@@ -470,7 +470,7 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
           </Button>
           <Button
             size="sm"
-            disabled={!serial || !inventoryNo || !modelKey || !requiredDone || !hasPhoto}
+            disabled={!serial || !inventoryNo || !productId || !requiredDone || !hasPhoto}
             onClick={() => {
               save("Átadási adatok rögzítve");
               store.handOverToUser(handover.id, note || undefined);
@@ -479,7 +479,7 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
           >
             Átadás az igénylőnek
           </Button>
-          {(!serial || !inventoryNo || !modelKey || !requiredDone || !hasPhoto) && (
+          {(!serial || !inventoryNo || !productId || !requiredDone || !hasPhoto) && (
             <span className="self-center text-xs text-muted-foreground">
               Az átadáshoz kötelező: modell, gyári szám, leltárkód, minden kötelező checklist-lépés
               {!requiredDone ? ` (hiányzik: ${missingRequired.length})` : ""} és legalább egy fénykép
