@@ -117,6 +117,7 @@ export const ORG_UNITS: OrgUnit[] = [
     type: "klinikai",
     approverUserId: "u-fekete",
   },
+  { id: "ou-it", name: "IT Szolgáltatási Egység", type: "hivatal", approverUserId: "u-nagy" },
 ];
 
 export const USERS: User[] = [
