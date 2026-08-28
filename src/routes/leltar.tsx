@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useStore } from "@/lib/store";
 import { HARDWARE_MODELS, SOFTWARE_SUGGESTIONS, isMobileModel, specForModel } from "@/lib/inventory-data";
+import { needsLocationForCategory, productModelLabel } from "@/lib/handover-products";
 import { ASSET_LOCATIONS } from "@/lib/asset-data";
 import { INVENTORY_STATUS_LABELS, type InventoryItem } from "@/lib/types";
 import { MyAssets, MyLicences, SharedAssets } from "@/components/personal-assets";
@@ -354,14 +355,26 @@ function Inventory() {
           {hardware.length === 0 ? (
             <p className="text-sm text-muted-foreground">Még nincs rögzített hardvereszköz.</p>
           ) : (
-            hardware.map((i) => (
+            hardware.map((i) => {
+              const product = (store.products ?? []).find((p) => p.id === i.productId);
+              const category = product
+                ? (store.productCategories ?? []).find((c) => c.id === product.categoryId)
+                : undefined;
+              const modelLabel =
+                (product ? productModelLabel(product) : undefined) ??
+                HARDWARE_MODELS.find((m) => m.key === i.modelKey)?.label ??
+                "Egyedi eszköz";
+              const personalUse = product
+                ? !needsLocationForCategory(category)
+                : isMobileModel(i.modelKey);
+              return (
               <article key={i.id} className="card-surface p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h3 className="font-display text-base font-semibold">{i.name}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {HARDWARE_MODELS.find((m) => m.key === i.modelKey)?.label ?? "Egyedi eszköz"} ·{" "}
-                      {isMobileModel(i.modelKey)
+                      {modelLabel} ·{" "}
+                      {personalUse
                         ? "Személyi használat"
                         : (i.location ??
                           ([i.building, i.room].filter(Boolean).join(" · ") ||
@@ -395,7 +408,8 @@ function Inventory() {
                 )}
                 <SpecGrid item={i} />
               </article>
-            ))
+              );
+            })
           )}
         </TabsContent>
 

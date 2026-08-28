@@ -39,6 +39,7 @@ import type {
 } from "./types";
 import { INITIAL_PRODUCTS, INITIAL_PRODUCT_CATEGORIES } from "./product-catalog";
 import { INVENTORY, specForModel } from "./inventory-data";
+import { handoverPurposeTitle, productForHandover, specFromProduct } from "./handover-products";
 import { modelKeyForStandard, standardLabel } from "./handover-mapping";
 import { productLockInfo } from "./product-lock";
 import type {
@@ -1564,19 +1565,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setState((s) => {
         const h = (s.handovers ?? []).find((x) => x.id === id);
         if (!h) return s;
+        const catalogCtx = {
+          products: s.products ?? [],
+          categories: s.productCategories ?? [],
+          requests: s.requests,
+        };
+        const catalogProduct = productForHandover(h, catalogCtx);
         const invId = `inv-${Date.now()}`;
         const item: InventoryItem = {
           id: invId,
           ownerId: h.recipientId,
           kind: "hardver",
-          name: h.deviceName,
+          name: handoverPurposeTitle(h, catalogCtx),
           modelKey: h.modelKey,
+          productId: catalogProduct?.id,
           serial: h.serial,
           inventoryNo: h.inventoryNo,
           building: h.building,
           room: h.room,
           note: `Beszerzési folyamatból átvéve (${h.planItemId})${h.note ? ` · ${h.note}` : ""}`,
-          spec: specForModel(h.modelKey),
+          spec: catalogProduct ? specFromProduct(catalogProduct) : specForModel(h.modelKey),
           status: "jovahagyva",
           createdAt: today(),
           decidedAt: today(),
@@ -1600,13 +1608,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           deviceId: h.serial ?? assetId,
           categoryKey: planItem?.categoryKey ?? "egyeb",
           modelKey: h.modelKey ?? "",
+          productId: catalogProduct?.id,
           serial: h.serial ?? "",
           usage: "szemelyi",
           assignedUserId: h.recipientId,
           inventoryResponsibleId: h.referentId ?? h.recipientId,
           orgUnitId: h.orgUnitId,
           locationId: location.id,
-          purpose: h.deviceName,
+          purpose: item.name,
           purchaseDate: today(),
           commissionDate: today(),
           purchaseValue: planItem?.unitPriceOverride ?? 0,

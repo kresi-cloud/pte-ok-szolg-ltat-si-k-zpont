@@ -427,6 +427,8 @@ export interface InventoryItem {
   name: string;
   /** hardver: modellkulcs a felismerési adatbázisból; szoftver: verzió */
   modelKey?: string | undefined;
+  /** hardver: a beszerzői katalógus tétele, ha onnan érkezett az eszköz */
+  productId?: string | undefined;
   serial?: string | undefined;
   /** PTE intézményi leltárkód (leltári szám) */
   inventoryNo?: string | undefined;

@@ -19,6 +19,7 @@ import {
   replacementPriority,
   yearsSince,
 } from "@/lib/asset-logic";
+import { productModelLabel } from "@/lib/handover-products";
 import { Field, LicenceBadge, LifecycleBadge, PriorityBadge, StatTile } from "@/components/asset-bits";
 import {
   PERSONAL_CHECK_LABELS,
@@ -118,6 +119,14 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
   const asset = store.assets.find((a) => a.id === assetId)!;
   const model = assetLookup.model(asset.modelKey);
   const spec = model?.spec;
+  // Katalógusból beszerzett eszköznél a modellnév és a műszaki adatok a
+  // termék adatlapjáról származnak (nincs beépített modellkulcs).
+  const product = (store.products ?? []).find((p) => p.id === asset.productId);
+  const title = model
+    ? assetLookup.modelLabel(asset.modelKey)
+    : product
+      ? productModelLabel(product)
+      : assetLookup.modelLabel(asset.modelKey);
   const check = store.checks.find((c) => c.assetId === asset.id && c.userId === store.currentUser.id);
   const [answer, setAnswer] = useState<string>(shared ? "megtalalhato" : "nalam_van_hasznalom");
   const [comment, setComment] = useState("");
@@ -131,7 +140,7 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
         <div>
           <h3 className="font-display text-base font-semibold">
             <Link to="/eszkoz/$id" params={{ id: asset.id }} className="hover:underline">
-              {assetLookup.modelLabel(asset.modelKey)}
+              {title}
             </Link>
           </h3>
           <p className="text-sm text-muted-foreground">
@@ -152,15 +161,21 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
 
       <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Field label="Operációs rendszer">
-          {spec?.os ?? "—"} {spec?.osVersion ?? ""}
+          {spec?.os ?? product?.spec.os ?? "—"} {spec?.osVersion ?? product?.spec.osVersion ?? ""}
         </Field>
         <Field label="Processzor">
-          {spec?.processor ? `${spec.processor.name} · ${spec.processor.cores} mag` : "—"}
+          {spec?.processor
+            ? `${spec.processor.name} · ${spec.processor.cores} mag`
+            : (product?.spec.cpu ?? "—")}
         </Field>
         <Field label="Memória">
-          {spec?.memory ? `${spec.memory.capacityGb} GB ${spec.memory.type}` : "—"}
+          {spec?.memory ? `${spec.memory.capacityGb} GB ${spec.memory.type}` : (product?.spec.ram ?? "—")}
         </Field>
-        <Field label="Tároló">{spec?.storage ? `${spec.storage.capacity} ${spec.storage.type}` : "—"}</Field>
+        <Field label="Tároló">
+          {spec?.storage
+            ? `${spec.storage.capacity} ${spec.storage.type}`
+            : (product?.spec.storage ?? "—")}
+        </Field>
         <Field label="Üzembe helyezés">
           {asset.commissionDate} ({yearsSince(asset.commissionDate).toFixed(1)} év)
         </Field>
@@ -175,7 +190,7 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
       </dl>
 
       <div className="mt-3 flex flex-wrap gap-1.5">
-        {(spec?.features ?? []).map((f) => (
+        {(spec?.features ?? product?.spec.features ?? []).map((f) => (
           <Badge key={f} variant="secondary" className="font-normal">
             {f}
           </Badge>
