@@ -129,8 +129,9 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
       ? specForModel(modelKey)
       : undefined;
   const needsLocation = Boolean(productId) && needsLocationForCategory(category);
-  const buildings = [...new Set(ASSET_LOCATIONS.map((l) => l.building))];
-  const rooms = ASSET_LOCATIONS.filter((l) => l.building === building).map((l) => l.room);
+  const buildings = [...new Set(recipientLocations.map((l) => l.building))];
+  const rooms = recipientLocations.filter((l) => l.building === building);
+
   const done = handover.status === "atadva" || handover.status === "atvetel_igazolva";
 
   const save = (label: string, extra: Partial<AssetHandover> = {}) => {
