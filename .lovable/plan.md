@@ -1,8 +1,10 @@
-# "Az igény útja" – az ügy aktuális gazdájának megjelenítése
+# "Az igény útja" – az ügy aktuális gazdájának megjelenítése (korlátozott láthatósággal)
 
 ## Cél
 
-Az igényrészletes oldal (`/igeny/$id`) Folyamat fülén, az "Az igény útja" felületen mindig látszódjon, hogy **konkrétan kinél tart az ügy** – névvel és szerepkörrel, a folyamat aktuális szakaszától függően.
+Az igényrészletes oldal (`/igeny/$id`) Folyamat fülén, az "Az igény útja" felületen látszódjon, hogy **konkrétan kinél tart az ügy** – névvel és szerepkörrel, a folyamat aktuális szakaszától függően.
+
+**Láthatóság:** az aktuális felelőst (és a szakaszonkénti felelősneveket) csak az ügyért felelős szerepkörök és a vezetők látják; az átlagos igénylő számára ez az információ rejtve marad.
 
 ## Jelenlegi állapot
 
