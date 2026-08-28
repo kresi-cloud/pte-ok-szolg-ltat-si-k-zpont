@@ -175,15 +175,18 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
       {canAct && !done && (
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor={`model-${handover.id}`}>Eszközmodell (műszaki adatok forrása)</Label>
-            <Select value={modelKey} onValueChange={setModelKey}>
+            <Label htmlFor={`model-${handover.id}`}>
+              Eszközmodell (műszaki adatok forrása)
+              {category ? ` – ${category.name}` : ""}
+            </Label>
+            <Select value={productId} onValueChange={setProductId}>
               <SelectTrigger id={`model-${handover.id}`}>
                 <SelectValue placeholder="Válasszon modellt" />
               </SelectTrigger>
               <SelectContent>
-                {HARDWARE_MODELS.map((m) => (
-                  <SelectItem key={m.key} value={m.key}>
-                    {m.label}
+                {options.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name} ({p.vendor})
                   </SelectItem>
                 ))}
               </SelectContent>
