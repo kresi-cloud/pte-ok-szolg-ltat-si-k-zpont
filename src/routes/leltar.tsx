@@ -128,9 +128,8 @@ function Inventory() {
   const preview = hw.modelKey ? specForModel(hw.modelKey) : null;
   const needsLocation = Boolean(hw.modelKey) && !isMobileModel(hw.modelKey);
   const buildings = [...new Set(userLocations.map((l) => l.building))];
-  const rooms = userLocations
-    .filter((l) => l.building === hw.building)
-    .map((l) => `${l.room} (${LOCATION_KIND_LABELS[l.kind]})`);
+  const rooms = userLocations.filter((l) => l.building === hw.building);
+
 
 
   return (
