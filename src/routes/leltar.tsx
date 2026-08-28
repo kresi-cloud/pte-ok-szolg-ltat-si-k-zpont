@@ -18,7 +18,8 @@ import {
 import { useStore } from "@/lib/store";
 import { HARDWARE_MODELS, SOFTWARE_SUGGESTIONS, isMobileModel, specForModel } from "@/lib/inventory-data";
 import { needsLocationForCategory, productModelLabel } from "@/lib/handover-products";
-import { ASSET_LOCATIONS } from "@/lib/asset-data";
+import { LOCATION_KIND_LABELS } from "@/lib/asset-types";
+import { locationsForUser } from "@/lib/asset-logic";
 import { INVENTORY_STATUS_LABELS, type InventoryItem } from "@/lib/types";
 import { MyAssets, MyLicences, SharedAssets } from "@/components/personal-assets";
 import { PageHeading } from "@/components/page-heading";
