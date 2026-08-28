@@ -172,6 +172,8 @@ export interface Asset {
   deviceId: string;
   categoryKey: AssetCategoryKey;
   modelKey: string;
+  /** a beszerzői katalógus tétele, ha onnan érkezett az eszköz */
+  productId?: string | undefined;
   serial: string;
   usage: AssetUsageType;
   /** személyhez rendelt eszköz használója */
