@@ -1564,19 +1564,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setState((s) => {
         const h = (s.handovers ?? []).find((x) => x.id === id);
         if (!h) return s;
+        const catalogCtx = {
+          products: s.products ?? [],
+          categories: s.productCategories ?? [],
+          requests: s.requests,
+        };
+        const catalogProduct = productForHandover(h, catalogCtx);
         const invId = `inv-${Date.now()}`;
         const item: InventoryItem = {
           id: invId,
           ownerId: h.recipientId,
           kind: "hardver",
-          name: h.deviceName,
+          name: handoverPurposeTitle(h, catalogCtx),
           modelKey: h.modelKey,
+          productId: catalogProduct?.id,
           serial: h.serial,
           inventoryNo: h.inventoryNo,
           building: h.building,
           room: h.room,
           note: `Beszerzési folyamatból átvéve (${h.planItemId})${h.note ? ` · ${h.note}` : ""}`,
-          spec: specForModel(h.modelKey),
+          spec: catalogProduct ? specFromProduct(catalogProduct) : specForModel(h.modelKey),
           status: "jovahagyva",
           createdAt: today(),
           decidedAt: today(),
