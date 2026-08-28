@@ -1095,6 +1095,8 @@ function hwDetails(s: Seed) {
 
 function buildRequest(s: Seed): ServiceRequest {
   const hw = hwDetails(s);
+  const cost = hw ? hw.cost : s.cost;
+  const goalText = hw ? hw.goal : s.goal;
   const unit = ORG_UNITS.find((o) => o.id === s.orgUnitId)!;
   const approverId = unit.approverUserId ?? "u-nagy";
   const approvals: Approval[] = [];
@@ -1107,7 +1109,7 @@ function buildRequest(s: Seed): ServiceRequest {
       appr(1, "Szervezeti jóváhagyó", approverId, "jovahagyva", s.createdAt, "Támogatom."),
     );
     approvals.push(appr(2, "Szolgáltatásgazda", "u-nemeth", "jovahagyva", s.updatedAt));
-    if ((s.cost ?? 0) > 500000) {
+    if ((cost ?? 0) > 500000) {
       approvals.push(appr(3, "Költségkeret-gazda", "u-farkas", "jovahagyva", s.updatedAt));
     }
   } else if (s.status === "elutasitva") {
@@ -1118,7 +1120,7 @@ function buildRequest(s: Seed): ServiceRequest {
   }
 
   const messages: RequestMessage[] = [
-    msg(s.requesterId, s.createdAt, s.goal),
+    msg(s.requesterId, s.createdAt, goalText),
   ];
   if (s.assigneeId) {
     messages.push(
@@ -1148,10 +1150,17 @@ function buildRequest(s: Seed): ServiceRequest {
 
   return {
     id: s.id,
-    title: s.title,
+    title: hw ? hw.title : s.title,
     domain: s.domain,
     catalogItemId: s.catalogItemId,
-    goal: s.goal,
+    goal: goalText,
+    productCategoryId: hw?.category?.id,
+    productId: hw?.product.id,
+    quantity: hw?.qty,
+    requestReason: hw?.personalUse ? s.reason : undefined,
+    requestReasonNote: hw?.personalUse ? s.reasonNote : undefined,
+    workLocationId: hw?.personalUse ? s.workLocationId : undefined,
+    handoverMode: hw?.personalUse ? s.handoverMode : undefined,
     requesterId: s.requesterId,
     orgUnitId: s.orgUnitId,
     teamId: s.teamId,
@@ -1161,15 +1170,15 @@ function buildRequest(s: Seed): ServiceRequest {
     createdAt: s.createdAt,
     updatedAt: s.updatedAt,
     dueDate: s.dueDate,
-    estimatedCost: s.cost,
-    effortDays: s.cost ? Math.max(2, Math.round(s.cost / 150000)) : 3,
+    estimatedCost: cost,
+    effortDays: cost ? Math.max(2, Math.round(cost / 150000)) : 3,
     nextStep: s.next,
-    users: "Intézeti munkatársak",
-    userCount: s.domain === "digitalizacio" ? "50–200 fő" : "1–10 fő",
-    personalData: s.domain === "digitalizacio" || s.domain === "web",
-    integration: s.domain === "digitalizacio" ? "Neptun, Microsoft 365" : "Nem szükséges",
-    recurring: s.domain === "hardver" ? "Egyszeri igény" : "Tartós szolgáltatás",
-    budget: s.cost ? `${(s.cost / 1000).toLocaleString("hu-HU")} eFt keret` : "Nincs megadva",
+    users: hw?.personalUse ? "Igénylő személyes használat" : "Intézeti munkatársak",
+    userCount: hw?.personalUse ? "1 fő" : "1–10 fő",
+    personalData: false,
+    integration: "Nem szükséges",
+    recurring: "Egyszeri igény",
+    budget: cost ? `${(cost / 1000).toLocaleString("hu-HU")} eFt keret` : "Nincs megadva",
     slaRisk: s.slaRisk,
     projectId: s.projectId,
     messages,
@@ -1211,20 +1220,20 @@ function buildRequest(s: Seed): ServiceRequest {
               : "Licenc és hozzáférés",
       team: TEAMS.find((t) => t.id === s.teamId)!.name,
       complexity:
-        (s.cost ?? 0) > 2000000 ? "összetett" : (s.cost ?? 0) > 300000 ? "közepes" : "egyszerű",
+        (cost ?? 0) > 2000000 ? "összetett" : (cost ?? 0) > 300000 ? "közepes" : "egyszerű",
       workflow:
-        (s.cost ?? 0) > 500000
+        (cost ?? 0) > 500000
           ? "Igénylő → szervezeti jóváhagyó → költségkeret-gazda → szolgáltatásgazda"
           : "Igénylő → szervezeti jóváhagyó → szolgáltatási csapat",
-      approvalNeeded: (s.cost ?? 0) > 0,
-      projectCandidate: (s.cost ?? 0) > 2000000,
+      approvalNeeded: (cost ?? 0) > 0,
+      projectCandidate: (cost ?? 0) > 2000000,
       confidence: 0.72 + ((s.id.length * 7) % 20) / 100,
     },
     internal: {
       classification: `${DOMAINS.find((d) => d.key === s.domain)!.name} / ${s.priority}`,
       dependencies:
         s.projectId ? "Kapcsolódik egy futó fejlesztési kezdeményezéshez." : "Nincs ismert függőség.",
-      procurement: (s.cost ?? 0) > 300000,
+      procurement: (cost ?? 0) > 300000,
       security: s.domain === "szoftver" ? "IT biztonsági ellenőrzés szükséges" : "Nem érintett",
       dataProtection:
         s.domain === "digitalizacio" || s.domain === "web"
