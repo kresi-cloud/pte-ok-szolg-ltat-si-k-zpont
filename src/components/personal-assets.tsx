@@ -177,7 +177,7 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
             : (product?.spec.storage ?? "—")}
         </Field>
         <Field label="Üzembe helyezés">
-          {asset.commissionDate} ({yearsSince(asset.commissionDate).toFixed(1)} év)
+          {asset.commissionDate} ({Math.max(0, yearsSince(asset.commissionDate)).toFixed(1)} év)
         </Field>
         <Field label="Garancia vége">
           {asset.warrantyEnd}
