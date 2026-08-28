@@ -203,7 +203,7 @@ function AssetDetail() {
               <Field label="Politika szerinti élettartam">
                 {policy.minYears}–{policy.maxYears} év (tervezés: {policy.plannedYears} év)
               </Field>
-              <Field label="Jelenlegi életkor">{yearsSince(asset.commissionDate).toFixed(1)} év</Field>
+              <Field label="Jelenlegi életkor">{Math.max(0, yearsSince(asset.commissionDate)).toFixed(1)} év</Field>
               <Field label="Életciklus vége">{lifecycleEnd(asset)}</Field>
               <Field label="Számított státusz">{lifecycleStatus(asset)}</Field>
               <Field label="Csereprioritás">{replacementPriority(asset)}</Field>
