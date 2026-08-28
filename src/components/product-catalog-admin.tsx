@@ -298,7 +298,13 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
               </p>
             ) : (
               <ul className="space-y-3">
-                {catProducts.map((p) => (
+                {catProducts.map((p) => {
+                  const lock = productLockInfo(p.id, {
+                    requests: store.requests,
+                    planItems: store.planItems,
+                    handovers: store.handovers ?? [],
+                  });
+                  return (
                   <li key={p.id} className="card-surface p-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
@@ -307,6 +313,9 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                           {p.vendor} · {p.referencePrice.toLocaleString("hu-HU")} Ft ·{" "}
                           {p.spec.cpu} · {p.spec.ram} · {p.spec.storage}
                         </span>
+                        {lock.locked && (
+                          <span className="mt-1 block text-xs text-amber-700">{lock.reason}</span>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary">{TIER_LABELS[p.tier]} kategóriától</Badge>
