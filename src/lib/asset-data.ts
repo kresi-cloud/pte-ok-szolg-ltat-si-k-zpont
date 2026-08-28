@@ -111,19 +111,56 @@ export const FUNDING_SOURCES: FundingSource[] = [
 ];
 
 export const ASSET_LOCATIONS: AssetLocation[] = [
-  { id: "loc-dekani-1", building: "Központi épület", room: "Dékáni Hivatal 112.", orgUnitId: "ou-dekani" },
-  { id: "loc-dekani-2", building: "Központi épület", room: "Tárgyaló 118.", orgUnitId: "ou-dekani" },
-  { id: "loc-elettani-1", building: "Elméleti Tömb", room: "Élettani Intézet 214.", orgUnitId: "ou-elettani" },
-  { id: "loc-elettani-2", building: "Elméleti Tömb", room: "Élettani labor 03.", orgUnitId: "ou-elettani" },
-  { id: "loc-anatomiai-1", building: "Anatómiai épület", room: "Oktatói szoba 21.", orgUnitId: "ou-anatomiai" },
-  { id: "loc-anatomiai-2", building: "Anatómiai épület", room: "Gyakorlóterem A.", orgUnitId: "ou-anatomiai" },
-  { id: "loc-biokemiai-1", building: "Elméleti Tömb", room: "Biokémiai Intézet 305.", orgUnitId: "ou-biokemiai" },
-  { id: "loc-farmakologiai-1", building: "Elméleti Tömb", room: "Farmakológia 402.", orgUnitId: "ou-farmakologiai" },
-  { id: "loc-oktatas-1", building: "Központi épület", room: "Oktatásszervezés 007.", orgUnitId: "ou-oktatas" },
-  { id: "loc-oktatas-2", building: "Központi épület", room: "Számítógépes labor 1.", orgUnitId: "ou-oktatas" },
-  { id: "loc-kutatas-1", building: "Kutatóház", room: "Kutatástámogatás 12.", orgUnitId: "ou-kutatas" },
-  { id: "loc-klinikai-1", building: "Klinikai Tömb", room: "Együttműködési iroda 4.", orgUnitId: "ou-klinikai" },
+  // Dékáni Hivatal
+  { id: "loc-dekani-1", building: "Központi épület", room: "Dékáni Hivatal 112.", kind: "iroda", orgUnitId: "ou-dekani", primaryUserIds: ["u-dekan"] },
+  { id: "loc-dekani-2", building: "Központi épület", room: "Tárgyaló 118.", kind: "iroda", orgUnitId: "ou-dekani" },
+  { id: "loc-dekani-3", building: "Központi épület", room: "Dékánhelyettesi iroda 114.", kind: "iroda", orgUnitId: "ou-dekani", primaryUserIds: ["u-feher"] },
+  { id: "loc-dekani-4", building: "Központi épület", room: "Hivatalvezetői iroda 110.", kind: "iroda", orgUnitId: "ou-dekani", primaryUserIds: ["u-nagy"] },
+  { id: "loc-dekani-5", building: "Központi épület", room: "Gazdasági vezetői iroda 121.", kind: "iroda", orgUnitId: "ou-dekani", primaryUserIds: ["u-gazdvez"] },
+  { id: "loc-dekani-6", building: "Központi épület", room: "Beszerzési iroda 124.", kind: "iroda", orgUnitId: "ou-dekani", primaryUserIds: ["u-beszerzo", "u-farkas"] },
+  { id: "loc-dekani-7", building: "Központi épület", room: "Szolgáltatási ügyfélszolgálat 105.", kind: "iroda", orgUnitId: "ou-dekani", primaryUserIds: ["u-horvath", "u-molnar"] },
+  { id: "loc-dekani-8", building: "Központi épület", room: "Web és digitalizációs iroda 131.", kind: "iroda", orgUnitId: "ou-dekani", primaryUserIds: ["u-balogh", "u-nemeth"] },
+  { id: "loc-dekani-9", building: "Központi épület", room: "Eszközmenedzsment iroda 128.", kind: "iroda", orgUnitId: "ou-dekani", primaryUserIds: ["u-kiss"] },
+
+  // IT egység
+  { id: "loc-it-1", building: "Központi épület", room: "IT szervizműhely 002.", kind: "muhely", orgUnitId: "ou-it", primaryUserIds: ["u-eszkozmgr"] },
+  { id: "loc-it-2", building: "Központi épület", room: "IT eszközraktár 004.", kind: "muhely", orgUnitId: "ou-it" },
+
+  // Élettani Intézet
+  { id: "loc-elettani-1", building: "Elméleti Tömb", room: "Élettani Intézet 214.", kind: "iroda", orgUnitId: "ou-elettani", primaryUserIds: ["u-kovacs"] },
+  { id: "loc-elettani-2", building: "Elméleti Tömb", room: "Élettani labor 03.", kind: "labor", orgUnitId: "ou-elettani" },
+  { id: "loc-elettani-3", building: "Elméleti Tömb", room: "Intézetigazgatói iroda 210.", kind: "iroda", orgUnitId: "ou-elettani", primaryUserIds: ["u-szabo"] },
+  { id: "loc-elettani-4", building: "Elméleti Tömb", room: "Élettani IT műhely 216.", kind: "muhely", orgUnitId: "ou-elettani", primaryUserIds: ["u-itref"] },
+
+  // Anatómiai Intézet
+  { id: "loc-anatomiai-1", building: "Anatómiai épület", room: "Oktatói szoba 21.", kind: "iroda", orgUnitId: "ou-anatomiai" },
+  { id: "loc-anatomiai-2", building: "Anatómiai épület", room: "Gyakorlóterem A.", kind: "labor", orgUnitId: "ou-anatomiai" },
+  { id: "loc-anatomiai-3", building: "Anatómiai épület", room: "Intézetigazgatói iroda 12.", kind: "iroda", orgUnitId: "ou-anatomiai", primaryUserIds: ["u-fekete"] },
+  { id: "loc-anatomiai-4", building: "Anatómiai épület", room: "Preparáló műhely 05.", kind: "muhely", orgUnitId: "ou-anatomiai" },
+
+  // Biokémiai Intézet
+  { id: "loc-biokemiai-1", building: "Elméleti Tömb", room: "Biokémiai Intézet 305.", kind: "iroda", orgUnitId: "ou-biokemiai" },
+  { id: "loc-biokemiai-2", building: "Elméleti Tömb", room: "Intézetigazgatói iroda 301.", kind: "iroda", orgUnitId: "ou-biokemiai", primaryUserIds: ["u-varga"] },
+  { id: "loc-biokemiai-3", building: "Elméleti Tömb", room: "Analitikai labor 308.", kind: "labor", orgUnitId: "ou-biokemiai" },
+
+  // Farmakológiai Intézet
+  { id: "loc-farmakologiai-1", building: "Elméleti Tömb", room: "Farmakológia 402.", kind: "iroda", orgUnitId: "ou-farmakologiai" },
+  { id: "loc-farmakologiai-2", building: "Elméleti Tömb", room: "Intézetigazgatói iroda 400.", kind: "iroda", orgUnitId: "ou-farmakologiai", primaryUserIds: ["u-toth"] },
+  { id: "loc-farmakologiai-3", building: "Elméleti Tömb", room: "Farmakológiai labor 407.", kind: "labor", orgUnitId: "ou-farmakologiai" },
+
+  // Oktatásszervezés
+  { id: "loc-oktatas-1", building: "Központi épület", room: "Oktatásszervezés 007.", kind: "iroda", orgUnitId: "ou-oktatas", primaryUserIds: ["u-simon"] },
+  { id: "loc-oktatas-2", building: "Központi épület", room: "Számítógépes labor 1.", kind: "labor", orgUnitId: "ou-oktatas" },
+
+  // Kutatástámogatás
+  { id: "loc-kutatas-1", building: "Kutatóház", room: "Kutatástámogatás 12.", kind: "iroda", orgUnitId: "ou-kutatas", primaryUserIds: ["u-lukacs"] },
+  { id: "loc-kutatas-2", building: "Kutatóház", room: "Kutatási labor 07.", kind: "labor", orgUnitId: "ou-kutatas" },
+
+  // Klinikai együttműködés
+  { id: "loc-klinikai-1", building: "Klinikai Tömb", room: "Együttműködési iroda 4.", kind: "iroda", orgUnitId: "ou-klinikai" },
+  { id: "loc-klinikai-2", building: "Klinikai Tömb", room: "Klinikai oktatólabor 9.", kind: "labor", orgUnitId: "ou-klinikai" },
 ];
+
 
 const feat = (...f: string[]) => f;
 
