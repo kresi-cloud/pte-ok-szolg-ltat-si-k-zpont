@@ -1109,6 +1109,8 @@ export const EN_DICT: Record<string, string> = {
   "Az adat hibás": "The data is incorrect",
   "Az igény útja": "The path of the request",
   "Az ügy jelenleg nála van": "The case is currently with",
+  "Minden jóváhagyó döntött.": "All approvers have decided.",
+  "Még nincs jóváhagyási döntés.": "No approval decision yet.",
   "Az ügy lezárult": "The case is closed",
   "Nincs aktív felelőse, a folyamat befejeződött.": "There is no active owner; the process has finished.",
   "Szolgáltatási ügyintéző / beszerző – beszerzési tervsor létrehozására vár.": "Service staff / buyer – waiting for the procurement plan item to be created.",
