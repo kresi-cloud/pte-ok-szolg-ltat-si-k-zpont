@@ -160,15 +160,21 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
 
       <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Field label="Operációs rendszer">
-          {spec?.os ?? "—"} {spec?.osVersion ?? ""}
+          {spec?.os ?? product?.spec.os ?? "—"} {spec?.osVersion ?? product?.spec.osVersion ?? ""}
         </Field>
         <Field label="Processzor">
-          {spec?.processor ? `${spec.processor.name} · ${spec.processor.cores} mag` : "—"}
+          {spec?.processor
+            ? `${spec.processor.name} · ${spec.processor.cores} mag`
+            : (product?.spec.cpu ?? "—")}
         </Field>
         <Field label="Memória">
-          {spec?.memory ? `${spec.memory.capacityGb} GB ${spec.memory.type}` : "—"}
+          {spec?.memory ? `${spec.memory.capacityGb} GB ${spec.memory.type}` : (product?.spec.ram ?? "—")}
         </Field>
-        <Field label="Tároló">{spec?.storage ? `${spec.storage.capacity} ${spec.storage.type}` : "—"}</Field>
+        <Field label="Tároló">
+          {spec?.storage
+            ? `${spec.storage.capacity} ${spec.storage.type}`
+            : (product?.spec.storage ?? "—")}
+        </Field>
         <Field label="Üzembe helyezés">
           {asset.commissionDate} ({yearsSince(asset.commissionDate).toFixed(1)} év)
         </Field>
