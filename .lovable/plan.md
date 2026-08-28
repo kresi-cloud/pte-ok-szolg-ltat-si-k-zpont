@@ -9,13 +9,21 @@ Az igényrészletes oldal (`/igeny/$id`) Folyamat fülén, az "Az igény útja" 
 ## Jelenlegi állapot
 
 - A Folyamat fülön van egy állapot-idővonal ("Az igény útja") és egy "Beszerzési szakasz" lista.
-- A függő jóváhagyók neve már megjelenik a beszerzési szakasz első sorának apró betűs részletében (`pendingApprovers`), de a beszerzési/átadási szakaszoknál nincs felelős megjelenítve, és nincs egységes, jól látható "kinél az ügy" jelzés.
+- A függő jóváhagyók neve már megjelenik a beszerzési szakasz első sorának apró betűs részletében (`pendingApprovers`) – ez az igénylőnek is látszik, ezért ezt is el kell rejteni.
+- A beszerzési/átadási szakaszoknál nincs felelős megjelenítve, és nincs egységes, jól látható "kinél az ügy" jelzés.
+
+## Láthatósági szabály
+
+Az aktuális felelőst megmutató panel és a szakaszonkénti felelősnevek csak akkor jelennek meg, ha az aktuális felhasználó az ügy kezelésében érintett vagy vezető:
+
+- **Látja:** `ugyintezo`, `szolgaltatasgazda`, `admin`, `beszerzo`, `eszkozmenedzser`, `gazdasagi_vezeto`, `it_referens`, `vezeto`, `dekan`, továbbá az igény jóváhagyási láncában szereplő `jovahagyo` (aki az ügy jóváhagyója vagy az volt).
+- **Nem látja:** az igénylő és minden más felhasználó – számára a Folyamat fül a jelenlegi, név nélküli idővonalat mutatja (a felelősneveket tartalmazó részletsorok is rejtve).
 
 ## Megvalósítás
 
 ### 1. "Az ügy jelenleg nála van" kiemelt panel – `src/routes/igeny.$id.tsx`
 
-Az "Az igény útja" cím alá egy kiemelt sáv (kártya a szakasz tetején), amely az aktuális szakaszhoz tartozó személy(ek)et mutatja:
+Az "Az igény útja" cím alá egy kiemelt sáv (csak a fenti jogosult szerepköröknek), amely az aktuális szakaszhoz tartozó személy(ek)et mutatja:
 
 ```text
 ┌──────────────────────────────────────────────────┐
