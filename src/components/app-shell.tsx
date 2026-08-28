@@ -81,9 +81,25 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [searchOpen, setSearchOpen] = useState(false);
 
+  /** Rá váró döntés esetén a jóváhagyási sor a szerepkörtől függetlenül elérhető. */
+  const hasPendingApproval = useMemo(
+    () =>
+      store.requests.some((r) =>
+        r.approvals.some(
+          (a) => a.decision === "fuggoben" && a.approverId === store.currentUser.id,
+        ),
+      ),
+    [store.requests, store.currentUser.id],
+  );
+
   const items = useMemo(
-    () => NAV.filter((n) => n.roles.includes(store.activeRole)),
-    [store.activeRole],
+    () =>
+      NAV.filter(
+        (n) =>
+          n.roles.includes(store.activeRole) ||
+          (n.to === "/jovahagyasok" && hasPendingApproval),
+      ),
+    [store.activeRole, hasPendingApproval],
   );
 
   if (!store.loggedIn) return <LoginScreen />;
