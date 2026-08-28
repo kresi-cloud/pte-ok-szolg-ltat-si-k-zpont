@@ -1325,7 +1325,7 @@ export const EN_DICT: Record<string, string> = {
   "Műhely": "Workshop",
   "Labor": "Laboratory",
   "Munkatársak": "Staff",
-  "Szervezeti egység": "Organisational unit",
+  
   "Helyiségleltár: minden szervezeti egységhez tartozó iroda, műhely és labor, a hozzájuk rendelt munkatársakkal és az ott nyilvántartott eszközök számával.":
     "Room inventory: every office, workshop and laboratory per organisational unit, with the assigned staff and the number of registered assets.",
   "IT Szolgáltatási Egység": "IT Services Unit",
