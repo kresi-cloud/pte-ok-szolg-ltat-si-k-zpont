@@ -19,6 +19,7 @@ import {
   replacementPriority,
   yearsSince,
 } from "@/lib/asset-logic";
+import { productModelLabel } from "@/lib/handover-products";
 import { Field, LicenceBadge, LifecycleBadge, PriorityBadge, StatTile } from "@/components/asset-bits";
 import {
   PERSONAL_CHECK_LABELS,
