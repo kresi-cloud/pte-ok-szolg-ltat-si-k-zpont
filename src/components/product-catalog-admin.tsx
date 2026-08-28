@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useStore } from "@/lib/store";
 import { TIERS, TIER_LABELS } from "@/lib/product-catalog";
+import { productLockInfo } from "@/lib/product-lock";
 import type { EmployeeTier, Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
