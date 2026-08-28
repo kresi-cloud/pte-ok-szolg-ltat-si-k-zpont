@@ -505,6 +505,8 @@ export interface AssetHandover {
   /** a helyi IT referens, aki telepíti és átadja */
   referentId?: string | undefined;
   deviceName: string;
+  /** a beszerzői katalógus tétele, amelyből a műszaki adatok származnak */
+  productId?: string | undefined;
   /** eszközfelismerési modellkulcs (a műszaki adatok forrása) */
   modelKey?: string | undefined;
   serial?: string | undefined;
