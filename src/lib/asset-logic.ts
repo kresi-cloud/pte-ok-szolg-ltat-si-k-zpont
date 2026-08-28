@@ -34,6 +34,11 @@ export const assetLookup = {
     const l = ASSET_LOCATIONS.find((x) => x.id === id);
     return l ? `${l.building} · ${l.room}` : "—";
   },
+  locationKindLabel: (id: string) => {
+    const l = ASSET_LOCATIONS.find((x) => x.id === id);
+    return l ? LOCATION_KIND_LABELS[l.kind] : "—";
+  },
+
   standard: (key?: string) => HARDWARE_STANDARDS.find((s) => s.key === key),
   price: (id: string) => REFERENCE_PRICES.find((p) => p.id === id),
   funding: (id: string) => FUNDING_SOURCES.find((f) => f.id === id)?.name ?? "—",
