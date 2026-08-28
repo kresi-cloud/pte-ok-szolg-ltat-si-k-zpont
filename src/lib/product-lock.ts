@@ -24,7 +24,7 @@ export function productLockInfo(productId: string, ctx: ProductLockContext): Pro
     (r) => r.productId === productId && !CLOSED_REQUEST_STATUSES.includes(r.status),
   ).length;
   const openPlanItems = (ctx.planItems ?? []).filter(
-    (p) => p.productId === productId && p.status !== "teljesult" && p.status !== "elutasitva",
+    (p) => p.productId === productId && p.status !== "teljesult",
   ).length;
   const openHandovers = (ctx.handovers ?? []).filter(
     (h) => h.productId === productId && h.status !== "atvetel_igazolva",
