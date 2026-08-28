@@ -658,6 +658,42 @@ function RequestDetail() {
         <TabsContent value="folyamat">
           <section className="card-surface p-6">
             <h2 className="font-display text-base font-semibold">Az igény útja</h2>
+            {canSeeOwner && (
+              <div
+                className={cn(
+                  "mt-4 rounded-md border p-4",
+                  ownerInfo.kind === "closed"
+                    ? "border-border bg-secondary/50"
+                    : "border-primary/30 bg-primary/5",
+                )}
+              >
+                <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <UserRound className="size-3.5" aria-hidden="true" />
+                  {ownerInfo.kind === "closed" ? "Az ügy lezárult" : "Az ügy jelenleg nála van"}
+                </p>
+                {ownerInfo.kind === "people" && (
+                  <ul className="mt-2 space-y-2">
+                    {ownerInfo.people.map((p) => (
+                      <li key={`${p.name}-${p.role}`} className="text-sm">
+                        <span className="font-semibold">{p.name}</span>
+                        <span className="text-muted-foreground"> – {p.role}</span>
+                        {p.note && (
+                          <span className="block text-xs text-muted-foreground">{p.note}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {ownerInfo.kind === "message" && (
+                  <p className="mt-2 text-sm">{ownerInfo.text}</p>
+                )}
+                {ownerInfo.kind === "closed" && (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Nincs aktív felelőse, a folyamat befejeződött.
+                  </p>
+                )}
+              </div>
+            )}
             <ol className="mt-6 space-y-0">
               {TIMELINE.map((s, i) => {
                 const done = currentIndex >= 0 && i < currentIndex;
