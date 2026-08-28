@@ -77,7 +77,8 @@ function ApprovalQueue() {
 
   const rows = tab === "sajat" ? myPending : tab === "fuggo" ? allPending : risky;
 
-  const canApprove = store.activeRole !== "igenylo";
+  // Igénylő szerepkörben is dönthet, ha személy szerint rá vár jóváhagyás.
+  const canApprove = store.activeRole !== "igenylo" || myPending.length > 0;
 
   const decide = (r: ServiceRequest, decision: "jovahagyva" | "elutasitva") => {
     const mine = r.approvals.find(
