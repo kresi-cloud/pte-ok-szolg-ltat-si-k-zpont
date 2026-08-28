@@ -21,7 +21,8 @@ import {
   productForHandover,
   specFromProduct,
 } from "@/lib/handover-products";
-import { ASSET_LOCATIONS } from "@/lib/asset-data";
+import { LOCATION_KIND_LABELS } from "@/lib/asset-types";
+import { locationsForUser } from "@/lib/asset-logic";
 import {
   ATTACHMENT_KIND_LABELS,
   HANDOVER_CHECKLIST,
