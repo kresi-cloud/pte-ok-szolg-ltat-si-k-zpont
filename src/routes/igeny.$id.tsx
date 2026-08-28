@@ -761,7 +761,7 @@ function RequestDetail() {
                   </span>
                   <span>
                     <span className={s.done ? "font-medium" : "text-muted-foreground"}>{s.label}</span>
-                    {s.detail && (
+                    {s.detail && (!s.sensitive || canSeeOwner) && (
                       <span className="block text-xs text-muted-foreground">{s.detail}</span>
                     )}
                   </span>
