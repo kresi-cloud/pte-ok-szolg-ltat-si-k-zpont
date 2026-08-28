@@ -10,6 +10,7 @@ import {
   MessageSquare,
   Paperclip,
   Star,
+  UserRound,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,10 +30,14 @@ import { lookup, useStore } from "@/lib/store";
 import {
   HANDOVER_MODE_LABELS,
   REQUEST_REASON_LABELS,
+  ROLE_LABELS,
   STATUS_LABELS,
   STATUS_ORDER,
+  type RoleKey,
   type StatusKey,
 } from "@/lib/types";
+import { PLAN_APPROVAL_STATUS_LABELS } from "@/lib/asset-types";
+import { daysUntil } from "@/lib/plan-approvals";
 import { ASSET_LOCATIONS, ASSET_MODELS } from "@/lib/asset-data";
 import { similarAssetsFor } from "@/lib/similar-assets";
 import { SimilarAssetNotice } from "@/components/similar-asset-notice";
