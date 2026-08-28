@@ -116,8 +116,16 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
   const hasPhoto = attachments.some((a) => a.kind === "fenykep");
   const requiredDone = missingRequired.length === 0;
 
-  const spec = modelKey ? specForModel(modelKey) : undefined;
-  const needsLocation = Boolean(modelKey) && !isMobileModel(modelKey);
+  const options = handoverProductOptions(handover, catalogCtx);
+  const category = categoryForHandover(handover, catalogCtx);
+  const selectedProduct = options.find((p) => p.id === productId);
+  const modelKey = selectedProduct?.modelKey ?? handover.modelKey ?? "";
+  const spec = selectedProduct
+    ? specFromProduct(selectedProduct)
+    : modelKey
+      ? specForModel(modelKey)
+      : undefined;
+  const needsLocation = Boolean(productId) && needsLocationForCategory(category);
   const buildings = [...new Set(ASSET_LOCATIONS.map((l) => l.building))];
   const rooms = ASSET_LOCATIONS.filter((l) => l.building === building).map((l) => l.room);
   const done = handover.status === "atadva" || handover.status === "atvetel_igazolva";
