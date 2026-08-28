@@ -81,3 +81,25 @@ export function specFromProduct(product: Product): HardwareSpec {
 export function needsLocationForCategory(category?: ProductCategory): boolean {
   return category ? category.personalUse !== true : false;
 }
+
+/** A katalógustétel megjelenítendő modellcímkéje (név + gyártó). */
+export function productModelLabel(product: Product): string {
+  return product.vendor ? `${product.name} · ${product.vendor}` : product.name;
+}
+
+/**
+ * A leltártétel megnevezése: a felhasználási célt tükrözi (az eredeti igény
+ * címe), nem a modellnevet. Tartalék: a termékkör neve, majd az eszköznév.
+ */
+export function handoverPurposeTitle(
+  handover: Pick<AssetHandover, "productId" | "requestId" | "deviceName">,
+  ctx: HandoverCatalogContext,
+): string {
+  const request = handover.requestId
+    ? ctx.requests.find((r) => r.id === handover.requestId)
+    : undefined;
+  if (request?.title?.trim()) return request.title.trim();
+  const category = categoryForHandover(handover, ctx);
+  if (category) return category.name;
+  return handover.deviceName;
+}
