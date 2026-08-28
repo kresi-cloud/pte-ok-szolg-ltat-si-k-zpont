@@ -16,7 +16,7 @@ import type { DomainKey, HandoverMode, RequestReason } from "@/lib/types";
 import { HANDOVER_MODE_LABELS, REQUEST_REASON_LABELS } from "@/lib/types";
 import { ASSET_MODELS } from "@/lib/asset-data";
 import { LOCATION_KIND_LABELS } from "@/lib/asset-types";
-import { locationsForUser } from "@/lib/asset-logic";
+import { defaultLocationForUser, locationsForUser } from "@/lib/asset-logic";
 import { tierOf, visibleCategories, visibleProducts } from "@/lib/product-catalog";
 import { similarAssetsFor } from "@/lib/similar-assets";
 import { SimilarAssetNotice } from "@/components/similar-asset-notice";
