@@ -1,19 +1,29 @@
-# "Az igény útja" – az ügy aktuális gazdájának megjelenítése
+# "Az igény útja" – az ügy aktuális gazdájának megjelenítése (korlátozott láthatósággal)
 
 ## Cél
 
-Az igényrészletes oldal (`/igeny/$id`) Folyamat fülén, az "Az igény útja" felületen mindig látszódjon, hogy **konkrétan kinél tart az ügy** – névvel és szerepkörrel, a folyamat aktuális szakaszától függően.
+Az igényrészletes oldal (`/igeny/$id`) Folyamat fülén, az "Az igény útja" felületen látszódjon, hogy **konkrétan kinél tart az ügy** – névvel és szerepkörrel, a folyamat aktuális szakaszától függően.
+
+**Láthatóság:** az aktuális felelőst (és a szakaszonkénti felelősneveket) csak az ügyért felelős szerepkörök és a vezetők látják; az átlagos igénylő számára ez az információ rejtve marad.
 
 ## Jelenlegi állapot
 
 - A Folyamat fülön van egy állapot-idővonal ("Az igény útja") és egy "Beszerzési szakasz" lista.
-- A függő jóváhagyók neve már megjelenik a beszerzési szakasz első sorának apró betűs részletében (`pendingApprovers`), de a beszerzési/átadási szakaszoknál nincs felelős megjelenítve, és nincs egységes, jól látható "kinél az ügy" jelzés.
+- A függő jóváhagyók neve már megjelenik a beszerzési szakasz első sorának apró betűs részletében (`pendingApprovers`) – ez az igénylőnek is látszik, ezért ezt is el kell rejteni.
+- A beszerzési/átadási szakaszoknál nincs felelős megjelenítve, és nincs egységes, jól látható "kinél az ügy" jelzés.
+
+## Láthatósági szabály
+
+Az aktuális felelőst megmutató panel és a szakaszonkénti felelősnevek csak akkor jelennek meg, ha az aktuális felhasználó az ügy kezelésében érintett vagy vezető:
+
+- **Látja:** `ugyintezo`, `szolgaltatasgazda`, `admin`, `beszerzo`, `eszkozmenedzser`, `gazdasagi_vezeto`, `it_referens`, `vezeto`, `dekan`, továbbá az igény jóváhagyási láncában szereplő `jovahagyo` (aki az ügy jóváhagyója vagy az volt).
+- **Nem látja:** az igénylő és minden más felhasználó – számára a Folyamat fül a jelenlegi, név nélküli idővonalat mutatja (a felelősneveket tartalmazó részletsorok is rejtve).
 
 ## Megvalósítás
 
 ### 1. "Az ügy jelenleg nála van" kiemelt panel – `src/routes/igeny.$id.tsx`
 
-Az "Az igény útja" cím alá egy kiemelt sáv (kártya a szakasz tetején), amely az aktuális szakaszhoz tartozó személy(ek)et mutatja:
+Az "Az igény útja" cím alá egy kiemelt sáv (csak a fenti jogosult szerepköröknek), amely az aktuális szakaszhoz tartozó személy(ek)et mutatja:
 
 ```text
 ┌──────────────────────────────────────────────────┐
@@ -32,9 +42,10 @@ A szakaszonkénti feloldási sorrend (az első teljesülő szabály nyer):
 5. **Átadás folyamatban** (`handover` létezik, de nem `atvetel_igazolva`): státusz szerint az IT referens (`handover.referentId`, telepítés/átadás) vagy az igénylő (`handover.recipientId`, átvételi visszaigazolásra vár).
 6. **Lezárva / elutasítva / visszavonva**: nincs aktív gazda – "Az ügy lezárult" jelzés.
 
-### 2. Beszerzési szakasz sorainak kiegészítése
+### 2. Beszerzési szakasz sorainak kiegészítése és takarása
 
-A meglévő `procurementTrack` sorok `detail` mezője minden szakasznál tartalmazza a felelős nevét (nem csak az első sornál), pl. "Beszerzés folyamatban – Beszerző neve", "Telepítés – IT referens neve".
+- A meglévő `procurementTrack` sorok `detail` mezője minden szakasznál tartalmazza a felelős nevét (nem csak az első sornál), pl. "Beszerzés folyamatban – Beszerző neve", "Telepítés – IT referens neve".
+- A felelősnevet tartalmazó részletsorok (beleértve a meglévő "Döntésre vár: …" sort is) csak a jogosult szerepköröknek renderelődnek; az igénylő a részletek nélküli, semleges listát látja.
 
 ### 3. Fordítások – `src/lib/i18n/dictionary.ts`
 
@@ -43,12 +54,15 @@ Az összes új felirat ("Az ügy jelenleg nála van", "döntésre vár", "átvé
 ## Technikai részletek
 
 - Csak `src/routes/igeny.$id.tsx` és `src/lib/i18n/dictionary.ts` módosul; segédfüggvény (pl. `currentOwnerOf(request, store)`) a komponensen belül vagy `src/lib/` segédmodulban.
+- A jogosultságot egy `canSeeOwner` feltétel adja: `fullView` (ügyintéző/szolgáltatásgazda/admin/vezető/dékán) vagy az aktív szerepkör `beszerzo`/`eszkozmenedzser`/`gazdasagi_vezeto`/`it_referens`, illetve a felhasználó szerepel az igény `approvals` listájában.
 - Névfeloldás a meglévő `lookup.userName()` / `lookup.unit()` segédekkel; a szerepkör-felhasználókat a `store.users` szerepkörlista alapján keressük (első találat elegendő a demóhoz).
 - Nincs adatmodell- vagy store-változás; a meglévő `approvals`, `planItems`, `planApprovals`, `handovers` adatok elegendők.
 
 ## Ellenőrzés
 
-- Beküldött, jóváhagyásra váró igénynél a jóváhagyó neve látszik.
-- Dékáni tervjóváhagyásra váró tételnél a dékán neve és a határidő látszik.
-- Átadás alatt álló eszköznél az IT referens, átvételre várva az igénylő neve látszik.
+- Igénylőként megnyitva az igényt: a Folyamat fülön nem jelenik meg sem a felelőspanel, sem nevet tartalmazó részletsor.
+- Ügyintéző/dékán/beszerző/IT referens szerepkörben a felelőspanel látszik:
+  - jóváhagyásra váró igénynél a jóváhagyó neve;
+  - dékáni tervjóváhagyásra váró tételnél a dékán neve és a határidő;
+  - átadás alatt álló eszköznél az IT referens, átvételre várva az igénylő neve.
 - Angol nyelvváltás után is helyes feliratok.
