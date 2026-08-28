@@ -136,6 +136,7 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
       {
         serial: serial || undefined,
         inventoryNo: inventoryNo || undefined,
+        productId: productId || undefined,
         modelKey: modelKey || undefined,
         building: needsLocation ? building || undefined : undefined,
         room: needsLocation ? room || undefined : undefined,
