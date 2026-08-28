@@ -5,10 +5,12 @@ import type {
   AuditEvent,
   CatalogItem,
   DomainKey,
+  HandoverMode,
   OrgUnit,
   Priority,
   Project,
   RequestMessage,
+  RequestReason,
   ResponsibilityRow,
   ServiceDomain,
   ServiceRequest,
@@ -16,6 +18,10 @@ import type {
   StatusKey,
   User,
 } from "./types";
+import { HANDOVER_MODE_LABELS, REQUEST_REASON_LABELS } from "./types";
+import { INITIAL_PRODUCTS, INITIAL_PRODUCT_CATEGORIES } from "./product-catalog";
+import { ASSET_LOCATIONS } from "./asset-data";
+
 
 export const DOMAINS: ServiceDomain[] = [
   {
@@ -573,7 +579,15 @@ interface Seed {
   slaRisk?: boolean;
   projectId?: string;
   catalogItemId?: string;
+  /** Termékkatalógusból választott eszköz (eszközigénylésnél). */
+  productId?: string;
+  quantity?: number;
+  reason?: RequestReason;
+  reasonNote?: string;
+  workLocationId?: string;
+  handoverMode?: HandoverMode;
 }
+
 
 const seeds: Seed[] = [
   {
@@ -633,9 +647,9 @@ const seeds: Seed[] = [
   },
   {
     id: "HW-2026-0210",
-    title: "Notebook igénylés új oktatói munkakörhöz",
+    title: "",
     domain: "hardver",
-    goal: "Új kollégánk oktatási és kutatási munkájához hordozható munkaállomásra van szükség.",
+    goal: "",
     requesterId: "u-szabo",
     orgUnitId: "ou-elettani",
     teamId: "t-hw",
@@ -644,10 +658,12 @@ const seeds: Seed[] = [
     priority: "kozepes",
     createdAt: "2026-07-12",
     updatedAt: "2026-08-04",
-    dueDate: "2026-08-30",
-    cost: 690000,
-    next: "Beszerzési eljárás indítása.",
-    catalogItemId: "c-notebook",
+    next: "Beszerzési tervsor összeállítása.",
+    productId: "prod-dell-latitude-5540",
+    reason: "uj_belepo",
+    reasonNote: "Az új oktatói munkakör betöltése augusztus végén esedékes.",
+    workLocationId: "loc-elettani-1",
+    handoverMode: "munkavegzes",
   },
   {
     id: "SW-2026-0091",
@@ -688,9 +704,9 @@ const seeds: Seed[] = [
   },
   {
     id: "HW-2026-0198",
-    title: "Monitorcsere két oktatói szobában",
+    title: "",
     domain: "hardver",
-    goal: "Két elavult, villódzó monitor cseréje az intézeti oktatói szobákban.",
+    goal: "Két elavult, villódzó monitor cseréje az intézeti oktatói szobában.",
     requesterId: "u-fekete",
     orgUnitId: "ou-anatomiai",
     teamId: "t-hw",
@@ -699,10 +715,9 @@ const seeds: Seed[] = [
     priority: "alacsony",
     createdAt: "2026-06-11",
     updatedAt: "2026-06-28",
-    dueDate: "2026-06-30",
-    cost: 180000,
     next: "Lezárva, eszközök átadva.",
-    catalogItemId: "c-monitor",
+    productId: "prod-dell-p2725h",
+    quantity: 2,
   },
   {
     id: "DIG-2026-0034",
@@ -742,9 +757,9 @@ const seeds: Seed[] = [
   },
   {
     id: "HW-2026-0221",
-    title: "Nyomtató bővítés a hivatali irodában",
+    title: "",
     domain: "hardver",
-    goal: "A jelenlegi nyomtató nem bírja a féléves adminisztrációs terhelést.",
+    goal: "A hivatali iroda jelenlegi nyomtatója nem bírja a féléves adminisztrációs terhelést.",
     requesterId: "u-simon",
     orgUnitId: "ou-oktatas",
     teamId: "t-hw",
@@ -753,6 +768,7 @@ const seeds: Seed[] = [
     createdAt: "2026-08-08",
     updatedAt: "2026-08-08",
     next: "Beérkezett igény feldolgozásra vár.",
+    productId: "prod-hp-laserjet-m430",
   },
   {
     id: "WEB-2026-0156",
@@ -809,7 +825,7 @@ const seeds: Seed[] = [
   },
   {
     id: "HW-2026-0233",
-    title: "Munkaállomás csere a titkárságon",
+    title: "",
     domain: "hardver",
     goal: "A titkársági gép hét éves, lassú, a napi ügyintézést akadályozza.",
     requesterId: "u-varga",
@@ -820,10 +836,8 @@ const seeds: Seed[] = [
     priority: "kozepes",
     createdAt: "2026-08-02",
     updatedAt: "2026-08-07",
-    dueDate: "2026-09-20",
-    cost: 520000,
-    next: "Költségkeret-gazdai jóváhagyásra vár.",
-    catalogItemId: "c-workstation",
+    next: "Szervezeti jóváhagyásra vár.",
+    productId: "prod-hp-elitedesk-800-g9",
   },
   {
     id: "DIG-2026-0041",
@@ -944,9 +958,9 @@ const seeds: Seed[] = [
   },
   {
     id: "HW-2026-0180",
-    title: "Perifériák beszerzése a géptermbe",
+    title: "",
     domain: "hardver",
-    goal: "Billentyűzetek és egerek pótlása az oktatási gépteremben.",
+    goal: "Billentyűzet- és egérkészletek pótlása az oktatási gépteremben.",
     requesterId: "u-simon",
     orgUnitId: "ou-oktatas",
     teamId: "t-hw",
@@ -955,9 +969,9 @@ const seeds: Seed[] = [
     priority: "alacsony",
     createdAt: "2026-04-22",
     updatedAt: "2026-05-14",
-    dueDate: "2026-05-20",
-    cost: 240000,
     next: "Lezárva.",
+    productId: "prod-logitech-mk545",
+    quantity: 8,
   },
   {
     id: "DIG-2026-0026",
@@ -1011,25 +1025,78 @@ const seeds: Seed[] = [
   },
   {
     id: "HW-2026-0245",
-    title: "Kutatólabor munkaállomás bővítés",
+    title: "",
     domain: "hardver",
-    goal: "A képelemzéshez nagyobb memóriájú gépre van szükség.",
-    requesterId: "u-varga",
-    orgUnitId: "ou-biokemiai",
+    goal: "A kutatási képelemzéshez nagy memóriájú, dedikált GPU-val szerelt munkaállomásra van szükség.",
+    requesterId: "u-lukacs",
+    orgUnitId: "ou-kutatas",
     teamId: "t-hw",
     assigneeId: "u-kiss",
     status: "tervezes",
     priority: "magas",
     createdAt: "2026-07-31",
     updatedAt: "2026-08-09",
-    dueDate: "2026-09-25",
-    cost: 980000,
-    next: "Konfiguráció összeállítása.",
-    slaRisk: true,
+    next: "Beszerzési tervsor gazdasági ellenőrzése.",
+    productId: "prod-lenovo-p3-linux",
+  },
+  {
+    id: "HW-2026-0252",
+    title: "",
+    domain: "hardver",
+    goal: "",
+    requesterId: "u-toth",
+    orgUnitId: "ou-farmakologiai",
+    teamId: "t-hw",
+    status: "bekuldve",
+    priority: "kozepes",
+    createdAt: "2026-08-11",
+    updatedAt: "2026-08-11",
+    next: "Beérkezett igény feldolgozásra vár.",
+    productId: "prod-samsung-a56",
+    reason: "nincs_ilyen_eszkoz",
+    workLocationId: "loc-farmakologiai-1",
+    handoverMode: "ugyfelszolgalat",
   },
 ];
 
+/** Eszközigénylés szövegei a termékkatalógus alapján – az űrlappal azonos formátumban. */
+function hwDetails(s: Seed) {
+  const product = INITIAL_PRODUCTS.find((p) => p.id === s.productId);
+  if (!product) return null;
+  const category = INITIAL_PRODUCT_CATEGORIES.find((c) => c.id === product.categoryId);
+  const personalUse = category?.personalUse === true;
+  const qty = personalUse ? 1 : Math.max(1, s.quantity ?? 1);
+  const loc = (id?: string) => {
+    const l = ASSET_LOCATIONS.find((x) => x.id === id);
+    return l ? `${l.building} · ${l.room}` : "Nincs megadva";
+  };
+  const handoverLabel =
+    s.handoverMode === "ugyfelszolgalat"
+      ? HANDOVER_MODE_LABELS.ugyfelszolgalat
+      : `${HANDOVER_MODE_LABELS.munkavegzes} – ${loc(s.workLocationId)}`;
+  const title = `${category?.name ?? "Eszköz"} igénylés – ${product.name}${qty > 1 ? ` (${qty} db)` : ""}`;
+  const goal = [
+    `Igényelt eszköz: ${product.name} (${product.vendor}), ${qty} db.`,
+    `Termékkör: ${category?.name ?? "—"}.`,
+    `Konfiguráció: ${product.spec.cpu} · ${product.spec.ram} · ${product.spec.storage} · ${product.spec.os} ${product.spec.osVersion}.`,
+    ...(personalUse
+      ? [
+          s.reason ? `Igénylés indoka: ${REQUEST_REASON_LABELS[s.reason]}` : "",
+          s.reasonNote ? `Kiegészítés: ${s.reasonNote}` : "",
+          s.workLocationId ? `Munkavégzés helye: ${loc(s.workLocationId)}` : "",
+          `Kért átvételi hely: ${handoverLabel}`,
+        ]
+      : [s.goal ? `Indoklás: ${s.goal}` : ""]),
+  ]
+    .filter(Boolean)
+    .join("\n");
+  return { product, category, personalUse, qty, title, goal, cost: product.referencePrice * qty };
+}
+
 function buildRequest(s: Seed): ServiceRequest {
+  const hw = hwDetails(s);
+  const cost = hw ? hw.cost : s.cost;
+  const goalText = hw ? hw.goal : s.goal;
   const unit = ORG_UNITS.find((o) => o.id === s.orgUnitId)!;
   const approverId = unit.approverUserId ?? "u-nagy";
   const approvals: Approval[] = [];
@@ -1042,7 +1109,7 @@ function buildRequest(s: Seed): ServiceRequest {
       appr(1, "Szervezeti jóváhagyó", approverId, "jovahagyva", s.createdAt, "Támogatom."),
     );
     approvals.push(appr(2, "Szolgáltatásgazda", "u-nemeth", "jovahagyva", s.updatedAt));
-    if ((s.cost ?? 0) > 500000) {
+    if ((cost ?? 0) > 500000) {
       approvals.push(appr(3, "Költségkeret-gazda", "u-farkas", "jovahagyva", s.updatedAt));
     }
   } else if (s.status === "elutasitva") {
@@ -1053,7 +1120,7 @@ function buildRequest(s: Seed): ServiceRequest {
   }
 
   const messages: RequestMessage[] = [
-    msg(s.requesterId, s.createdAt, s.goal),
+    msg(s.requesterId, s.createdAt, goalText),
   ];
   if (s.assigneeId) {
     messages.push(
@@ -1083,10 +1150,17 @@ function buildRequest(s: Seed): ServiceRequest {
 
   return {
     id: s.id,
-    title: s.title,
+    title: hw ? hw.title : s.title,
     domain: s.domain,
     catalogItemId: s.catalogItemId,
-    goal: s.goal,
+    goal: goalText,
+    productCategoryId: hw?.category?.id,
+    productId: hw?.product.id,
+    quantity: hw?.qty,
+    requestReason: hw?.personalUse ? s.reason : undefined,
+    requestReasonNote: hw?.personalUse ? s.reasonNote : undefined,
+    workLocationId: hw?.personalUse ? s.workLocationId : undefined,
+    handoverMode: hw?.personalUse ? s.handoverMode : undefined,
     requesterId: s.requesterId,
     orgUnitId: s.orgUnitId,
     teamId: s.teamId,
@@ -1096,15 +1170,15 @@ function buildRequest(s: Seed): ServiceRequest {
     createdAt: s.createdAt,
     updatedAt: s.updatedAt,
     dueDate: s.dueDate,
-    estimatedCost: s.cost,
-    effortDays: s.cost ? Math.max(2, Math.round(s.cost / 150000)) : 3,
+    estimatedCost: cost,
+    effortDays: cost ? Math.max(2, Math.round(cost / 150000)) : 3,
     nextStep: s.next,
-    users: "Intézeti munkatársak",
-    userCount: s.domain === "digitalizacio" ? "50–200 fő" : "1–10 fő",
-    personalData: s.domain === "digitalizacio" || s.domain === "web",
-    integration: s.domain === "digitalizacio" ? "Neptun, Microsoft 365" : "Nem szükséges",
-    recurring: s.domain === "hardver" ? "Egyszeri igény" : "Tartós szolgáltatás",
-    budget: s.cost ? `${(s.cost / 1000).toLocaleString("hu-HU")} eFt keret` : "Nincs megadva",
+    users: hw?.personalUse ? "Igénylő személyes használat" : "Intézeti munkatársak",
+    userCount: hw?.personalUse ? "1 fő" : "1–10 fő",
+    personalData: false,
+    integration: "Nem szükséges",
+    recurring: "Egyszeri igény",
+    budget: cost ? `${(cost / 1000).toLocaleString("hu-HU")} eFt keret` : "Nincs megadva",
     slaRisk: s.slaRisk,
     projectId: s.projectId,
     messages,
@@ -1146,20 +1220,20 @@ function buildRequest(s: Seed): ServiceRequest {
               : "Licenc és hozzáférés",
       team: TEAMS.find((t) => t.id === s.teamId)!.name,
       complexity:
-        (s.cost ?? 0) > 2000000 ? "összetett" : (s.cost ?? 0) > 300000 ? "közepes" : "egyszerű",
+        (cost ?? 0) > 2000000 ? "összetett" : (cost ?? 0) > 300000 ? "közepes" : "egyszerű",
       workflow:
-        (s.cost ?? 0) > 500000
+        (cost ?? 0) > 500000
           ? "Igénylő → szervezeti jóváhagyó → költségkeret-gazda → szolgáltatásgazda"
           : "Igénylő → szervezeti jóváhagyó → szolgáltatási csapat",
-      approvalNeeded: (s.cost ?? 0) > 0,
-      projectCandidate: (s.cost ?? 0) > 2000000,
+      approvalNeeded: (cost ?? 0) > 0,
+      projectCandidate: (cost ?? 0) > 2000000,
       confidence: 0.72 + ((s.id.length * 7) % 20) / 100,
     },
     internal: {
       classification: `${DOMAINS.find((d) => d.key === s.domain)!.name} / ${s.priority}`,
       dependencies:
         s.projectId ? "Kapcsolódik egy futó fejlesztési kezdeményezéshez." : "Nincs ismert függőség.",
-      procurement: (s.cost ?? 0) > 300000,
+      procurement: (cost ?? 0) > 300000,
       security: s.domain === "szoftver" ? "IT biztonsági ellenőrzés szükséges" : "Nem érintett",
       dataProtection:
         s.domain === "digitalizacio" || s.domain === "web"
