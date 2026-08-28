@@ -189,7 +189,7 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
       </dl>
 
       <div className="mt-3 flex flex-wrap gap-1.5">
-        {(spec?.features ?? []).map((f) => (
+        {(spec?.features ?? product?.spec.features ?? []).map((f) => (
           <Badge key={f} variant="secondary" className="font-normal">
             {f}
           </Badge>
