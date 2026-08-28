@@ -240,10 +240,11 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
                   </SelectTrigger>
                   <SelectContent>
                     {rooms.map((r) => (
-                      <SelectItem key={r} value={r}>
-                        {r}
+                      <SelectItem key={r.id} value={r.room}>
+                        {r.room} ({LOCATION_KIND_LABELS[r.kind]})
                       </SelectItem>
                     ))}
+
                   </SelectContent>
                 </Select>
               </div>
