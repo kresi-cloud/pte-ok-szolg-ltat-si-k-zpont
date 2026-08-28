@@ -407,7 +407,8 @@ function Inventory() {
                 )}
                 <SpecGrid item={i} />
               </article>
-            ))
+              );
+            })
           )}
         </TabsContent>
 
