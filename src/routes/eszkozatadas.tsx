@@ -97,7 +97,13 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
   const store = useStore();
   const [serial, setSerial] = useState(handover.serial ?? "");
   const [inventoryNo, setInventoryNo] = useState(handover.inventoryNo ?? "");
-  const [modelKey, setModelKey] = useState(handover.modelKey ?? "");
+  const catalogCtx = {
+    products: store.products,
+    categories: store.productCategories,
+    requests: store.requests,
+  };
+  const defaultProduct = productForHandover(handover, catalogCtx);
+  const [productId, setProductId] = useState(handover.productId ?? defaultProduct?.id ?? "");
   const [building, setBuilding] = useState(handover.building ?? "");
   const [room, setRoom] = useState(handover.room ?? "");
   const [note, setNote] = useState(handover.note ?? "");
