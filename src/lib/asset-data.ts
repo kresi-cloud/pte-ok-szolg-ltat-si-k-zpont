@@ -603,6 +603,7 @@ export const REFERENCE_PRICES: ReferencePrice[] = [
   { id: "rp-monitor-large", label: "27\" 4K monitor", categoryKey: "monitor", netPrice: 95000, vatRate: 0.27, priceDate: "2026-05-14", validUntil: "2027-05-14", source: "keretszerzodes", supplier: "Kari IT keretszerződés / 2026-03" },
   { id: "rp-dock", label: "USB-C dokkoló", categoryKey: "dokkolo", netPrice: 74000, vatRate: 0.27, priceDate: "2026-01-19", validUntil: "2026-12-31", source: "tervezoi_ar", supplier: "Kézzel rögzített tervezési ár" },
   { id: "rp-tablet", label: "Tablet", categoryKey: "tablet", netPrice: 330000, vatRate: 0.27, priceDate: "2026-03-11", validUntil: "2027-03-11", source: "intezmenyi_beszerzes", supplier: "2026. márciusi beszerzés" },
+  { id: "rp-mobile-phone", label: "Intézményi okostelefon", categoryKey: "mobil", netPrice: 118000, vatRate: 0.27, priceDate: "2026-04-08", validUntil: "2027-04-08", source: "keretszerzodes", supplier: "Kari mobil keretszerződés / 2026" },
   { id: "rp-printer", label: "Hálózati MFP nyomtató", categoryKey: "nyomtato", netPrice: 285000, vatRate: 0.27, priceDate: "2025-09-02", validUntil: "2026-09-02", source: "piaci_becsles", supplier: "Piaci becslés", note: "Régi árinformáció." },
 ];
 
