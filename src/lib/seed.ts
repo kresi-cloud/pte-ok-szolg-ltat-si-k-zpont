@@ -5,10 +5,12 @@ import type {
   AuditEvent,
   CatalogItem,
   DomainKey,
+  HandoverMode,
   OrgUnit,
   Priority,
   Project,
   RequestMessage,
+  RequestReason,
   ResponsibilityRow,
   ServiceDomain,
   ServiceRequest,
@@ -16,6 +18,10 @@ import type {
   StatusKey,
   User,
 } from "./types";
+import { HANDOVER_MODE_LABELS, REQUEST_REASON_LABELS } from "./types";
+import { INITIAL_PRODUCTS, INITIAL_PRODUCT_CATEGORIES } from "./product-catalog";
+import { ASSET_LOCATIONS } from "./asset-data";
+
 
 export const DOMAINS: ServiceDomain[] = [
   {
