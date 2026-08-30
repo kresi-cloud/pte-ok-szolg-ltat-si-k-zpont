@@ -37,7 +37,8 @@ import {
   type RoleKey,
   type StatusKey,
 } from "@/lib/types";
-import { PLAN_APPROVAL_STATUS_LABELS } from "@/lib/asset-types";
+import { PLAN_APPROVAL_STATUS_LABELS, QUARTER_LABELS } from "@/lib/asset-types";
+import { canReviewProcurement } from "@/lib/access";
 import { daysUntil } from "@/lib/plan-approvals";
 import { ASSET_LOCATIONS, ASSET_MODELS } from "@/lib/asset-data";
 import { similarAssetsFor } from "@/lib/similar-assets";
