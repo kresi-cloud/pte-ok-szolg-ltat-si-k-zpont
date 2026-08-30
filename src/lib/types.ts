@@ -72,7 +72,10 @@ export interface OrgUnit {
   name: string;
   type: "hivatal" | "intezet" | "oktatas" | "kutatas" | "klinikai";
   approverUserId?: string | undefined;
+  /** Helyettes jóváhagyó – akkor dönt, ha a jóváhagyó maga az igénylő. */
+  deputyApproverUserId?: string | undefined;
 }
+
 
 export interface User {
   id: string;
