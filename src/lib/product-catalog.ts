@@ -22,9 +22,27 @@ export function tierOf(user: Pick<User, "employeeTier">): EmployeeTier {
   return user.employeeTier ?? "alkalmazotti";
 }
 
+/**
+ * Ezekben a termékkörökben érvényesül a munkavállalói besorolás
+ * (alkalmazotti/vezetői/felsővezetői); minden más termékkörben
+ * besorolástól függetlenül mindenki számára igényelhetők a modellek.
+ */
+export const TIERED_CATEGORY_IDS: ReadonlySet<string> = new Set([
+  "pc-notebook",
+  "pc-okostelefon",
+  "pc-mobiltelefon",
+  "pc-tablet",
+]);
+
+export function categoryIsTiered(categoryId: string): boolean {
+  return TIERED_CATEGORY_IDS.has(categoryId);
+}
+
 /** Látható-e a termék az adott besorolású munkavállaló számára. */
 export function productVisibleFor(product: Product, tier: EmployeeTier): boolean {
-  return product.active && TIER_RANK[product.tier] <= TIER_RANK[tier];
+  if (!product.active) return false;
+  if (!categoryIsTiered(product.categoryId)) return true;
+  return TIER_RANK[product.tier] <= TIER_RANK[tier];
 }
 
 export function visibleProducts(products: Product[], tier: EmployeeTier): Product[] {

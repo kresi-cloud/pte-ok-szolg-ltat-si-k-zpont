@@ -646,8 +646,9 @@ function BuyerWorkspace() {
         <TabsContent value="katalogus" className="mt-4 space-y-4">
           <p className="text-sm text-muted-foreground">
             Termékkörök és konkrét eszközmodellek kezelése. A modellekhez megadott technikai
-            adatlap jelenik meg az igénylőnek, az elérhetőség pedig a munkavállalói besorolás
-            szerint szűkül.
+            adatlap jelenik meg az igénylőnek. A munkavállalói besorolás szerinti szűkés csak a
+            notebook, okostelefon, mobiltelefon és tablet körökben érvényesül; minden más
+            termékkört besorolástól függetlenül mindenki igényelhet.
           </p>
           <ProductCatalogAdmin readOnly={viewOnly} />
         </TabsContent>
