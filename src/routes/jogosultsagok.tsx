@@ -1,10 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ShieldCheck, History, Lock } from "lucide-react";
+import { ShieldCheck, History, Lock, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -14,7 +31,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { lookup, useStore } from "@/lib/store";
-import { ROLE_DESCRIPTIONS, ROLE_LABELS, type RoleKey } from "@/lib/types";
+import { ORG_UNITS } from "@/lib/seed";
+import {
+  ROLE_DESCRIPTIONS,
+  ROLE_LABELS,
+  type EmployeeTier,
+  type RoleKey,
+} from "@/lib/types";
 import { TIERS, TIER_LABELS } from "@/lib/product-catalog";
 import { PageHeading } from "@/components/page-heading";
 import { useViewOnly } from "@/lib/access";
@@ -127,10 +150,13 @@ function Permissions() {
             description="A szerepköröket a kar adminja osztja ki. Minden módosítás indoklással, naplózva történik."
           />
         </div>
-        <Badge className="gap-1.5">
+        <div className="flex items-center gap-3">
+          {canManage && <NewUserDialog />}
+          <Badge className="gap-1.5">
           <ShieldCheck className="size-3.5" aria-hidden="true" />{" "}
-          {canManage ? "Admin jogkör aktív" : "Dékáni betekintés (csak olvasható)"}
-        </Badge>
+            {canManage ? "Admin jogkör aktív" : "Dékáni betekintés (csak olvasható)"}
+          </Badge>
+        </div>
       </header>
 
       {!canManage && <ViewOnlyNotice />}
@@ -304,5 +330,220 @@ function Permissions() {
         </aside>
       </div>
     </div>
+  );
+}
+
+function NewUserDialog() {
+  const store = useStore();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [title, setTitle] = useState("");
+  const [email, setEmail] = useState("");
+  const [employeeId, setEmployeeId] = useState("");
+  const [orgUnitId, setOrgUnitId] = useState("");
+  const [managerId, setManagerId] = useState("");
+  const [roles, setRoles] = useState<RoleKey[]>(["igenylo"]);
+  const [tier, setTier] = useState<EmployeeTier>("alkalmazotti");
+  const [reason, setReason] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  function reset() {
+    setName("");
+    setTitle("");
+    setEmail("");
+    setEmployeeId("");
+    setOrgUnitId("");
+    setManagerId("");
+    setRoles(["igenylo"]);
+    setTier("alkalmazotti");
+    setReason("");
+    setError(null);
+  }
+
+  function toggleRole(role: RoleKey, on: boolean) {
+    setRoles((prev) => (on ? [...prev, role] : prev.filter((r) => r !== role)));
+  }
+
+  function submit() {
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!name.trim() || !title.trim() || !orgUnitId) {
+      setError("A név, a beosztás és a szervezeti egység megadása kötelező.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError("Érvényes e-mail cím szükséges.");
+      return;
+    }
+    if (store.users.some((u) => u.email.toLowerCase() === trimmedEmail)) {
+      setError("Ezzel az e-mail címmel már létezik felhasználó.");
+      return;
+    }
+    if (reason.trim().length < 5) {
+      setError("A létrehozáshoz rövid indoklás szükséges (min. 5 karakter).");
+      return;
+    }
+    store.addUser(
+      {
+        name: name.trim(),
+        title: title.trim(),
+        email: trimmedEmail,
+        employeeId: employeeId.trim() || `PTE-${Math.floor(10000 + Math.random() * 89999)}`,
+        orgUnitId,
+        roles,
+        managerId: managerId || undefined,
+        employeeTier: tier,
+      },
+      reason.trim(),
+    );
+    setOpen(false);
+    reset();
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) reset();
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button className="gap-1.5">
+          <UserPlus className="size-4" aria-hidden="true" /> Új felhasználó
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-xl">
+        <DialogHeader>
+          <DialogTitle>Új felhasználó létrehozása</DialogTitle>
+          <DialogDescription>
+            A felhasználó azonnal megjelenik a listában, a művelet a jogosultsági naplóba kerül.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="nu-name">Név *</Label>
+            <Input
+              id="nu-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Pl. Kis Anna"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="nu-title">Beosztás *</Label>
+            <Input
+              id="nu-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Pl. adminisztrátor"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="nu-email">E-mail cím *</Label>
+            <Input
+              id="nu-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="kis.anna@aok.pte.hu"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="nu-empid">Dolgozói azonosító</Label>
+            <Input
+              id="nu-empid"
+              value={employeeId}
+              onChange={(e) => setEmployeeId(e.target.value)}
+              placeholder="Automatikusan generálódik"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Szervezeti egység *</Label>
+            <Select value={orgUnitId} onValueChange={setOrgUnitId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Válasszon egységet…" />
+              </SelectTrigger>
+              <SelectContent>
+                {ORG_UNITS.map((o) => (
+                  <SelectItem key={o.id} value={o.id}>
+                    {o.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Közvetlen felettes</Label>
+            <Select value={managerId} onValueChange={setManagerId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Nincs megadva" />
+              </SelectTrigger>
+              <SelectContent>
+                {store.users
+                  .filter((u) => u.roles.includes("jovahagyo") || u.roles.includes("vezeto"))
+                  .map((u) => (
+                    <SelectItem key={u.id} value={u.id}>
+                      {u.name}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Szerepkörök</Label>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {ALL_ROLES.map((r) => (
+              <label key={r} className="flex cursor-pointer items-center gap-2 text-sm">
+                <Checkbox
+                  checked={roles.includes(r)}
+                  onCheckedChange={(v) => toggleRole(r, v === true)}
+                />
+                {ROLE_LABELS[r]}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Munkavállalói besorolás</Label>
+          <div className="flex flex-wrap gap-4">
+            {TIERS.map((t) => (
+              <label key={t} className="flex cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="nu-tier"
+                  className="size-4 accent-[hsl(var(--primary))]"
+                  checked={tier === t}
+                  onChange={() => setTier(t)}
+                />
+                {TIER_LABELS[t]}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="nu-reason">Indoklás *</Label>
+          <Input
+            id="nu-reason"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Pl. új munkatárs belépése, dékáni utasítás száma…"
+          />
+        </div>
+
+        {error && <p className="text-sm text-destructive">{error}</p>}
+
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Mégse
+          </Button>
+          <Button onClick={submit}>Felhasználó létrehozása</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
