@@ -1,6 +1,6 @@
 import { Building2, ShieldCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useStore, USERS } from "@/lib/store";
+import { useStore } from "@/lib/store";
 import { ROLE_LABELS } from "@/lib/types";
 import { lookup } from "@/lib/store";
 import { DEMO_USER_IDS } from "@/lib/demo-users";
