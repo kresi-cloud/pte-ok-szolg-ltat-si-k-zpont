@@ -55,6 +55,19 @@ export const Route = createFileRoute("/beszerzesek")({
 
 const QUARTERS: Quarter[] = ["Q1", "Q2", "Q3", "Q4"];
 
+/** Ki a soron következő döntéshozó az adott tervciklus-státuszban. */
+const WAITING_ON: Record<string, string> = {
+  tervezes: "IT eszközmenedzser – terv összeállítása és beküldése",
+  gazdasagi_ellenorzes: "Gazdasági vezető – pénzügyi ellenőrzés",
+  dekani_jovahagyas: "Dékán – jóváhagyás",
+  jovahagyasra_var: "Dékán – jóváhagyás",
+  visszakuldve: "IT eszközmenedzser – átdolgozás",
+  jovahagyva: "Beszerző – beszerzés indítása",
+  vegrehajtas: "Beszerző – végrehajtás alatt",
+  lezarva: "Lezárva",
+  elutasitva: "Elutasítva",
+};
+
 /** Egy évre előre eső negyedéves tervblokkok (aktuális negyedévtől számítva). */
 function schedulingBlocks(): { value: string; label: string; planYear: number; quarter: Quarter }[] {
   const now = new Date(TODAY);
