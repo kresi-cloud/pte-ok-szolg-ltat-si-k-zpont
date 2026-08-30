@@ -12,9 +12,11 @@
 
 ## Megoldás
 
-1. **Hiányzó szereplők pótlása** a törzsadatokban:
-   - Minden szervezeti egységhez helyi IT referens (Anatómiai, Biokémiai, Farmakológiai, Oktatásszervezési, Kutatástámogatási, Klinikai, Dékáni Hivatal — az IT egységre a meglévő eszközmenedzser mellé is), PTE-stílusú névvel, e-mail-lel, azonosítóval.
+1. **Minden döntéshozó legyen elérhető:** a demó bejelentkezési és felhasználóváltó lista ne kézi felsorolás legyen, hanem minden olyan felhasználó jelenjen meg, aki a folyamatban szerepet kaphat (jóváhagyó, ügyintéző, szolgáltatásgazda, vezető, beszerző, eszközmenedzser, gazdasági vezető, IT referens, admin) – a seedből és az admin által létrehozott felhasználókból egyaránt. Ezzel Perneczky és a többi „láthatatlan" jóváhagyó azonnal használható.
+2. **Hiányzó szereplők pótlása** a törzsadatokban:
+   - Minden szervezeti egységhez helyi IT referens (Anatómiai, Biokémiai, Farmakológiai, Oktatásszervezési, Kutatástámogatási, Klinikai, Dékáni Hivatal), PTE-stílusú névvel, e-mail-lel, azonosítóval.
    - Az intézetekhez egy-egy helyettes jóváhagyó (igazgatóhelyettes) `jovahagyo` szerepkörrel, aki az igazgató saját igényét jóváhagyja.
+
 2. **Központi útvonal-feloldó** (`src/lib/routing.ts`): egyetlen helyen dől el, ki a következő döntéshozó/ügyintéző. Szabályai:
    - 1. jóváhagyó = az egység jóváhagyója; ha az azonos az igénylővel, akkor az egység helyettes jóváhagyója; ha az sincs, a hivatalvezető; ha az sem, a dékán.
    - 2. jóváhagyó = a csapat gazdája; ha nem létező azonosító, a szolgáltatásgazda szerepkörű felhasználó.
