@@ -236,6 +236,8 @@ interface StoreValue extends PersistedState {
   submitScrapProposal: (id: string) => void;
   decideScrapProposal: (id: string, decision: "jovahagyva" | "visszakuldve", comment?: string) => void;
   submitPlanForFinance: (id: string, comment?: string) => void;
+  /** Gazdasági vezetői sürgetés: kéri az eszközmenedzsertől a terv beküldését. */
+  nudgePlanSubmission: (id: string) => void;
   financeReviewPlan: (id: string, decision: "tovabb" | "vissza", comment?: string) => void;
   startPlanExecution: (id: string) => void;
   /** Beszerző: a tervsor eszköze fizikailag beérkezett – átadási folyamat indul. */
