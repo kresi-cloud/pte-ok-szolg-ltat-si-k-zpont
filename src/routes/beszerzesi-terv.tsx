@@ -85,6 +85,21 @@ function ProcurementPage() {
     { net: 0, gross: 0, withContingency: 0, qty: 0 },
   );
 
+  if (!canReview) {
+    return (
+      <div className="card-surface mx-auto max-w-2xl space-y-3 p-6">
+        <h1 className="font-display text-xl font-semibold">Beszerzési terv</h1>
+        <p className="text-sm text-muted-foreground">
+          A beszerzési terv az IT eszközmenedzser, a beszerző, a gazdasági vezető és a kari
+          vezetés felülete. Saját igényei állapotát az „Igényeim” oldalon követheti.
+        </p>
+        <Button asChild variant="outline">
+          <Link to="/igenyeim">Saját igényeim</Link>
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
