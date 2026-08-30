@@ -27,3 +27,13 @@ export function useViewOnly(area: AccessArea): boolean {
   const { activeRole } = useStore();
   return isViewOnly(activeRole, area);
 }
+
+/** Tervtételt csak az IT eszközmenedzser és a beszerző vihet fel/szerkeszthet. */
+export function canPlanProcurement(role: RoleKey): boolean {
+  return role === "eszkozmenedzser" || role === "beszerzo";
+}
+
+/** A beszerzési tervet ellenőrző/betekintő szerepkörök. */
+export function canReviewProcurement(role: RoleKey): boolean {
+  return canPlanProcurement(role) || ["gazdasagi_vezeto", "vezeto", "dekan"].includes(role);
+}
