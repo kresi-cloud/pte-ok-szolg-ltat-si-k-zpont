@@ -1265,6 +1265,46 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...s.assetAudit,
         ],
       })),
+    nudgePlanSubmission: (id) =>
+      setState((s) => ({
+        ...s,
+        planApprovals: (s.planApprovals ?? []).map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                history: [
+                  ...(p.history ?? []),
+                  {
+                    at: today(),
+                    actorId: currentUser.id,
+                    action: "Gazdasági vezetői sürgetés: terv beküldése ellenőrzésre",
+                  },
+                ],
+              }
+            : p,
+        ),
+        notifications: [
+          {
+            id: `n-${Date.now()}`,
+            at: today(),
+            text: "A gazdasági vezető kéri a beszerzési terv beküldését ellenőrzésre.",
+            read: false,
+          },
+          ...s.notifications,
+        ],
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "beszerzes",
+            entityId: id,
+            action: "Terv beküldésének sürgetése",
+            detail: "Gazdasági vezetői jelzés az IT eszközmenedzsernek.",
+          },
+          ...s.assetAudit,
+        ],
+      })),
     submitPlanForFinance: (id, comment) =>
       setState((s) => ({
         ...s,
