@@ -61,7 +61,7 @@ export function LoginScreen() {
               Demó belépés más szerepkörrel
             </p>
             <ul className="mt-3 space-y-2">
-              {DEMO_USERS.map((id) => {
+              {[...DEMO_USERS, ...extraIds].map((id) => {
                 const u = USERS.find((x) => x.id === id)!;
                 return (
                   <li key={id}>
