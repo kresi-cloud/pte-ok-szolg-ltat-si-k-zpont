@@ -55,6 +55,19 @@ export const Route = createFileRoute("/beszerzesek")({
 
 const QUARTERS: Quarter[] = ["Q1", "Q2", "Q3", "Q4"];
 
+/** Ki a soron következő döntéshozó az adott tervciklus-státuszban. */
+const WAITING_ON: Record<string, string> = {
+  tervezes: "IT eszközmenedzser – terv összeállítása és beküldése",
+  gazdasagi_ellenorzes: "Gazdasági vezető – pénzügyi ellenőrzés",
+  dekani_jovahagyas: "Dékán – jóváhagyás",
+  jovahagyasra_var: "Dékán – jóváhagyás",
+  visszakuldve: "IT eszközmenedzser – átdolgozás",
+  jovahagyva: "Beszerző – beszerzés indítása",
+  vegrehajtas: "Beszerző – végrehajtás alatt",
+  lezarva: "Lezárva",
+  elutasitva: "Elutasítva",
+};
+
 /** Egy évre előre eső negyedéves tervblokkok (aktuális negyedévtől számítva). */
 function schedulingBlocks(): { value: string; label: string; planYear: number; quarter: Quarter }[] {
   const now = new Date(TODAY);
@@ -424,8 +437,27 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
         </ul>
       )}
 
+      <p className="rounded-sm bg-muted px-3 py-2 text-xs text-muted-foreground">
+        <span className="font-medium text-foreground">Kire vár: </span>
+        {WAITING_ON[status]}
+      </p>
+
       {(isPlanner || isBuyer || isFinance || isDean) && status !== "vegrehajtas" && (
         <div className="space-y-2 border-t border-border pt-3">
+          {isFinance && (status === "tervezes" || status === "visszakuldve") && (
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={items.length === 0}
+              onClick={() => {
+                store.nudgePlanSubmission(approval.id);
+                toast.success("Sürgetés elküldve az IT eszközmenedzsernek");
+              }}
+            >
+              Beküldés sürgetése
+            </Button>
+          )}
+
           {isPlanner && (status === "tervezes" || status === "visszakuldve") && (
             <>
               <Textarea
@@ -570,8 +602,22 @@ function BuyerWorkspace() {
   }
 
   const openAdHoc = adHoc.filter((p) => p.status !== "teljesult").length;
-  const pendingApprovals = approvals.filter((a) => a.status === "jovahagyasra_var").length;
+  /** A régi „jovahagyasra_var” státusz a dékáni jóváhagyással egyenértékű. */
+  const deanPending = approvals.filter((a) =>
+    ["dekani_jovahagyas", "jovahagyasra_var"].includes(a.status),
+  ).length;
+  const financePending = approvals.filter((a) => a.status === "gazdasagi_ellenorzes").length;
+  const planningCycles = approvals.filter((a) =>
+    ["tervezes", "visszakuldve"].includes(a.status),
+  ).length;
   const totalYear = yearItems.reduce((s, i) => s + itemCost(i).withContingency, 0);
+  const role = store.activeRole;
+  const secondTile =
+    role === "gazdasagi_vezeto"
+      ? { label: "Gazdasági ellenőrzésre vár", value: String(financePending) }
+      : role === "eszkozmenedzser"
+        ? { label: "Beküldésre váró tervciklus", value: String(planningCycles) }
+        : { label: "Dékáni jóváhagyásra vár", value: String(deanPending) };
 
   return (
     <div className="space-y-8">
@@ -585,7 +631,7 @@ function BuyerWorkspace() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatTile label="Nyitott eseti beszerzés" value={String(openAdHoc)} />
-        <StatTile label="Dékáni jóváhagyásra vár" value={String(pendingApprovals)} />
+        <StatTile label={secondTile.label} value={secondTile.value} />
         <StatTile label={`${NEXT_FINANCIAL_YEAR}. évi keret`} value={huf(totalYear)} />
       </div>
 

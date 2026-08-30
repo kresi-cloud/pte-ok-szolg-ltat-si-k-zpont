@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeading } from "@/components/page-heading";
-import { useViewOnly } from "@/lib/access";
+import { canPlanProcurement, canReviewProcurement, useViewOnly } from "@/lib/access";
 import { ViewOnlyNotice } from "@/components/view-only-notice";
 import { lookup, ORG_UNITS, useStore } from "@/lib/store";
 import { FUNDING_SOURCES, HARDWARE_STANDARDS, NEXT_FINANCIAL_YEAR, REFERENCE_PRICES } from "@/lib/asset-data";
@@ -55,7 +55,10 @@ const QUARTERS: Quarter[] = ["Q1", "Q2", "Q3", "Q4"];
 
 function ProcurementPage() {
   const store = useStore();
-  const viewOnly = useViewOnly("beszerzesi-terv");
+  const canPlan = canPlanProcurement(store.activeRole);
+  const canReview = canReviewProcurement(store.activeRole);
+  /** Ellenőrző szerepkörök (gazdasági vezető, vezető, dékán) csak betekintenek. */
+  const viewOnly = useViewOnly("beszerzesi-terv") || (canReview && !canPlan);
   const items = store.planItems.filter((p) => p.planYear === NEXT_FINANCIAL_YEAR);
 
   const candidates = useMemo(
@@ -81,6 +84,21 @@ function ProcurementPage() {
     },
     { net: 0, gross: 0, withContingency: 0, qty: 0 },
   );
+
+  if (!canReview) {
+    return (
+      <div className="card-surface mx-auto max-w-2xl space-y-3 p-6">
+        <h1 className="font-display text-xl font-semibold">Beszerzési terv</h1>
+        <p className="text-sm text-muted-foreground">
+          A beszerzési terv az IT eszközmenedzser, a beszerző, a gazdasági vezető és a kari
+          vezetés felülete. Saját igényei állapotát az „Igényeim” oldalon követheti.
+        </p>
+        <Button asChild variant="outline">
+          <Link to="/igenyeim">Saját igényeim</Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -109,7 +127,7 @@ function ProcurementPage() {
         <TabsList className="flex-wrap">
           <TabsTrigger value="terv">Negyedéves terv</TabsTrigger>
           <TabsTrigger value="jeloltek">Cserejelöltek</TabsTrigger>
-          <TabsTrigger value="uj">Új tétel</TabsTrigger>
+          {canPlan && <TabsTrigger value="uj">Új tétel</TabsTrigger>}
           <TabsTrigger value="forras">Forrás és egység szerint</TabsTrigger>
         </TabsList>
 
@@ -183,9 +201,11 @@ function ProcurementPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="uj">
-          <NewPlanItemForm />
-        </TabsContent>
+        {canPlan && (
+          <TabsContent value="uj">
+            <NewPlanItemForm />
+          </TabsContent>
+        )}
 
         <TabsContent value="forras" className="space-y-4">
           <section className="card-surface overflow-x-auto p-5">

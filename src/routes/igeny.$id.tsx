@@ -30,13 +30,15 @@ import { lookup, useStore } from "@/lib/store";
 import {
   HANDOVER_MODE_LABELS,
   REQUEST_REASON_LABELS,
+  REQUESTED_TIMING_LABELS,
   ROLE_LABELS,
   STATUS_LABELS,
   STATUS_ORDER,
   type RoleKey,
   type StatusKey,
 } from "@/lib/types";
-import { PLAN_APPROVAL_STATUS_LABELS } from "@/lib/asset-types";
+import { PLAN_APPROVAL_STATUS_LABELS, QUARTER_LABELS } from "@/lib/asset-types";
+import { canReviewProcurement } from "@/lib/access";
 import { daysUntil } from "@/lib/plan-approvals";
 import { ASSET_LOCATIONS, ASSET_MODELS } from "@/lib/asset-data";
 import { similarAssetsFor } from "@/lib/similar-assets";
@@ -413,11 +415,15 @@ function RequestDetail() {
 
         {planItem && (
           <p className="mt-4 rounded-md border border-accent/30 bg-accent/10 px-4 py-3 text-sm">
-            <span className="font-medium">Beszerzési terv: </span>
-            az igény bekerült a {planItem.planYear}. évi tervbe ({planItem.quarter}, {planItem.quantity} db).{" "}
-            <Link to="/beszerzesi-terv" className="underline">
-              Beszerzési terv megnyitása
-            </Link>
+            <span className="font-medium">Beszerzési besorolás: </span>
+            {planItem.timing === "azonnali"
+              ? `az igény azonnali beszerzési csomagba került (${planItem.quantity} db).`
+              : `az igény a ${planItem.planYear}. évi terv ${QUARTER_LABELS[planItem.quarter]}ébe került (${planItem.quantity} db).`}{" "}
+            {canReviewProcurement(store.activeRole) && (
+              <Link to="/beszerzesi-terv" className="underline">
+                Beszerzési terv megnyitása
+              </Link>
+            )}
           </p>
         )}
 
@@ -555,6 +561,19 @@ function RequestDetail() {
                       ["Felhasználók", request.users ?? "Nincs megadva"],
                       ["Érintett felhasználószám", request.userCount ?? "Nincs megadva"],
                     ]),
+                ...(request.requestedQuarter
+                  ? [
+                      [
+                        "Igényelt beszerzési ütemezés",
+                        request.requestedQuarter === "azonnali"
+                          ? "Azonnali beszerzés"
+                          : REQUESTED_TIMING_LABELS[request.requestedQuarter],
+                      ],
+                      ...(request.urgencyReason
+                        ? [["Az azonnali beszerzés indoka", request.urgencyReason]]
+                        : []),
+                    ]
+                  : []),
                 ["Adatkezelési érintettség", request.personalData ? "Igen" : "Nem"],
                 ["Integráció", request.integration ?? "Nem szükséges"],
                 [

@@ -236,6 +236,8 @@ interface StoreValue extends PersistedState {
   submitScrapProposal: (id: string) => void;
   decideScrapProposal: (id: string, decision: "jovahagyva" | "visszakuldve", comment?: string) => void;
   submitPlanForFinance: (id: string, comment?: string) => void;
+  /** Gazdasági vezetői sürgetés: kéri az eszközmenedzsertől a terv beküldését. */
+  nudgePlanSubmission: (id: string) => void;
   financeReviewPlan: (id: string, decision: "tovabb" | "vissza", comment?: string) => void;
   startPlanExecution: (id: string) => void;
   /** Beszerző: a tervsor eszköze fizikailag beérkezett – átadási folyamat indul. */
@@ -1261,6 +1263,46 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             entityId: id,
             action: "Beszerzési bontás módosítása",
             detail: timing === "azonnali" ? "Azonnali beszerzés" : "Negyedéves terv",
+          },
+          ...s.assetAudit,
+        ],
+      })),
+    nudgePlanSubmission: (id) =>
+      setState((s) => ({
+        ...s,
+        planApprovals: (s.planApprovals ?? []).map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                history: [
+                  ...(p.history ?? []),
+                  {
+                    at: today(),
+                    actorId: currentUser.id,
+                    action: "Gazdasági vezetői sürgetés: terv beküldése ellenőrzésre",
+                  },
+                ],
+              }
+            : p,
+        ),
+        notifications: [
+          {
+            id: `n-${Date.now()}`,
+            at: today(),
+            text: "A gazdasági vezető kéri a beszerzési terv beküldését ellenőrzésre.",
+            read: false,
+          },
+          ...s.notifications,
+        ],
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "beszerzes",
+            entityId: id,
+            action: "Terv beküldésének sürgetése",
+            detail: "Gazdasági vezetői jelzés az IT eszközmenedzsernek.",
           },
           ...s.assetAudit,
         ],
