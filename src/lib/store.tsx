@@ -378,7 +378,33 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           if (missing.length) merged.products = [...merged.products, ...missing];
         }
 
+        // Nem létező vagy önmagát jóváhagyó döntéshozók javítása a mentett állapotban.
+        const known = [...USERS, ...(merged.extraUsers ?? [])];
+        if (Array.isArray(merged.requests)) {
+          merged.requests = merged.requests.map((r) => {
+            const approvals = r.approvals.map((a) => {
+              if (a.decision !== "fuggoben") return a;
+              const broken = isUnknownUser(known, a.approverId) || a.approverId === r.requesterId;
+              if (!broken) return a;
+              const approverId =
+                a.step === 1
+                  ? resolveUnitApprover(known, r.orgUnitId, r.requesterId)
+                  : resolveServiceOwner(known, r.teamId);
+              return { ...a, approverId };
+            });
+            return { ...r, approvals };
+          });
+        }
+        if (Array.isArray(merged.handovers)) {
+          merged.handovers = merged.handovers.map((h) =>
+            isUnknownUser(known, h.referentId)
+              ? { ...h, referentId: resolveItReferent(known, h.orgUnitId) }
+              : h,
+          );
+        }
+
         setState(merged);
+
       }
     } catch {
       /* ignore */
