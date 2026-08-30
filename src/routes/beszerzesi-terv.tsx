@@ -55,7 +55,10 @@ const QUARTERS: Quarter[] = ["Q1", "Q2", "Q3", "Q4"];
 
 function ProcurementPage() {
   const store = useStore();
-  const viewOnly = useViewOnly("beszerzesi-terv");
+  const canPlan = canPlanProcurement(store.activeRole);
+  const canReview = canReviewProcurement(store.activeRole);
+  /** Ellenőrző szerepkörök (gazdasági vezető, vezető, dékán) csak betekintenek. */
+  const viewOnly = useViewOnly("beszerzesi-terv") || (canReview && !canPlan);
   const items = store.planItems.filter((p) => p.planYear === NEXT_FINANCIAL_YEAR);
 
   const candidates = useMemo(
