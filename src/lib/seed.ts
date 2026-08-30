@@ -94,31 +94,71 @@ export const DOMAINS: ServiceDomain[] = [
 ];
 
 export const ORG_UNITS: OrgUnit[] = [
-  { id: "ou-dekani", name: "Dékáni Hivatal", type: "hivatal", approverUserId: "u-nagy" },
-  { id: "ou-elettani", name: "Élettani Intézet", type: "intezet", approverUserId: "u-szabo" },
-  { id: "ou-anatomiai", name: "Anatómiai Intézet", type: "intezet", approverUserId: "u-fekete" },
+  {
+    id: "ou-dekani",
+    name: "Dékáni Hivatal",
+    type: "hivatal",
+    approverUserId: "u-nagy",
+    deputyApproverUserId: "u-feher",
+  },
+  {
+    id: "ou-elettani",
+    name: "Élettani Intézet",
+    type: "intezet",
+    approverUserId: "u-szabo",
+    deputyApproverUserId: "u-elettani-h",
+  },
+  {
+    id: "ou-anatomiai",
+    name: "Anatómiai Intézet",
+    type: "intezet",
+    approverUserId: "u-fekete",
+    deputyApproverUserId: "u-anatomiai-h",
+  },
   {
     id: "ou-biokemiai",
     name: "Biokémiai és Orvosi Kémiai Intézet",
     type: "intezet",
     approverUserId: "u-varga",
+    deputyApproverUserId: "u-biokemiai-h",
   },
   {
     id: "ou-farmakologiai",
     name: "Farmakológiai és Farmakoterápiai Intézet",
     type: "intezet",
     approverUserId: "u-toth",
+    deputyApproverUserId: "u-farmakologiai-h",
   },
-  { id: "ou-oktatas", name: "Oktatásszervezési Egység", type: "oktatas", approverUserId: "u-nagy" },
-  { id: "ou-kutatas", name: "Kutatástámogatási Egység", type: "kutatas", approverUserId: "u-nagy" },
+  {
+    id: "ou-oktatas",
+    name: "Oktatásszervezési Egység",
+    type: "oktatas",
+    approverUserId: "u-nagy",
+    deputyApproverUserId: "u-oktatas-h",
+  },
+  {
+    id: "ou-kutatas",
+    name: "Kutatástámogatási Egység",
+    type: "kutatas",
+    approverUserId: "u-nagy",
+    deputyApproverUserId: "u-kutatas-h",
+  },
   {
     id: "ou-klinikai",
     name: "Klinikai Központtal együttműködő egységek",
     type: "klinikai",
     approverUserId: "u-fekete",
+    deputyApproverUserId: "u-klinikai-h",
   },
-  { id: "ou-it", name: "IT Szolgáltatási Egység", type: "hivatal", approverUserId: "u-nagy" },
+  {
+    id: "ou-it",
+    name: "IT Szolgáltatási Egység",
+    type: "hivatal",
+    approverUserId: "u-nagy",
+    deputyApproverUserId: "u-molnar",
+  },
 ];
+
 
 export const USERS: User[] = [
   {
