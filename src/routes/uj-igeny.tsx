@@ -169,6 +169,17 @@ function Wizard() {
     ? "tajekoztatas"
     : "figyelmeztetes";
 
+  /** Igényelt ütemezés: minden eszközigénynél kötelező, azonnalinál indoklással. */
+  const timingOk =
+    !isHw ||
+    (!!form.requestedQuarter &&
+      (form.requestedQuarter !== "azonnali" || form.urgencyReason.trim().length >= 10));
+  const timingLabel = form.requestedQuarter
+    ? form.requestedQuarter === "azonnali"
+      ? "Azonnali beszerzés"
+      : REQUESTED_TIMING_LABELS[form.requestedQuarter as RequestedTiming]
+    : "Nincs megadva";
+
   const personalDetailsOk =
     !!form.requestReason &&
     !!form.workLocationId &&
@@ -179,7 +190,7 @@ function Wizard() {
     (key === "category" && !!form.productCategoryId) ||
     (key === "product" && !!form.productId) ||
     (key === "goal" && form.goal.trim().length > 20 && form.title.trim().length > 3) ||
-    (key === "details" && (!(isHw && isPersonalUse) || personalDetailsOk)) ||
+    (key === "details" && (!(isHw && isPersonalUse) || personalDetailsOk) && timingOk) ||
     key === "summary";
 
   const locationLabel = (id: string) => {
