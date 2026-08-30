@@ -109,7 +109,7 @@ function ProcurementPage() {
         <TabsList className="flex-wrap">
           <TabsTrigger value="terv">Negyedéves terv</TabsTrigger>
           <TabsTrigger value="jeloltek">Cserejelöltek</TabsTrigger>
-          <TabsTrigger value="uj">Új tétel</TabsTrigger>
+          {canPlan && <TabsTrigger value="uj">Új tétel</TabsTrigger>}
           <TabsTrigger value="forras">Forrás és egység szerint</TabsTrigger>
         </TabsList>
 
