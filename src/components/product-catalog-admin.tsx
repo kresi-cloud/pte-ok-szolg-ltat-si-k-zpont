@@ -306,7 +306,7 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                     handovers: store.handovers ?? [],
                   });
                   return (
-                  <li key={p.id} className="card-surface p-4">
+                  <li key={p.id} className={cn("card-surface p-4", !p.active && "opacity-60")}>
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <span className="block font-medium">{p.name}</span>
@@ -319,6 +319,26 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                         )}
                       </div>
                       <div className="flex items-center gap-2">
+                        {!p.active && <Badge variant="outline">Nem igényelhető</Badge>}
+                        <div className="flex items-center gap-1.5">
+                          <Switch
+                            id={`active-${p.id}`}
+                            checked={p.active}
+                            onCheckedChange={(v) => {
+                              if (!v && lock.locked) {
+                                const ok = window.confirm(
+                                  "A termékhez aktív beszerzési folyamat tartozik; a kikapcsolás csak az új igényeket tiltja, a folyamatban lévőket nem érinti. Folytatja?",
+                                );
+                                if (!ok) return;
+                              }
+                              store.updateProduct(p.id, { active: v });
+                              toast.success(v ? "A termék ismét igényelhető" : "A termék már nem igényelhető");
+                            }}
+                          />
+                          <Label htmlFor={`active-${p.id}`} className="text-xs font-normal">
+                            Igényelhető
+                          </Label>
+                        </div>
                         <Badge variant="secondary">{TIER_LABELS[p.tier]} kategóriától</Badge>
                         <Button
                           size="sm"

@@ -1,5 +1,11 @@
 // Manually curated additions for fragments the automated pass did not cover.
 export const EN_OVERRIDES: Record<string, string> = {
+  "Igényelhető": "Requestable",
+  "Nem igényelhető": "Not requestable",
+  "A termék ismét igényelhető": "The product is requestable again",
+  "A termék már nem igényelhető": "The product is no longer requestable",
+  "A termékhez aktív beszerzési folyamat tartozik; a kikapcsolás csak az új igényeket tiltja, a folyamatban lévőket nem érinti. Folytatja?":
+    "This product has an active procurement process; switching it off only blocks new requests and does not affect ongoing ones. Continue?",
   "Kezdőlap": "Home",
   "Szoftver": "Software",
   "Hardver": "Hardware",
