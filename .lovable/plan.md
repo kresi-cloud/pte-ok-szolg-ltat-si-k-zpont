@@ -17,14 +17,15 @@
    - Minden szervezeti egységhez helyi IT referens (Anatómiai, Biokémiai, Farmakológiai, Oktatásszervezési, Kutatástámogatási, Klinikai, Dékáni Hivatal), PTE-stílusú névvel, e-mail-lel, azonosítóval.
    - Az intézetekhez egy-egy helyettes jóváhagyó (igazgatóhelyettes) `jovahagyo` szerepkörrel, aki az igazgató saját igényét jóváhagyja.
 
-2. **Központi útvonal-feloldó** (`src/lib/routing.ts`): egyetlen helyen dől el, ki a következő döntéshozó/ügyintéző. Szabályai:
+3. **Központi útvonal-feloldó** (`src/lib/routing.ts`): egyetlen helyen dől el, ki a következő döntéshozó/ügyintéző. Szabályai:
    - 1. jóváhagyó = az egység jóváhagyója; ha az azonos az igénylővel, akkor az egység helyettes jóváhagyója; ha az sincs, a hivatalvezető; ha az sem, a dékán.
    - 2. jóváhagyó = a csapat gazdája; ha nem létező azonosító, a szolgáltatásgazda szerepkörű felhasználó.
    - Átadási referens = az egység IT referense, egyébként bármely IT referens.
    - A feloldó mindig a futásidejű felhasználólistán dolgozik (seed + admin által létrehozott felhasználók), és garantáltan létező azonosítót ad vissza.
-3. **A store beépítése:** az igénybeküldés, az átadás-létrehozás és minden olyan pont, ahol ma közvetlen `u-...` beégetés vagy `?? "u-nagy"` szerepel, ezt a feloldót hívja.
-4. **Meglévő adatok kijavítása:** a betöltéskor futó hidratáció ellenőrzi a mentett igényeket és átadásokat; ha egy jóváhagyó/ügyintéző azonosító nem létező felhasználóra mutat, vagy az igénylővel azonos, átirányítja az érvényes döntéshozóra.
-5. **Angol fordítások** az új felhasználók beosztásaihoz, ha szükséges.
+4. **A store beépítése:** az igénybeküldés, az átadás-létrehozás és minden olyan pont, ahol ma közvetlen `u-...` beégetés vagy `?? "u-nagy"` szerepel, ezt a feloldót hívja.
+5. **Meglévő adatok kijavítása:** a betöltéskor futó hidratáció ellenőrzi a mentett igényeket és átadásokat; ha egy jóváhagyó/ügyintéző azonosító nem létező felhasználóra mutat, vagy az igénylővel azonos, átirányítja az érvényes döntéshozóra. A most beragadt ASUS notebook igény ezzel (vagy Perneczky elérhetővé válásával) azonnal továbbléptethető.
+6. **Angol fordítások** az új felhasználók beosztásaihoz, ha szükséges.
+
 
 ## Tesztelés
 
