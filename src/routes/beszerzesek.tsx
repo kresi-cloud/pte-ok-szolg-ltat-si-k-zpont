@@ -611,9 +611,10 @@ function BuyerWorkspace() {
               </span>
               <Select value={bulkBlock} onValueChange={setBulkBlock}>
                 <SelectTrigger className="w-[190px]">
-                  <SelectValue placeholder="Célnegyedév" />
+                  <SelectValue placeholder="Cél: azonnali vagy negyedév" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="azonnali">Azonnali beszerzés</SelectItem>
                   {BLOCKS.map((b) => (
                     <SelectItem key={b.value} value={b.value}>
                       {b.label}
@@ -625,17 +626,27 @@ function BuyerWorkspace() {
                 size="sm"
                 disabled={selectedIds.length === 0 || !bulkBlock}
                 onClick={() => {
+                  if (bulkBlock === "azonnali") {
+                    selectedIds.forEach((id) => store.setPlanItemTiming(id, "azonnali"));
+                    toast.success(
+                      `${selectedIds.length} tétel azonnali beszerzésbe sorolva`,
+                    );
+                    setSelectedIds([]);
+                    return;
+                  }
                   const block = BLOCKS.find((b) => b.value === bulkBlock);
                   if (!block) return;
-                  selectedIds.forEach((id) =>
-                    store.reschedulePlanItem(id, block.planYear, block.quarter),
-                  );
+                  selectedIds.forEach((id) => {
+                    store.setPlanItemTiming(id, "negyedeves");
+                    store.reschedulePlanItem(id, block.planYear, block.quarter);
+                  });
                   toast.success(`${selectedIds.length} tétel átütemezve: ${block.label}`);
                   setSelectedIds([]);
                 }}
               >
                 Áthelyezés
               </Button>
+
             </div>
           )}
           <div className="grid gap-4">
