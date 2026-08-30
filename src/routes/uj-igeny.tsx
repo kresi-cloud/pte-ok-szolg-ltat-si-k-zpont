@@ -12,8 +12,8 @@ import { AiBadge } from "@/components/status-badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { CATALOG, DOMAINS, lookup, useStore } from "@/lib/store";
-import type { DomainKey, HandoverMode, RequestReason } from "@/lib/types";
-import { HANDOVER_MODE_LABELS, REQUEST_REASON_LABELS } from "@/lib/types";
+import type { DomainKey, HandoverMode, RequestReason, RequestedTiming } from "@/lib/types";
+import { HANDOVER_MODE_LABELS, REQUEST_REASON_LABELS, REQUESTED_TIMING_LABELS } from "@/lib/types";
 import { ASSET_MODELS } from "@/lib/asset-data";
 import { LOCATION_KIND_LABELS } from "@/lib/asset-types";
 import { defaultLocationForUser, locationsForUser } from "@/lib/asset-logic";
