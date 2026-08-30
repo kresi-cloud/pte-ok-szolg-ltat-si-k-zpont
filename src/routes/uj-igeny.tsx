@@ -76,6 +76,8 @@ interface FormState {
   workLocationId: string;
   handoverMode: string;
   handoverLocationId: string;
+  requestedQuarter: string;
+  urgencyReason: string;
   siteUrl: string;
   refined: boolean;
 }
