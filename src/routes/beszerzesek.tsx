@@ -81,16 +81,31 @@ function standardLabel(key: string) {
   return HARDWARE_STANDARDS.find((s) => s.key === key)?.label ?? key;
 }
 
+function rowActions(
+  item: ProcurementPlanItem,
+  role: string,
+  hasHandover: boolean,
+): { canHandToPlanner: boolean; canStart: boolean; canDeliver: boolean } {
+  const isBuyer = role === "beszerzo";
+  return {
+    canHandToPlanner: isBuyer && !item.handedToPlannerAt,
+    canStart: isBuyer && item.status !== "beszerzes_alatt" && item.status !== "teljesult",
+    canDeliver: isBuyer && item.status !== "teljesult" && !hasHandover,
+  };
+}
+
 function ItemRow({
   item,
   canAct,
   canSchedule = false,
+  showActions = true,
   selected,
   onToggleSelect,
 }: {
   item: ProcurementPlanItem;
   canAct: boolean;
   canSchedule?: boolean | undefined;
+  showActions?: boolean | undefined;
   selected?: boolean | undefined;
   onToggleSelect?: ((on: boolean) => void) | undefined;
 }) {
@@ -98,6 +113,10 @@ function ItemRow({
   const cost = itemCost(item);
   const hasHandover = (store.handovers ?? []).some((h) => h.planItemId === item.id);
   const blockValue = `${item.planYear}-${item.quarter}`;
+  const isImmediate = item.timing === "azonnali";
+  const actions = rowActions(item, store.activeRole, hasHandover);
+  const anyAction =
+    actions.canHandToPlanner || (canAct && (actions.canStart || actions.canDeliver));
   return (
     <tr className="border-t border-border align-top">
       {canSchedule && (
@@ -140,8 +159,15 @@ function ItemRow({
       {canSchedule && (
         <td className="px-3 py-3">
           <div className="space-y-2">
+            <span className="block text-xs font-medium">
+              Jelenleg:{" "}
+              {isImmediate ? "Azonnali" : `${item.planYear}. ${QUARTER_LABELS[item.quarter]}`}
+            </span>
+            <label className="block text-[11px] tracking-wide text-muted-foreground uppercase">
+              Bontás
+            </label>
             <Select
-              value={item.timing === "azonnali" ? "azonnali" : "negyedeves"}
+              value={isImmediate ? "azonnali" : "negyedeves"}
               onValueChange={(v) => {
                 store.setPlanItemTiming(item.id, v as "azonnali" | "negyedeves");
                 toast.success(v === "azonnali" ? "Azonnali beszerzés" : "Negyedéves tervbe sorolva");
@@ -155,7 +181,11 @@ function ItemRow({
                 <SelectItem value="negyedeves">Negyedéves terv</SelectItem>
               </SelectContent>
             </Select>
+            <label className="block text-[11px] tracking-wide text-muted-foreground uppercase">
+              Célnegyedév
+            </label>
             <Select
+              disabled={isImmediate}
               value={BLOCKS.some((b) => b.value === blockValue) ? blockValue : ""}
               onValueChange={(v) => {
                 const block = BLOCKS.find((b) => b.value === v);
@@ -165,7 +195,13 @@ function ItemRow({
               }}
             >
               <SelectTrigger className="w-[170px]">
-                <SelectValue placeholder={`${item.planYear}. ${QUARTER_LABELS[item.quarter]}`} />
+                <SelectValue
+                  placeholder={
+                    isImmediate
+                      ? "Azonnali – nincs tervnegyedév"
+                      : `${item.planYear}. ${QUARTER_LABELS[item.quarter]}`
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 {BLOCKS.map((b) => (
@@ -178,58 +214,65 @@ function ItemRow({
           </div>
         </td>
       )}
-      <td className="px-3 py-3">
-        <div className="flex flex-wrap gap-2">
-          {store.activeRole === "beszerzo" && !item.handedToPlannerAt && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                store.handPlanItemToPlanner(item.id);
-                toast.success("Átadva az IT eszközmenedzsernek tervezésre");
-              }}
-            >
-              Átadás eszközmenedzsernek
-            </Button>
-          )}
-          {canAct && (
-            <>
-              {item.status !== "beszerzes_alatt" && item.status !== "teljesult" && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    store.updatePlanItem(item.id, { status: "beszerzes_alatt" });
-                    toast.success("Beszerzés elindítva");
-                  }}
-                >
-                  Beszerzés indítása
-                </Button>
-              )}
-              {item.status !== "teljesult" && !hasHandover && (
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    store.markPlanItemDelivered(item.id);
-                    toast.success("Beérkezés rögzítve – átadva a kari IT referensnek");
-                  }}
-                >
-                  Beérkezett – átadásra
-                </Button>
-              )}
-              {hasHandover && (
-                <span className="self-center text-xs text-muted-foreground">
-                  Átadási folyamatban a kari IT referensnél
-                </span>
-              )}
-            </>
-          )}
-        </div>
-      </td>
+      {showActions && (
+        <td className="px-3 py-3">
+          <div className="flex flex-wrap gap-2">
+            {actions.canHandToPlanner && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  store.handPlanItemToPlanner(item.id);
+                  toast.success("Átadva az IT eszközmenedzsernek tervezésre");
+                }}
+              >
+                Átadás eszközmenedzsernek
+              </Button>
+            )}
+            {canAct && (
+              <>
+                {actions.canStart && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      store.updatePlanItem(item.id, { status: "beszerzes_alatt" });
+                      toast.success("Beszerzés elindítva");
+                    }}
+                  >
+                    Beszerzés indítása
+                  </Button>
+                )}
+                {actions.canDeliver && (
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      store.markPlanItemDelivered(item.id);
+                      toast.success("Beérkezés rögzítve – átadva a kari IT referensnek");
+                    }}
+                  >
+                    Beérkezett – átadásra
+                  </Button>
+                )}
+              </>
+            )}
+            {!anyAction && (
+              <span className="self-center text-xs text-muted-foreground">
+                {hasHandover
+                  ? "Átadási folyamatban a kari IT referensnél"
+                  : item.status === "teljesult"
+                    ? "Teljesült"
+                    : "Nincs teendő"}
+              </span>
+            )}
+          </div>
+        </td>
+      )}
 
     </tr>
   );
 }
+
 
 function ItemsTable({
   items,
