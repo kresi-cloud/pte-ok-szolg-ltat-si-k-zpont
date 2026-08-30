@@ -148,6 +148,8 @@ interface PersistedState {
   productCategories: ProductCategory[];
   products: Product[];
   tierOverrides: Record<string, EmployeeTier>;
+  /** Admin által a jogosultságkezelésben létrehozott új felhasználók. */
+  extraUsers: User[];
 }
 
 const initialState: PersistedState = {
@@ -175,6 +177,7 @@ const initialState: PersistedState = {
   productCategories: INITIAL_PRODUCT_CATEGORIES,
   products: INITIAL_PRODUCTS,
   tierOverrides: {},
+  extraUsers: [],
 };
 
 interface StoreValue extends PersistedState {
@@ -242,6 +245,8 @@ interface StoreValue extends PersistedState {
     comment?: string,
   ) => void;
 
+  /** Admin: új felhasználó létrehozása a jogosultságkezelésben. */
+  addUser: (input: Omit<User, "id" | "initials">, reason: string) => string;
   setUserRoles: (userId: string, roles: RoleKey[], reason: string) => void;
   /** Munkavállalói besorolás módosítása (jogosultságkezelés). */
   setUserTier: (userId: string, tier: EmployeeTier, reason?: string) => void;
@@ -383,15 +388,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [state, hydrated]);
 
-  const effectiveUsers = useMemo(
-    () =>
-      USERS.map((u) => {
-        const roles = state.roleOverrides[u.id];
-        const tier = (state.tierOverrides ?? {})[u.id] ?? u.employeeTier ?? defaultTierFor(u);
-        return { ...u, ...(roles ? { roles } : {}), employeeTier: tier };
-      }),
-    [state.roleOverrides, state.tierOverrides],
-  );
+  const effectiveUsers = useMemo(() => {
+    const all = [...USERS, ...(state.extraUsers ?? [])];
+    const mapped = all.map((u) => {
+      const roles = state.roleOverrides[u.id];
+      const tier = (state.tierOverrides ?? {})[u.id] ?? u.employeeTier ?? defaultTierFor(u);
+      return { ...u, ...(roles ? { roles } : {}), employeeTier: tier };
+    });
+    syncExtraUsers(state.extraUsers ?? []);
+    return mapped;
+  }, [state.roleOverrides, state.tierOverrides, state.extraUsers]);
 
   const currentUser = useMemo(
     () => effectiveUsers.find((u) => u.id === state.currentUserId) ?? effectiveUsers[0]!,
@@ -1779,9 +1785,41 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ? s.dismissedAnnouncements
           : [...s.dismissedAnnouncements, id],
       })),
+    addUser: (input, reason) => {
+      const id = `u-${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`;
+      const initials = input.name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((w) => w[0]!.toUpperCase())
+        .join("");
+      const user: User = {
+        ...input,
+        id,
+        initials,
+        roles: input.roles.length > 0 ? input.roles : ["igenylo"],
+      };
+      setState((s) => ({
+        ...s,
+        extraUsers: [...(s.extraUsers ?? []), user],
+        roleAudit: [
+          ...user.roles.map((role, i) => ({
+            id: `ra-${Date.now()}-n${i}`,
+            at: today(),
+            actorId: s.currentUserId,
+            targetUserId: id,
+            action: "megadva" as const,
+            role,
+            reason: `Új felhasználó létrehozása – ${reason}`,
+          })),
+          ...s.roleAudit,
+        ],
+      }));
+      return id;
+    },
     setUserRoles: (userId, roles, reason) =>
       setState((s) => {
-        const base = USERS.find((u) => u.id === userId);
+        const base = USERS.find((u) => u.id === userId) ?? (s.extraUsers ?? []).find((u) => u.id === userId);
         if (!base) return s;
         const prev = s.roleOverrides[userId] ?? base.roles;
         const added = roles.filter((r) => !prev.includes(r));
@@ -1960,10 +1998,22 @@ export function useStore() {
   return ctx;
 }
 
+// Admin által létrehozott felhasználók modul-szintű tükre, hogy a statikus
+// `lookup` segédfüggvények is feloldják őket (demó, egy fület feltételez).
+const EXTRA_USERS: User[] = [];
+function syncExtraUsers(users: User[]) {
+  EXTRA_USERS.length = 0;
+  EXTRA_USERS.push(...users);
+}
+
 export const lookup = {
-  user: (id?: string) => USERS.find((u) => u.id === id),
+  user: (id?: string) => USERS.find((u) => u.id === id) ?? EXTRA_USERS.find((u) => u.id === id),
   userName: (id?: string) =>
-    id === "u-system" ? "Rendszer" : (USERS.find((u) => u.id === id)?.name ?? "Ismeretlen"),
+    id === "u-system"
+      ? "Rendszer"
+      : (USERS.find((u) => u.id === id)?.name ??
+        EXTRA_USERS.find((u) => u.id === id)?.name ??
+        "Ismeretlen"),
   unit: (id?: string) => ORG_UNITS.find((o) => o.id === id)?.name ?? "—",
   team: (id?: string) => TEAMS.find((t) => t.id === id)?.name ?? "—",
   catalog: (id?: string) => CATALOG.find((c) => c.id === id),

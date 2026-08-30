@@ -1,6 +1,30 @@
 // Manually curated additions for fragments the automated pass did not cover.
 export const EN_OVERRIDES: Record<string, string> = {
   "Igényelhető": "Requestable",
+  "Új felhasználó": "New user",
+  "Új felhasználó létrehozása": "Create new user",
+  "A felhasználó azonnal megjelenik a listában, a művelet a jogosultsági naplóba kerül.":
+    "The user appears in the list immediately, and the action is recorded in the permissions log.",
+  "Név *": "Name *",
+  "Beosztás *": "Position *",
+  "E-mail cím *": "Email address *",
+  "Dolgozói azonosító": "Employee ID",
+  "Automatikusan generálódik": "Generated automatically",
+  "Szervezeti egység *": "Organisational unit *",
+  "Válasszon egységet…": "Select a unit…",
+  "Közvetlen felettes": "Direct manager",
+  "Nincs megadva": "Not specified",
+  "Indoklás *": "Reason *",
+  "Pl. új munkatárs belépése, dékáni utasítás száma…":
+    "E.g. new colleague joining, dean's instruction number…",
+  "Felhasználó létrehozása": "Create user",
+  "A név, a beosztás és a szervezeti egység megadása kötelező.":
+    "Name, position and organisational unit are required.",
+  "Érvényes e-mail cím szükséges.": "A valid email address is required.",
+  "Ezzel az e-mail címmel már létezik felhasználó.":
+    "A user with this email address already exists.",
+  "A létrehozáshoz rövid indoklás szükséges (min. 5 karakter).":
+    "A short reason (min. 5 characters) is required to create the user.",
   "Nem igényelhető": "Not requestable",
   "Ebben a termékkörben nincs besorolási korlát, mindenki igényelheti.":
     "There is no tier restriction in this category; everyone can request it.",
