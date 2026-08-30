@@ -1,3 +1,5 @@
+import { EXTRA_PRODUCTS_COMPUTING } from "./product-catalog-extra-computing";
+import { EXTRA_PRODUCTS_PERIPHERALS } from "./product-catalog-extra-peripherals";
 import type { EmployeeTier, Product, ProductCategory, User } from "./types";
 
 /** Munkavállalói kategóriák rangsora – a magasabb szint mindent lát alatta. */
@@ -51,7 +53,7 @@ export const INITIAL_PRODUCT_CATEGORIES: ProductCategory[] = [
   { id: "pc-nyomtato", name: "Nyomtató", description: "Munkacsoportos nyomtatás és szkennelés.", active: true },
 ];
 
-export const INITIAL_PRODUCTS: Product[] = [
+const BASE_PRODUCTS: Product[] = [
   // Notebook
   {
     id: "prod-lenovo-t14-g4",
@@ -532,4 +534,17 @@ export const INITIAL_PRODUCTS: Product[] = [
       features: ["Hálózati nyomtatás", "Biztonságos PIN-es nyomtatás", "Duplex", "Szkennelés e-mailbe"],
     },
   },
+];
+
+/** Minőségi besorolás magyarázata a beszerzői katalógushoz. */
+export const TIER_QUALITY_LABELS: Record<EmployeeTier, string> = {
+  alkalmazotti: "basic",
+  vezetoi: "átlagos",
+  felsovezetoi: "prémium",
+};
+
+export const INITIAL_PRODUCTS: Product[] = [
+  ...BASE_PRODUCTS,
+  ...EXTRA_PRODUCTS_COMPUTING,
+  ...EXTRA_PRODUCTS_PERIPHERALS,
 ];
