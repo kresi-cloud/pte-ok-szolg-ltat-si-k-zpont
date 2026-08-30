@@ -1,12 +1,14 @@
-# Minden igény létező döntéshozóhoz kerüljön
+# Minden igény létező, elérhető döntéshozóhoz kerüljön
 
 ## Mit találtam a jelenlegi állapotban
 
-- Az igény beküldésekor (`src/lib/store.tsx`) az 1. jóváhagyó a szervezeti egység `approverUserId` mezőjéből jön, `u-nagy` tartalék értékkel; a 2. lépés a szolgáltatáscsapat gazdája. Mind a kilenc szervezeti egységhez tartozik jóváhagyó, tehát „nem létező user" hiba emiatt nem áll elő.
-- Két valódi elakadási kockázat maradt:
-  1. **Önjóváhagyás:** az intézetigazgatók (Élettani, Anatómiai, Biokémiai, Farmakológiai) egyben a saját egységük jóváhagyói. Ha ők adnak be igényt, saját magukat kapják meg 1. jóváhagyónak — a folyamat formálisan halad, de érdemben nincs döntéshozó.
-  2. **Helyi IT referens:** egyetlen ilyen felhasználó van (Bercsényi L., Élettani Intézet). Minden más egység átadása is hozzá esik vissza, mert a kód „bármelyik IT referens" tartalékot használ.
-- Az admin által létrehozott új felhasználók a meglévő egységekbe kerülnek, így öröklik ugyanezeket a hiányokat.
+- Igen, jól látja – de a pontos ok más: **Dr. Perneczky Zs. (`u-fekete`) létezik** a törzsadatban (Anatómiai Intézet, `jovahagyo` szerepkör), viszont **nem szerepel a demó bejelentkezési / felhasználóváltó listában** (`src/lib/demo-users.ts`). Így az ASUS notebook igény első jóváhagyása hozzá kerül, de senki nem tud a nevében belépni → az ügy megáll.
+- Ugyanez érint minden jóváhagyót és ügyintézőt, aki nincs a listában: Dr. Hollósy I., Dr. Kaposvári M., Dr. Ecsedi K., Bihari E., Görömbei D., Vasadi Á., Szemerey N., Bethlendi B., Prof. Dr. Rónaszéki L.
+- Két további, tartalmi elakadási kockázat:
+  1. **Önjóváhagyás:** az intézetigazgatók (Élettani, Anatómiai, Biokémiai, Farmakológiai) egyben a saját egységük jóváhagyói. Ha ők adnak be igényt, saját magukat kapják meg 1. jóváhagyónak.
+  2. **Helyi IT referens:** egyetlen ilyen felhasználó van (Bercsényi L., Élettani Intézet), minden más egység átadása is hozzá esik vissza.
+- Az admin által létrehozott új felhasználók a meglévő egységekbe kerülnek, így öröklik ezeket a hiányokat.
+
 
 ## Megoldás
 
