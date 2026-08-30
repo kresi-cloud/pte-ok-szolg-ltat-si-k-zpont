@@ -38,6 +38,13 @@ import type {
   User,
 } from "./types";
 import { INITIAL_PRODUCTS, INITIAL_PRODUCT_CATEGORIES } from "./product-catalog";
+import {
+  isUnknownUser,
+  resolveItReferent,
+  resolveServiceOwner,
+  resolveUnitApprover,
+} from "./routing";
+
 import { INVENTORY, specForModel } from "./inventory-data";
 import { handoverPurposeTitle, productForHandover, specFromProduct } from "./handover-products";
 import { modelKeyForStandard, standardLabel } from "./handover-mapping";
