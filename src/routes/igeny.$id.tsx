@@ -414,11 +414,15 @@ function RequestDetail() {
 
         {planItem && (
           <p className="mt-4 rounded-md border border-accent/30 bg-accent/10 px-4 py-3 text-sm">
-            <span className="font-medium">Beszerzési terv: </span>
-            az igény bekerült a {planItem.planYear}. évi tervbe ({planItem.quarter}, {planItem.quantity} db).{" "}
-            <Link to="/beszerzesi-terv" className="underline">
-              Beszerzési terv megnyitása
-            </Link>
+            <span className="font-medium">Beszerzési besorolás: </span>
+            {planItem.timing === "azonnali"
+              ? `az igény azonnali beszerzési csomagba került (${planItem.quantity} db).`
+              : `az igény a ${planItem.planYear}. évi terv ${QUARTER_LABELS[planItem.quarter]}ébe került (${planItem.quantity} db).`}{" "}
+            {canReviewProcurement(store.activeRole) && (
+              <Link to="/beszerzesi-terv" className="underline">
+                Beszerzési terv megnyitása
+              </Link>
+            )}
           </p>
         )}
 
