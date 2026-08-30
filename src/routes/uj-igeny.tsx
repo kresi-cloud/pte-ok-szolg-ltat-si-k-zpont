@@ -233,6 +233,10 @@ function Wizard() {
               `Kért átvételi hely: ${handoverLabel}`,
             ]
           : [form.goal.trim() ? `Indoklás: ${form.goal.trim()}` : ""]),
+        `Igényelt beszerzési ütemezés: ${timingLabel}.`,
+        form.requestedQuarter === "azonnali" && form.urgencyReason.trim()
+          ? `Az azonnali beszerzés indoka: ${form.urgencyReason.trim()}`
+          : "",
       ]
         .filter(Boolean)
         .join("\n")
