@@ -556,6 +556,19 @@ function RequestDetail() {
                       ["Felhasználók", request.users ?? "Nincs megadva"],
                       ["Érintett felhasználószám", request.userCount ?? "Nincs megadva"],
                     ]),
+                ...(request.requestedQuarter
+                  ? [
+                      [
+                        "Igényelt beszerzési ütemezés",
+                        request.requestedQuarter === "azonnali"
+                          ? "Azonnali beszerzés"
+                          : REQUESTED_TIMING_LABELS[request.requestedQuarter],
+                      ],
+                      ...(request.urgencyReason
+                        ? [["Az azonnali beszerzés indoka", request.urgencyReason]]
+                        : []),
+                    ]
+                  : []),
                 ["Adatkezelési érintettség", request.personalData ? "Igen" : "Nem"],
                 ["Integráció", request.integration ?? "Nem szükséges"],
                 [
