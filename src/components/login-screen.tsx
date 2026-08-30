@@ -8,7 +8,8 @@ import { DEMO_USER_IDS } from "@/lib/demo-users";
 const DEMO_USERS = DEMO_USER_IDS;
 
 export function LoginScreen() {
-  const { login } = useStore();
+  const { login, extraUsers } = useStore();
+  const extraIds = (extraUsers ?? []).map((u) => u.id);
 
   return (
     <div className="grid min-h-dvh lg:grid-cols-2">
