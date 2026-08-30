@@ -60,9 +60,9 @@ export function resolveServiceOwner(users: User[], teamId?: string): string {
   );
 }
 
-/** Helyi IT referens az adott szervezeti egységhez. */
-export function resolveItReferent(users: User[], orgUnitId?: string): string | undefined {
-  return byRole(users, "it_referens", orgUnitId)?.id;
+/** Kari IT referens – egyetlen személy látja el az egész kar telepítéseit. */
+export function resolveItReferent(users: User[], _orgUnitId?: string): string | undefined {
+  return byRole(users, "it_referens")?.id;
 }
 
 /** Igaz, ha a megadott azonosító nem oldható fel létező felhasználóra. */

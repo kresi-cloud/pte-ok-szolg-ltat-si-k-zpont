@@ -367,7 +367,7 @@ export const USERS: User[] = [
     title: "kari IT referens",
     email: "bercsenyi.l@aok.pte.hu",
     employeeId: "PTE-100005",
-    orgUnitId: "ou-elettani",
+    orgUnitId: "ou-it",
     roles: ["it_referens"],
     teamId: "t-it",
     initials: "BL",
