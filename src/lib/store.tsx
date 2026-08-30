@@ -493,15 +493,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 id: `ap-${Date.now()}`,
                 step: 1,
                 role: "Szervezeti jóváhagyó",
-                approverId:
-                  ORG_UNITS.find((o) => o.id === currentUser.orgUnitId)?.approverUserId ?? "u-nagy",
+                approverId: resolveUnitApprover(
+                  effectiveUsers,
+                  currentUser.orgUnitId,
+                  currentUser.id,
+                ),
                 decision: "fuggoben",
               },
               {
                 id: `ap2-${Date.now()}`,
                 step: 2,
                 role: "Szolgáltatásgazda",
-                approverId: TEAMS.find((t) => t.id === team.id)!.ownerUserId,
+                approverId: resolveServiceOwner(effectiveUsers, team.id),
+
                 decision: "fuggoben",
               },
             ],
