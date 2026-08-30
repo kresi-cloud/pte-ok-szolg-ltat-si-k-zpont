@@ -1437,9 +1437,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           : undefined;
         const recipientId = request?.requesterId ?? currentUser.id;
         const orgUnitId = request?.orgUnitId ?? item.orgUnitId;
-        const referent =
-          effectiveUsers.find((u) => u.roles.includes("it_referens") && u.orgUnitId === orgUnitId) ??
-          effectiveUsers.find((u) => u.roles.includes("it_referens"));
+        const referentId = resolveItReferent(effectiveUsers, orgUnitId);
+
         const id = `ho-${Date.now()}`;
         const handover: AssetHandover = {
           id,
