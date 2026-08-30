@@ -869,6 +869,19 @@ function Wizard() {
                 : ([
                     ["Cél", isHw ? form.goal || "Nincs megadva" : form.goal],
                   ] as [string, string][])),
+              ...(isHw
+                ? ([
+                    ["Igényelt beszerzési ütemezés", timingLabel],
+                    ...(form.requestedQuarter === "azonnali"
+                      ? ([
+                          [
+                            "Az azonnali beszerzés indoka",
+                            form.urgencyReason.trim() || "Nincs megadva",
+                          ],
+                        ] as [string, string][])
+                      : []),
+                  ] as [string, string][])
+                : []),
               ["Érintett szervezeti egység", lookup.unit(currentUser.orgUnitId)],
               ...(isPersonalUse && isHw
                 ? ([] as [string, string][])
