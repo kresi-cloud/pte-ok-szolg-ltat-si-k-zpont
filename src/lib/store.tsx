@@ -378,6 +378,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           if (missing.length) merged.products = [...merged.products, ...missing];
         }
 
+        // Hiányzó tervciklusok pótlása minden olyan évre, amelyre van tervsor,
+        // valamint a régi „jovahagyasra_var” státusz átvezetése a mai folyamatra.
+        if (Array.isArray(merged.planApprovals)) {
+          const years = new Set<number>([
+            ...(merged.planItems ?? []).map((i) => i.planYear),
+            ...merged.planApprovals.map((a) => a.planYear),
+          ]);
+          const knownApprovals = new Set(merged.planApprovals.map((a) => a.id));
+          const missingCycles = [...years]
+            .flatMap((y) => buildPlanApprovals(y))
+            .filter((a) => !knownApprovals.has(a.id));
+          merged.planApprovals = [...merged.planApprovals, ...missingCycles].map((a) =>
+            (a.status as string) === "jovahagyasra_var"
+              ? { ...a, status: "dekani_jovahagyas" as const }
+              : a,
+          );
+        }
+
+
+
         // Nem létező vagy önmagát jóváhagyó döntéshozók javítása a mentett állapotban.
         const known = [...USERS, ...(merged.extraUsers ?? [])];
         if (Array.isArray(merged.requests)) {
