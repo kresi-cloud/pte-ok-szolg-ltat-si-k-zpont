@@ -424,8 +424,27 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
         </ul>
       )}
 
+      <p className="rounded-sm bg-muted px-3 py-2 text-xs text-muted-foreground">
+        <span className="font-medium text-foreground">Kire vár: </span>
+        {WAITING_ON[status]}
+      </p>
+
       {(isPlanner || isBuyer || isFinance || isDean) && status !== "vegrehajtas" && (
         <div className="space-y-2 border-t border-border pt-3">
+          {isFinance && (status === "tervezes" || status === "visszakuldve") && (
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={items.length === 0}
+              onClick={() => {
+                store.nudgePlanSubmission(approval.id);
+                toast.success("Sürgetés elküldve az IT eszközmenedzsernek");
+              }}
+            >
+              Beküldés sürgetése
+            </Button>
+          )}
+
           {isPlanner && (status === "tervezes" || status === "visszakuldve") && (
             <>
               <Textarea
