@@ -62,7 +62,7 @@ export function LoginScreen() {
             </p>
             <ul className="mt-3 space-y-2">
               {[...DEMO_USERS, ...extraIds].map((id) => {
-                const u = lookup.user(id);
+                const u = lookup.user(id)!;
                 return (
                   <li key={id}>
                     <button
