@@ -101,6 +101,8 @@ const empty: FormState = {
   workLocationId: "",
   handoverMode: "munkavegzes",
   handoverLocationId: "",
+  requestedQuarter: "",
+  urgencyReason: "",
   siteUrl: "",
   refined: false,
 };
