@@ -1,6 +1,6 @@
 import { Building2, ShieldCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useStore, USERS } from "@/lib/store";
+import { useStore } from "@/lib/store";
 import { ROLE_LABELS } from "@/lib/types";
 import { lookup } from "@/lib/store";
 import { DEMO_USER_IDS } from "@/lib/demo-users";
@@ -8,7 +8,8 @@ import { DEMO_USER_IDS } from "@/lib/demo-users";
 const DEMO_USERS = DEMO_USER_IDS;
 
 export function LoginScreen() {
-  const { login } = useStore();
+  const { login, extraUsers } = useStore();
+  const extraIds = (extraUsers ?? []).map((u) => u.id);
 
   return (
     <div className="grid min-h-dvh lg:grid-cols-2">
@@ -60,8 +61,8 @@ export function LoginScreen() {
               Demó belépés más szerepkörrel
             </p>
             <ul className="mt-3 space-y-2">
-              {DEMO_USERS.map((id) => {
-                const u = USERS.find((x) => x.id === id)!;
+              {[...DEMO_USERS, ...extraIds].map((id) => {
+                const u = lookup.user(id)!;
                 return (
                   <li key={id}>
                     <button
