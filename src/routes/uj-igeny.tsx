@@ -269,7 +269,16 @@ function Wizard() {
               form.handoverMode === "eltero" ? form.handoverLocationId || undefined : undefined,
           }
         : {}),
-      priority: "kozepes",
+      ...(isHw && form.requestedQuarter
+        ? {
+            requestedQuarter: form.requestedQuarter as RequestedTiming,
+            urgencyReason:
+              form.requestedQuarter === "azonnali"
+                ? form.urgencyReason.trim() || undefined
+                : undefined,
+          }
+        : {}),
+      priority: isHw && form.requestedQuarter === "azonnali" ? "magas" : "kozepes",
       ai: {
         category: domain?.name ?? "",
         subtype: preset?.name ?? "Automatikus besorolás",
