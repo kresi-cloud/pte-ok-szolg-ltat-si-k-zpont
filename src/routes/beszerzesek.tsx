@@ -631,7 +631,7 @@ function BuyerWorkspace() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatTile label="Nyitott eseti beszerzés" value={String(openAdHoc)} />
-        <StatTile label="Dékáni jóváhagyásra vár" value={String(pendingApprovals)} />
+        <StatTile label={secondTile.label} value={secondTile.value} />
         <StatTile label={`${NEXT_FINANCIAL_YEAR}. évi keret`} value={huf(totalYear)} />
       </div>
 
