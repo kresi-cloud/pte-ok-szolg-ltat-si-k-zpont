@@ -689,6 +689,52 @@ function Wizard() {
             </>
           )}
 
+          {isHw && (
+            <div className="space-y-2">
+              <Label htmlFor="req-quarter">Melyik negyedévre kéri a beszerzést?</Label>
+              <select
+                id="req-quarter"
+                value={form.requestedQuarter}
+                onChange={(e) =>
+                  set({
+                    requestedQuarter: e.target.value,
+                    ...(e.target.value === "azonnali" ? {} : { urgencyReason: "" }),
+                  })
+                }
+                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Válasszon ütemezést…</option>
+                {(Object.keys(REQUESTED_TIMING_LABELS) as RequestedTiming[]).map((q) => (
+                  <option key={q} value={q}>
+                    {REQUESTED_TIMING_LABELS[q]}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-muted-foreground">
+                A választás javaslatként kerül a beszerzési tervbe; a beszerző és a gazdasági vezető
+                felülvizsgálhatja.
+              </p>
+            </div>
+          )}
+
+          {isHw && form.requestedQuarter === "azonnali" && (
+            <div className="space-y-2">
+              <Label htmlFor="urgency">Az azonnali beszerzés indoka</Label>
+              <Textarea
+                id="urgency"
+                rows={3}
+                value={form.urgencyReason}
+                onChange={(e) => set({ urgencyReason: e.target.value })}
+                placeholder="Pl. a jelenlegi eszköz javíthatatlanul meghibásodott, a betegellátás nem állhat le"
+              />
+              <p className="text-xs text-muted-foreground">
+                Azonnali beszerzés csak indoklással kérhető (legalább 10 karakter).
+              </p>
+            </div>
+          )}
+
+
+
           {questions.includes("users") && !isPersonalUse && (
             <div className="space-y-2">
               <Label htmlFor="users">Kik fogják használni?</Label>
