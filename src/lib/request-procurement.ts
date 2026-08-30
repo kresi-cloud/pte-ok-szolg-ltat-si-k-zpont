@@ -129,9 +129,14 @@ export function planItemFromRequest(
       ? Math.round(r.estimatedCost / quantity)
       : undefined;
 
+  const requested = r.requestedQuarter;
+  const immediate = requested === "azonnali";
+  const quarter: Quarter =
+    requested && requested !== "azonnali" ? requested : immediate ? "Q1" : quarterFor(r.priority);
+
   return {
     planYear: NEXT_FINANCIAL_YEAR,
-    quarter: quarterFor(r.priority),
+    quarter,
     orgUnitId: r.orgUnitId,
     replacedAssetIds: r.replacedAssetId ? [r.replacedAssetId] : [],
     reason: `Jóváhagyott igény (${r.id}): ${r.title}`,
@@ -144,16 +149,33 @@ export function planItemFromRequest(
     contingencyPct: 10,
     quantityDiscountPct: 0,
     inflationPct: 3,
-    priority: r.priority === "kritikus" ? "kritikus" : r.priority === "magas" ? "magas" : "kozepes",
+    priority: immediate
+      ? "kritikus"
+      : r.priority === "kritikus"
+        ? "kritikus"
+        : r.priority === "magas"
+          ? "magas"
+          : "kozepes",
     fundingSourceId: "fs-kari",
     status: "jovahagyasra_var",
-    comment: product
-      ? `Katalógusból igényelt eszköz: ${product.name} (${product.vendor}).`
-      : "Automatikusan generálva jóváhagyott szolgáltatási igényből; gazdasági felülvizsgálat szükséges.",
+    comment: [
+      product
+        ? `Katalógusból igényelt eszköz: ${product.name} (${product.vendor}).`
+        : "Automatikusan generálva jóváhagyott szolgáltatási igényből; gazdasági felülvizsgálat szükséges.",
+      immediate
+        ? `Az igénylő azonnali beszerzést kért. Indoklás: ${r.urgencyReason ?? "nincs megadva"}`
+        : requested
+          ? `Az igénylő által kért ütemezés: ${requested}.`
+          : "",
+    ]
+      .filter(Boolean)
+      .join(" "),
     kind: r.replacedAssetId ? "csere" : "uj_kapacitas",
     sourceRequestId: r.id,
     productId: product?.id,
     deviceName: product ? `${product.name} (${product.vendor})` : undefined,
     modelKey: product?.modelKey,
+    timing: immediate ? "azonnali" : "negyedeves",
   };
 }
+
