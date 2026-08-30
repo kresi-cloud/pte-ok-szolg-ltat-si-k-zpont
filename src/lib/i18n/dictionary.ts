@@ -1123,7 +1123,7 @@ export const EN_DICT: Record<string, string> = {
   "Beszerzés folyamatban a beszerzőnél.": "Procurement in progress with the buyer.",
   "Átvételi visszaigazolásra vár": "Awaiting receipt confirmation",
   "Telepítés és átadás folyamatban": "Installation and handover in progress",
-  "IT referens kijelölésére vár.": "Awaiting assignment of a local IT referent.",
+  "IT referens kijelölésére vár.": "Awaiting assignment of the faculty IT referent.",
   
   "Visszaigazolásra vár:": "Awaiting confirmation:",
   "Becsült nettó": "Estimated net",
