@@ -1300,7 +1300,12 @@ function buildRequest(s: Seed): ServiceRequest {
   const cost = hw ? hw.cost : s.cost;
   const goalText = hw ? hw.goal : s.goal;
   const unit = ORG_UNITS.find((o) => o.id === s.orgUnitId)!;
-  const approverId = unit.approverUserId ?? "u-nagy";
+  // Önjóváhagyás elkerülése: ha az egység jóváhagyója maga az igénylő, a helyettes dönt.
+  const approverId =
+    (unit.approverUserId === s.requesterId
+      ? (unit.deputyApproverUserId ?? "u-nagy")
+      : unit.approverUserId) ?? "u-nagy";
+
   const approvals: Approval[] = [];
   const closedish = ["elfogadva", "tervezes", "megvalositas", "teszteles", "atadasra_var", "lezarva"];
   if (s.status === "jovahagyasra_var") {
