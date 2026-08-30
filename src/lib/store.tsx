@@ -1446,7 +1446,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           requestId: item.sourceRequestId,
           recipientId,
           orgUnitId,
-          referentId: referent?.id,
+          referentId,
           deviceName: item.deviceName ?? standardLabel(item.standardKey),
           productId: item.productId ?? request?.productId,
           modelKey: item.modelKey ?? modelKeyForStandard(item.standardKey),
