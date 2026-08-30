@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useStore } from "@/lib/store";
-import { TIERS, TIER_LABELS } from "@/lib/product-catalog";
+import { TIERS, TIER_LABELS, categoryIsTiered } from "@/lib/product-catalog";
 import { productLockInfo } from "@/lib/product-lock";
 import type { EmployeeTier, Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -255,16 +255,22 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                   <Field label="Gyártó" value={draft.vendor} onChange={(v) => set({ vendor: v })} placeholder="Xiaomi" />
                   <div className="space-y-1.5">
                     <Label>Elérhetőség</Label>
-                    <Select value={draft.tier} onValueChange={(v) => set({ tier: v as EmployeeTier })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {TIERS.map((t) => (
-                          <SelectItem key={t} value={t}>
-                            {TIER_LABELS[t]} kategóriától
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {activeCat && categoryIsTiered(activeCat.id) ? (
+                      <Select value={draft.tier} onValueChange={(v) => set({ tier: v as EmployeeTier })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {TIERS.map((t) => (
+                            <SelectItem key={t} value={t}>
+                              {TIER_LABELS[t]} kategóriától
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="rounded-md border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
+                        Ebben a termékkörben nincs besorolási korlát, mindenki igényelheti.
+                      </p>
+                    )}
                   </div>
                   <Field label="Referenciaár (Ft)" value={draft.referencePrice} onChange={(v) => set({ referencePrice: v })} placeholder="149000" />
                   <Field label="Operációs rendszer" value={draft.os} onChange={(v) => set({ os: v })} placeholder="Android (HyperOS)" />
@@ -339,7 +345,11 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                             Igényelhető
                           </Label>
                         </div>
-                        <Badge variant="secondary">{TIER_LABELS[p.tier]} kategóriától</Badge>
+                        {categoryIsTiered(p.categoryId) ? (
+                          <Badge variant="secondary">{TIER_LABELS[p.tier]} kategóriától</Badge>
+                        ) : (
+                          <Badge variant="outline">Mindenki igényelheti</Badge>
+                        )}
                         <Button
                           size="sm"
                           variant="outline"
