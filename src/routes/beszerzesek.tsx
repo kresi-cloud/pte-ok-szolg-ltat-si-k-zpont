@@ -287,6 +287,8 @@ function ItemsTable({
   selectedIds?: string[] | undefined;
   onToggleSelect?: ((id: string, on: boolean) => void) | undefined;
 }) {
+  const store = useStore();
+  const showActions = store.activeRole === "beszerzo";
   if (items.length === 0)
     return <p className="px-3 py-6 text-sm text-muted-foreground">Nincs megjeleníthető tétel.</p>;
   return (
@@ -298,8 +300,8 @@ function ItemsTable({
             <th className="px-3 py-2">Tétel</th>
             <th className="px-3 py-2">Becsült bruttó</th>
             <th className="px-3 py-2">Állapot</th>
-            {canSchedule && <th className="px-3 py-2">Tervblokk</th>}
-            <th className="px-3 py-2">Művelet</th>
+            {canSchedule && <th className="px-3 py-2">Ütemezés</th>}
+            {showActions && <th className="px-3 py-2">Művelet</th>}
           </tr>
         </thead>
         <tbody>
@@ -309,6 +311,8 @@ function ItemsTable({
               item={i}
               canAct={canAct}
               canSchedule={canSchedule}
+              showActions={showActions}
+
               selected={selectedIds?.includes(i.id)}
               onToggleSelect={(on) => onToggleSelect?.(i.id, on)}
             />
