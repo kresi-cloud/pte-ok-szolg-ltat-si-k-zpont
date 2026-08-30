@@ -602,8 +602,22 @@ function BuyerWorkspace() {
   }
 
   const openAdHoc = adHoc.filter((p) => p.status !== "teljesult").length;
-  const pendingApprovals = approvals.filter((a) => a.status === "jovahagyasra_var").length;
+  /** A régi „jovahagyasra_var” státusz a dékáni jóváhagyással egyenértékű. */
+  const deanPending = approvals.filter((a) =>
+    ["dekani_jovahagyas", "jovahagyasra_var"].includes(a.status),
+  ).length;
+  const financePending = approvals.filter((a) => a.status === "gazdasagi_ellenorzes").length;
+  const planningCycles = approvals.filter((a) =>
+    ["tervezes", "visszakuldve"].includes(a.status),
+  ).length;
   const totalYear = yearItems.reduce((s, i) => s + itemCost(i).withContingency, 0);
+  const role = store.activeRole;
+  const secondTile =
+    role === "gazdasagi_vezeto"
+      ? { label: "Gazdasági ellenőrzésre vár", value: String(financePending) }
+      : role === "eszkozmenedzser"
+        ? { label: "Beküldésre váró tervciklus", value: String(planningCycles) }
+        : { label: "Dékáni jóváhagyásra vár", value: String(deanPending) };
 
   return (
     <div className="space-y-8">
