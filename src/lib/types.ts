@@ -318,7 +318,23 @@ export interface ServiceRequest {
   handoverMode?: HandoverMode | undefined;
   /** Eltérő átvételi hely esetén a helyszín azonosítója. */
   handoverLocationId?: string | undefined;
+  /** Az igénylő által kért beszerzési ütemezés (negyedév vagy azonnali). */
+  requestedQuarter?: RequestedTiming | undefined;
+  /** Azonnali beszerzés kérésének indoklása. */
+  urgencyReason?: string | undefined;
 }
+
+/** Igényelt beszerzési ütemezés: negyedév vagy azonnali. */
+export type RequestedTiming = "Q1" | "Q2" | "Q3" | "Q4" | "azonnali";
+
+export const REQUESTED_TIMING_LABELS: Record<RequestedTiming, string> = {
+  Q1: "I. negyedév",
+  Q2: "II. negyedév",
+  Q3: "III. negyedév",
+  Q4: "IV. negyedév",
+  azonnali: "Azonnali beszerzés (indoklás szükséges)",
+};
+
 
 export type RequestReason =
   | "uj_belepo"

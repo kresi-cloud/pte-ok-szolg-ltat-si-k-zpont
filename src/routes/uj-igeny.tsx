@@ -12,8 +12,8 @@ import { AiBadge } from "@/components/status-badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { CATALOG, DOMAINS, lookup, useStore } from "@/lib/store";
-import type { DomainKey, HandoverMode, RequestReason } from "@/lib/types";
-import { HANDOVER_MODE_LABELS, REQUEST_REASON_LABELS } from "@/lib/types";
+import type { DomainKey, HandoverMode, RequestReason, RequestedTiming } from "@/lib/types";
+import { HANDOVER_MODE_LABELS, REQUEST_REASON_LABELS, REQUESTED_TIMING_LABELS } from "@/lib/types";
 import { ASSET_MODELS } from "@/lib/asset-data";
 import { LOCATION_KIND_LABELS } from "@/lib/asset-types";
 import { defaultLocationForUser, locationsForUser } from "@/lib/asset-logic";
@@ -76,6 +76,8 @@ interface FormState {
   workLocationId: string;
   handoverMode: string;
   handoverLocationId: string;
+  requestedQuarter: string;
+  urgencyReason: string;
   siteUrl: string;
   refined: boolean;
 }
@@ -99,6 +101,8 @@ const empty: FormState = {
   workLocationId: "",
   handoverMode: "munkavegzes",
   handoverLocationId: "",
+  requestedQuarter: "",
+  urgencyReason: "",
   siteUrl: "",
   refined: false,
 };
@@ -165,6 +169,17 @@ function Wizard() {
     ? "tajekoztatas"
     : "figyelmeztetes";
 
+  /** Igényelt ütemezés: minden eszközigénynél kötelező, azonnalinál indoklással. */
+  const timingOk =
+    !isHw ||
+    (!!form.requestedQuarter &&
+      (form.requestedQuarter !== "azonnali" || form.urgencyReason.trim().length >= 10));
+  const timingLabel = form.requestedQuarter
+    ? form.requestedQuarter === "azonnali"
+      ? "Azonnali beszerzés"
+      : REQUESTED_TIMING_LABELS[form.requestedQuarter as RequestedTiming]
+    : "Nincs megadva";
+
   const personalDetailsOk =
     !!form.requestReason &&
     !!form.workLocationId &&
@@ -175,7 +190,7 @@ function Wizard() {
     (key === "category" && !!form.productCategoryId) ||
     (key === "product" && !!form.productId) ||
     (key === "goal" && form.goal.trim().length > 20 && form.title.trim().length > 3) ||
-    (key === "details" && (!(isHw && isPersonalUse) || personalDetailsOk)) ||
+    (key === "details" && (!(isHw && isPersonalUse) || personalDetailsOk) && timingOk) ||
     key === "summary";
 
   const locationLabel = (id: string) => {
@@ -218,6 +233,10 @@ function Wizard() {
               `Kért átvételi hely: ${handoverLabel}`,
             ]
           : [form.goal.trim() ? `Indoklás: ${form.goal.trim()}` : ""]),
+        `Igényelt beszerzési ütemezés: ${timingLabel}.`,
+        form.requestedQuarter === "azonnali" && form.urgencyReason.trim()
+          ? `Az azonnali beszerzés indoka: ${form.urgencyReason.trim()}`
+          : "",
       ]
         .filter(Boolean)
         .join("\n")
@@ -250,7 +269,16 @@ function Wizard() {
               form.handoverMode === "eltero" ? form.handoverLocationId || undefined : undefined,
           }
         : {}),
-      priority: "kozepes",
+      ...(isHw && form.requestedQuarter
+        ? {
+            requestedQuarter: form.requestedQuarter as RequestedTiming,
+            urgencyReason:
+              form.requestedQuarter === "azonnali"
+                ? form.urgencyReason.trim() || undefined
+                : undefined,
+          }
+        : {}),
+      priority: isHw && form.requestedQuarter === "azonnali" ? "magas" : "kozepes",
       ai: {
         category: domain?.name ?? "",
         subtype: preset?.name ?? "Automatikus besorolás",
@@ -661,6 +689,52 @@ function Wizard() {
             </>
           )}
 
+          {isHw && (
+            <div className="space-y-2">
+              <Label htmlFor="req-quarter">Melyik negyedévre kéri a beszerzést?</Label>
+              <select
+                id="req-quarter"
+                value={form.requestedQuarter}
+                onChange={(e) =>
+                  set({
+                    requestedQuarter: e.target.value,
+                    ...(e.target.value === "azonnali" ? {} : { urgencyReason: "" }),
+                  })
+                }
+                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Válasszon ütemezést…</option>
+                {(Object.keys(REQUESTED_TIMING_LABELS) as RequestedTiming[]).map((q) => (
+                  <option key={q} value={q}>
+                    {REQUESTED_TIMING_LABELS[q]}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-muted-foreground">
+                A választás javaslatként kerül a beszerzési tervbe; a beszerző és a gazdasági vezető
+                felülvizsgálhatja.
+              </p>
+            </div>
+          )}
+
+          {isHw && form.requestedQuarter === "azonnali" && (
+            <div className="space-y-2">
+              <Label htmlFor="urgency">Az azonnali beszerzés indoka</Label>
+              <Textarea
+                id="urgency"
+                rows={3}
+                value={form.urgencyReason}
+                onChange={(e) => set({ urgencyReason: e.target.value })}
+                placeholder="Pl. a jelenlegi eszköz javíthatatlanul meghibásodott, a betegellátás nem állhat le"
+              />
+              <p className="text-xs text-muted-foreground">
+                Azonnali beszerzés csak indoklással kérhető (legalább 10 karakter).
+              </p>
+            </div>
+          )}
+
+
+
           {questions.includes("users") && !isPersonalUse && (
             <div className="space-y-2">
               <Label htmlFor="users">Kik fogják használni?</Label>
@@ -795,6 +869,19 @@ function Wizard() {
                 : ([
                     ["Cél", isHw ? form.goal || "Nincs megadva" : form.goal],
                   ] as [string, string][])),
+              ...(isHw
+                ? ([
+                    ["Igényelt beszerzési ütemezés", timingLabel],
+                    ...(form.requestedQuarter === "azonnali"
+                      ? ([
+                          [
+                            "Az azonnali beszerzés indoka",
+                            form.urgencyReason.trim() || "Nincs megadva",
+                          ],
+                        ] as [string, string][])
+                      : []),
+                  ] as [string, string][])
+                : []),
               ["Érintett szervezeti egység", lookup.unit(currentUser.orgUnitId)],
               ...(isPersonalUse && isHw
                 ? ([] as [string, string][])
