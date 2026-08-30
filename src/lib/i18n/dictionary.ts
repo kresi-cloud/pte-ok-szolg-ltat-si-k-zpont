@@ -1365,9 +1365,7 @@ export const EN_DICT: Record<string, string> = {
   "Beküldésre váró tervciklus": "Plan cycles awaiting submission",
   "Igényelt beszerzési ütemezés": "Requested procurement timing",
   "Az azonnali beszerzés indoka": "Reason for immediate procurement",
-  "Azonnali beszerzés": "Immediate procurement",
   "Beszerzési besorolás: ": "Procurement classification: ",
-  "Beszerzési terv megnyitása": "Open procurement plan",
   "IT eszközmenedzser – terv összeállítása és beküldése":
     "IT asset manager – compile and submit the plan",
   "Gazdasági vezető – pénzügyi ellenőrzés": "Economic director – financial review",
@@ -1375,8 +1373,6 @@ export const EN_DICT: Record<string, string> = {
   "IT eszközmenedzser – átdolgozás": "IT asset manager – rework",
   "Beszerző – beszerzés indítása": "Buyer – start procurement",
   "Beszerző – végrehajtás alatt": "Buyer – execution in progress",
-  "Lezárva": "Closed",
-  "Elutasítva": "Rejected",
   "1–10 fő": "1–10 people",
   "Belépés": "Login",
   "Bezárás": "Close",
