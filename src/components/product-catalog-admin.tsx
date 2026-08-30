@@ -345,10 +345,8 @@ export function ProductCatalogAdmin({ readOnly = false }: { readOnly?: boolean }
                             Igényelhető
                           </Label>
                         </div>
-                        {categoryIsTiered(p.categoryId) ? (
+                        {categoryIsTiered(p.categoryId) && (
                           <Badge variant="secondary">{TIER_LABELS[p.tier]} kategóriától</Badge>
-                        ) : (
-                          <Badge variant="outline">Mindenki igényelheti</Badge>
                         )}
                         <Button
                           size="sm"

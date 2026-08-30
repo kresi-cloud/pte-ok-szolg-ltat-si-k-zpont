@@ -2,7 +2,6 @@
 export const EN_OVERRIDES: Record<string, string> = {
   "Igényelhető": "Requestable",
   "Nem igényelhető": "Not requestable",
-  "Mindenki igényelheti": "Requestable by everyone",
   "Ebben a termékkörben nincs besorolási korlát, mindenki igényelheti.":
     "There is no tier restriction in this category; everyone can request it.",
   "A termék ismét igényelhető": "The product is requestable again",
