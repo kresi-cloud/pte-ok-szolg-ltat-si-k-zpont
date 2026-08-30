@@ -240,9 +240,9 @@ interface StoreValue extends PersistedState {
   startPlanExecution: (id: string) => void;
   /** Beszerző: a tervsor eszköze fizikailag beérkezett – átadási folyamat indul. */
   markPlanItemDelivered: (planItemId: string) => void;
-  /** Helyi IT referens: telepítési és azonosító adatok rögzítése. */
+  /** Kari IT referens: telepítési és azonosító adatok rögzítése. */
   updateHandover: (id: string, patch: Partial<AssetHandover>, label?: string) => void;
-  /** Helyi IT referens: eszköz átadása az igénylőnek. */
+  /** Kari IT referens: eszköz átadása az igénylőnek. */
   handOverToUser: (id: string, comment?: string) => void;
   /** Igénylő: átvétel visszaigazolása – az eszköz bekerül a személyi leltárba. */
   confirmHandoverReceipt: (id: string, comment?: string) => void;
@@ -1494,7 +1494,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               at: today(),
               read: false,
               requestId: item.sourceRequestId,
-              text: `${handover.deviceName} beérkezett – a helyi IT referens telepítésre és átadásra átvette.`,
+              text: `${handover.deviceName} beérkezett – a kari IT referens telepítésre és átadásra átvette.`,
             },
             ...s.notifications,
           ],

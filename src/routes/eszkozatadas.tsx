@@ -80,7 +80,7 @@ export const Route = createFileRoute("/eszkozatadas")({
       {
         name: "description",
         content:
-          "Helyi IT referens munkatere: a beszerzésből beérkezett eszközök telepítése, gyári szám és leltárkód rögzítése, átadás az igénylőnek.",
+          "Kari IT referens munkatere: a beszerzésből beérkezett eszközök telepítése, gyári szám és leltárkód rögzítése, átadás az igénylőnek.",
       },
       { property: "og:title", content: "Eszközátadás – ÁOK Digitális Szolgáltatási Portál" },
       {
@@ -525,7 +525,7 @@ function HandoverWorkspace() {
       <div className="card-surface mx-auto max-w-2xl space-y-3 p-6">
         <h1 className="font-display text-xl font-semibold">Eszközátadás</h1>
         <p className="text-sm text-muted-foreground">
-          Ez a felület a helyi IT referens munkatere. Az Ön átvételre váró eszközeit a Személyi
+          Ez a felület a kari IT referens munkatere. Az Ön átvételre váró eszközeit a Személyi
           leltár oldalon találja.
         </p>
         <Button asChild variant="outline">

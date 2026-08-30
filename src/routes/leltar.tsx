@@ -146,7 +146,7 @@ function Inventory() {
         <section className="card-surface space-y-3 border-l-4 border-l-primary p-5">
           <h2 className="font-display text-base font-semibold">Átvételre váró eszközök</h2>
           <p className="text-sm text-muted-foreground">
-            A helyi IT referens telepítette és átadta az alábbi eszközt. Az átvétel
+            A kari IT referens telepítette és átadta az alábbi eszközt. Az átvétel
             visszaigazolásával az eszköz automatikusan bekerül a személyi leltárába.
           </p>
           {pendingHandovers.map((h) => (

@@ -22,7 +22,7 @@ export const ROLE_LABELS: Record<RoleKey, string> = {
   beszerzo: "Beszerző",
   eszkozmenedzser: "IT eszközmenedzser",
   gazdasagi_vezeto: "Gazdasági vezető",
-  it_referens: "Helyi IT referens",
+  it_referens: "Kari IT referens",
 };
 
 export const ROLE_DESCRIPTIONS: Record<RoleKey, string> = {
@@ -507,7 +507,7 @@ export interface AssetHandover {
   /** az átvevő munkatárs */
   recipientId: string;
   orgUnitId: string;
-  /** a helyi IT referens, aki telepíti és átadja */
+  /** a kari IT referens, aki telepíti és átadja */
   referentId?: string | undefined;
   deviceName: string;
   /** a beszerzői katalógus tétele, amelyből a műszaki adatok származnak */
@@ -533,7 +533,7 @@ export interface AssetHandover {
   attachments?: HandoverAttachment[] | undefined;
 }
 
-/** Helyi IT referens telepítési checklist lépése. */
+/** Kari IT referens telepítési checklist lépése. */
 export interface ChecklistStep {
   key: string;
   label: string;

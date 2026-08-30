@@ -211,7 +211,7 @@ function ItemRow({
                   size="sm"
                   onClick={() => {
                     store.markPlanItemDelivered(item.id);
-                    toast.success("Beérkezés rögzítve – átadva a helyi IT referensnek");
+                    toast.success("Beérkezés rögzítve – átadva a kari IT referensnek");
                   }}
                 >
                   Beérkezett – átadásra
@@ -219,7 +219,7 @@ function ItemRow({
               )}
               {hasHandover && (
                 <span className="self-center text-xs text-muted-foreground">
-                  Átadási folyamatban a helyi IT referensnél
+                  Átadási folyamatban a kari IT referensnél
                 </span>
               )}
             </>
