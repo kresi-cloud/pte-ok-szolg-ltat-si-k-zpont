@@ -94,31 +94,71 @@ export const DOMAINS: ServiceDomain[] = [
 ];
 
 export const ORG_UNITS: OrgUnit[] = [
-  { id: "ou-dekani", name: "Dékáni Hivatal", type: "hivatal", approverUserId: "u-nagy" },
-  { id: "ou-elettani", name: "Élettani Intézet", type: "intezet", approverUserId: "u-szabo" },
-  { id: "ou-anatomiai", name: "Anatómiai Intézet", type: "intezet", approverUserId: "u-fekete" },
+  {
+    id: "ou-dekani",
+    name: "Dékáni Hivatal",
+    type: "hivatal",
+    approverUserId: "u-nagy",
+    deputyApproverUserId: "u-feher",
+  },
+  {
+    id: "ou-elettani",
+    name: "Élettani Intézet",
+    type: "intezet",
+    approverUserId: "u-szabo",
+    deputyApproverUserId: "u-elettani-h",
+  },
+  {
+    id: "ou-anatomiai",
+    name: "Anatómiai Intézet",
+    type: "intezet",
+    approverUserId: "u-fekete",
+    deputyApproverUserId: "u-anatomiai-h",
+  },
   {
     id: "ou-biokemiai",
     name: "Biokémiai és Orvosi Kémiai Intézet",
     type: "intezet",
     approverUserId: "u-varga",
+    deputyApproverUserId: "u-biokemiai-h",
   },
   {
     id: "ou-farmakologiai",
     name: "Farmakológiai és Farmakoterápiai Intézet",
     type: "intezet",
     approverUserId: "u-toth",
+    deputyApproverUserId: "u-farmakologiai-h",
   },
-  { id: "ou-oktatas", name: "Oktatásszervezési Egység", type: "oktatas", approverUserId: "u-nagy" },
-  { id: "ou-kutatas", name: "Kutatástámogatási Egység", type: "kutatas", approverUserId: "u-nagy" },
+  {
+    id: "ou-oktatas",
+    name: "Oktatásszervezési Egység",
+    type: "oktatas",
+    approverUserId: "u-nagy",
+    deputyApproverUserId: "u-oktatas-h",
+  },
+  {
+    id: "ou-kutatas",
+    name: "Kutatástámogatási Egység",
+    type: "kutatas",
+    approverUserId: "u-nagy",
+    deputyApproverUserId: "u-kutatas-h",
+  },
   {
     id: "ou-klinikai",
     name: "Klinikai Központtal együttműködő egységek",
     type: "klinikai",
     approverUserId: "u-fekete",
+    deputyApproverUserId: "u-klinikai-h",
   },
-  { id: "ou-it", name: "IT Szolgáltatási Egység", type: "hivatal", approverUserId: "u-nagy" },
+  {
+    id: "ou-it",
+    name: "IT Szolgáltatási Egység",
+    type: "hivatal",
+    approverUserId: "u-nagy",
+    deputyApproverUserId: "u-molnar",
+  },
 ];
+
 
 export const USERS: User[] = [
   {
@@ -324,15 +364,87 @@ export const USERS: User[] = [
   {
     id: "u-itref",
     name: "Bercsényi L.",
-    title: "helyi IT referens (Élettani Intézet)",
+    title: "kari IT referens",
     email: "bercsenyi.l@aok.pte.hu",
     employeeId: "PTE-100005",
-    orgUnitId: "ou-elettani",
+    orgUnitId: "ou-it",
     roles: ["it_referens"],
     teamId: "t-it",
     initials: "BL",
   },
+  // Helyettes jóváhagyók – az intézetigazgató saját igényéről ők döntenek.
+  {
+    id: "u-elettani-h",
+    name: "Dr. Barlahidai R.",
+    title: "igazgatóhelyettes",
+    email: "barlahidai.r@aok.pte.hu",
+    employeeId: "PTE-100212",
+    orgUnitId: "ou-elettani",
+    roles: ["igenylo", "jovahagyo"],
+    initials: "BR",
+  },
+  {
+    id: "u-anatomiai-h",
+    name: "Dr. Somlyai K.",
+    title: "igazgatóhelyettes",
+    email: "somlyai.k@aok.pte.hu",
+    employeeId: "PTE-100456",
+    orgUnitId: "ou-anatomiai",
+    roles: ["igenylo", "jovahagyo"],
+    initials: "SK",
+  },
+  {
+    id: "u-biokemiai-h",
+    name: "Dr. Rédei T.",
+    title: "igazgatóhelyettes",
+    email: "redei.t@aok.pte.hu",
+    employeeId: "PTE-100679",
+    orgUnitId: "ou-biokemiai",
+    roles: ["igenylo", "jovahagyo"],
+    initials: "RT",
+  },
+  {
+    id: "u-farmakologiai-h",
+    name: "Dr. Ligeti B.",
+    title: "igazgatóhelyettes",
+    email: "ligeti.b@aok.pte.hu",
+    employeeId: "PTE-100782",
+    orgUnitId: "ou-farmakologiai",
+    roles: ["igenylo", "jovahagyo"],
+    initials: "LB",
+  },
+  {
+    id: "u-oktatas-h",
+    name: "Dr. Halmágyi É.",
+    title: "oktatásszervezési vezető",
+    email: "halmagyi.e@aok.pte.hu",
+    employeeId: "PTE-119004",
+    orgUnitId: "ou-oktatas",
+    roles: ["igenylo", "jovahagyo"],
+    initials: "HÉ",
+  },
+  {
+    id: "u-kutatas-h",
+    name: "Dr. Tabajdi Cs.",
+    title: "kutatástámogatási vezető",
+    email: "tabajdi.cs@aok.pte.hu",
+    employeeId: "PTE-119875",
+    orgUnitId: "ou-kutatas",
+    roles: ["igenylo", "jovahagyo"],
+    initials: "TCS",
+  },
+  {
+    id: "u-klinikai-h",
+    name: "Dr. Vörösmarti A.",
+    title: "klinikai koordinátor",
+    email: "vorosmarti.a@aok.pte.hu",
+    employeeId: "PTE-118220",
+    orgUnitId: "ou-klinikai",
+    roles: ["igenylo", "jovahagyo"],
+    initials: "VA",
+  },
 ];
+
 
 export const TEAMS: ServiceTeam[] = [
   {
@@ -1099,7 +1211,12 @@ function buildRequest(s: Seed): ServiceRequest {
   const cost = hw ? hw.cost : s.cost;
   const goalText = hw ? hw.goal : s.goal;
   const unit = ORG_UNITS.find((o) => o.id === s.orgUnitId)!;
-  const approverId = unit.approverUserId ?? "u-nagy";
+  // Önjóváhagyás elkerülése: ha az egység jóváhagyója maga az igénylő, a helyettes dönt.
+  const approverId =
+    (unit.approverUserId === s.requesterId
+      ? (unit.deputyApproverUserId ?? "u-nagy")
+      : unit.approverUserId) ?? "u-nagy";
+
   const approvals: Approval[] = [];
   const closedish = ["elfogadva", "tervezes", "megvalositas", "teszteles", "atadasra_var", "lezarva"];
   if (s.status === "jovahagyasra_var") {

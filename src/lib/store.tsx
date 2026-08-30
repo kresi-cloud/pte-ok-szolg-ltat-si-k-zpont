@@ -38,6 +38,13 @@ import type {
   User,
 } from "./types";
 import { INITIAL_PRODUCTS, INITIAL_PRODUCT_CATEGORIES } from "./product-catalog";
+import {
+  isUnknownUser,
+  resolveItReferent,
+  resolveServiceOwner,
+  resolveUnitApprover,
+} from "./routing";
+
 import { INVENTORY, specForModel } from "./inventory-data";
 import { handoverPurposeTitle, productForHandover, specFromProduct } from "./handover-products";
 import { modelKeyForStandard, standardLabel } from "./handover-mapping";
@@ -233,9 +240,9 @@ interface StoreValue extends PersistedState {
   startPlanExecution: (id: string) => void;
   /** Beszerző: a tervsor eszköze fizikailag beérkezett – átadási folyamat indul. */
   markPlanItemDelivered: (planItemId: string) => void;
-  /** Helyi IT referens: telepítési és azonosító adatok rögzítése. */
+  /** Kari IT referens: telepítési és azonosító adatok rögzítése. */
   updateHandover: (id: string, patch: Partial<AssetHandover>, label?: string) => void;
-  /** Helyi IT referens: eszköz átadása az igénylőnek. */
+  /** Kari IT referens: eszköz átadása az igénylőnek. */
   handOverToUser: (id: string, comment?: string) => void;
   /** Igénylő: átvétel visszaigazolása – az eszköz bekerül a személyi leltárba. */
   confirmHandoverReceipt: (id: string, comment?: string) => void;
@@ -371,7 +378,33 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           if (missing.length) merged.products = [...merged.products, ...missing];
         }
 
+        // Nem létező vagy önmagát jóváhagyó döntéshozók javítása a mentett állapotban.
+        const known = [...USERS, ...(merged.extraUsers ?? [])];
+        if (Array.isArray(merged.requests)) {
+          merged.requests = merged.requests.map((r) => {
+            const approvals = r.approvals.map((a) => {
+              if (a.decision !== "fuggoben") return a;
+              const broken = isUnknownUser(known, a.approverId) || a.approverId === r.requesterId;
+              if (!broken) return a;
+              const approverId =
+                a.step === 1
+                  ? resolveUnitApprover(known, r.orgUnitId, r.requesterId)
+                  : resolveServiceOwner(known, r.teamId);
+              return { ...a, approverId };
+            });
+            return { ...r, approvals };
+          });
+        }
+        if (Array.isArray(merged.handovers)) {
+          merged.handovers = merged.handovers.map((h) =>
+            isUnknownUser(known, h.referentId)
+              ? { ...h, referentId: resolveItReferent(known, h.orgUnitId) }
+              : h,
+          );
+        }
+
         setState(merged);
+
       }
     } catch {
       /* ignore */
@@ -486,15 +519,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 id: `ap-${Date.now()}`,
                 step: 1,
                 role: "Szervezeti jóváhagyó",
-                approverId:
-                  ORG_UNITS.find((o) => o.id === currentUser.orgUnitId)?.approverUserId ?? "u-nagy",
+                approverId: resolveUnitApprover(
+                  effectiveUsers,
+                  currentUser.orgUnitId,
+                  currentUser.id,
+                ),
                 decision: "fuggoben",
               },
               {
                 id: `ap2-${Date.now()}`,
                 step: 2,
                 role: "Szolgáltatásgazda",
-                approverId: TEAMS.find((t) => t.id === team.id)!.ownerUserId,
+                approverId: resolveServiceOwner(effectiveUsers, team.id),
+
                 decision: "fuggoben",
               },
             ],
@@ -1426,9 +1463,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           : undefined;
         const recipientId = request?.requesterId ?? currentUser.id;
         const orgUnitId = request?.orgUnitId ?? item.orgUnitId;
-        const referent =
-          effectiveUsers.find((u) => u.roles.includes("it_referens") && u.orgUnitId === orgUnitId) ??
-          effectiveUsers.find((u) => u.roles.includes("it_referens"));
+        const referentId = resolveItReferent(effectiveUsers, orgUnitId);
+
         const id = `ho-${Date.now()}`;
         const handover: AssetHandover = {
           id,
@@ -1436,7 +1472,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           requestId: item.sourceRequestId,
           recipientId,
           orgUnitId,
-          referentId: referent?.id,
+          referentId,
           deviceName: item.deviceName ?? standardLabel(item.standardKey),
           productId: item.productId ?? request?.productId,
           modelKey: item.modelKey ?? modelKeyForStandard(item.standardKey),
@@ -1458,7 +1494,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               at: today(),
               read: false,
               requestId: item.sourceRequestId,
-              text: `${handover.deviceName} beérkezett – a helyi IT referens telepítésre és átadásra átvette.`,
+              text: `${handover.deviceName} beérkezett – a kari IT referens telepítésre és átadásra átvette.`,
             },
             ...s.notifications,
           ],
