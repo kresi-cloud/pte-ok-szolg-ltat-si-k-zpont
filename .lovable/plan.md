@@ -33,5 +33,5 @@ Playwright-tal végigfuttatom a teljes láncot mind a kilenc szervezeti egységb
 
 ## Technikai részletek
 
-- Érintett fájlok: `src/lib/seed.ts` (új felhasználók, egységenkénti helyettes jóváhagyó mező), `src/lib/types.ts` (`OrgUnit.deputyApproverUserId`), új `src/lib/routing.ts`, `src/lib/store.tsx` (beküldés, átadás, hidratációs javítás), `src/lib/i18n/overrides.ts`.
+- Érintett fájlok: `src/lib/demo-users.ts` (szerepkör alapú, teljes lista), `src/components/login-screen.tsx` és `src/components/app-shell.tsx` (belépés/felhasználóváltás), `src/lib/seed.ts` (új felhasználók, egységenkénti helyettes jóváhagyó mező), `src/lib/types.ts` (`OrgUnit.deputyApproverUserId`), új `src/lib/routing.ts`, `src/lib/store.tsx` (beküldés, átadás, hidratációs javítás), `src/lib/i18n/overrides.ts`.
 - Nincs adatbázis, minden a meglévő böngészőben tárolt állapotban marad; a hidratációs javítás visszamenőleg is rendbe teszi a már mentett demóállapotot.
