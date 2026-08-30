@@ -183,9 +183,11 @@ function ProcurementPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="uj">
-          <NewPlanItemForm />
-        </TabsContent>
+        {canPlan && (
+          <TabsContent value="uj">
+            <NewPlanItemForm />
+          </TabsContent>
+        )}
 
         <TabsContent value="forras" className="space-y-4">
           <section className="card-surface overflow-x-auto p-5">
