@@ -108,6 +108,12 @@ function Inventory() {
   const pendingHandovers = (store.handovers ?? []).filter(
     (h) => h.recipientId === currentUser.id && h.status === "atadva",
   );
+  const incomingHandovers = (store.handovers ?? []).filter(
+    (h) =>
+      h.recipientId === currentUser.id &&
+      (h.status === "beerkezett" || h.status === "elokeszites_alatt" || h.status === "atadasra_kesz"),
+  );
+
   const mine = inventory.filter((i) => i.ownerId === currentUser.id);
   const hardware = mine.filter((i) => i.kind === "hardver");
   const software = mine.filter((i) => i.kind === "szoftver");
