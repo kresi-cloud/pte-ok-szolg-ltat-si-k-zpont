@@ -183,6 +183,26 @@ function Inventory() {
         </section>
       )}
 
+      {incomingHandovers.length > 0 && (
+        <section className="card-surface space-y-3 border-l-4 border-l-accent p-5">
+          <h2 className="font-display text-base font-semibold">Beszerzésből érkező eszközök</h2>
+          <p className="text-sm text-muted-foreground">
+            Az alábbi eszköz megérkezett a beszerzésből, de még a kari IT referensnél van
+            telepítésen. Az átvételt akkor tudja visszaigazolni, ha a referens átadta Önnek.
+          </p>
+          {incomingHandovers.map((h) => (
+            <div key={h.id} className="rounded-md border border-border p-3">
+              <p className="text-sm font-semibold">{h.deviceName}</p>
+              <p className="text-xs text-muted-foreground">
+                Állapot: {HANDOVER_STATUS_LABELS[h.status]}
+              </p>
+            </div>
+          ))}
+        </section>
+      )}
+
+
+
       <div className="grid gap-3 sm:grid-cols-3">
         {[
           ["Hardvereszköz", hardware.length, Laptop],
