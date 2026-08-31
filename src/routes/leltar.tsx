@@ -20,7 +20,7 @@ import { HARDWARE_MODELS, SOFTWARE_SUGGESTIONS, isMobileModel, specForModel } fr
 import { needsLocationForCategory, productModelLabel } from "@/lib/handover-products";
 import { LOCATION_KIND_LABELS } from "@/lib/asset-types";
 import { locationsForUser } from "@/lib/asset-logic";
-import { INVENTORY_STATUS_LABELS, type InventoryItem } from "@/lib/types";
+import { HANDOVER_STATUS_LABELS, INVENTORY_STATUS_LABELS, type InventoryItem } from "@/lib/types";
 import { MyAssets, MyLicences, SharedAssets } from "@/components/personal-assets";
 import { PageHeading } from "@/components/page-heading";
 
@@ -108,6 +108,12 @@ function Inventory() {
   const pendingHandovers = (store.handovers ?? []).filter(
     (h) => h.recipientId === currentUser.id && h.status === "atadva",
   );
+  const incomingHandovers = (store.handovers ?? []).filter(
+    (h) =>
+      h.recipientId === currentUser.id &&
+      (h.status === "beerkezett" || h.status === "elokeszites_alatt" || h.status === "atadasra_kesz"),
+  );
+
   const mine = inventory.filter((i) => i.ownerId === currentUser.id);
   const hardware = mine.filter((i) => i.kind === "hardver");
   const software = mine.filter((i) => i.kind === "szoftver");
@@ -176,6 +182,26 @@ function Inventory() {
           ))}
         </section>
       )}
+
+      {incomingHandovers.length > 0 && (
+        <section className="card-surface space-y-3 border-l-4 border-l-accent p-5">
+          <h2 className="font-display text-base font-semibold">Beszerzésből érkező eszközök</h2>
+          <p className="text-sm text-muted-foreground">
+            Az alábbi eszköz megérkezett a beszerzésből, de még a kari IT referensnél van
+            telepítésen. Az átvételt akkor tudja visszaigazolni, ha a referens átadta Önnek.
+          </p>
+          {incomingHandovers.map((h) => (
+            <div key={h.id} className="rounded-md border border-border p-3">
+              <p className="text-sm font-semibold">{h.deviceName}</p>
+              <p className="text-xs text-muted-foreground">
+                Állapot: {HANDOVER_STATUS_LABELS[h.status]}
+              </p>
+            </div>
+          ))}
+        </section>
+      )}
+
+
 
       <div className="grid gap-3 sm:grid-cols-3">
         {[
