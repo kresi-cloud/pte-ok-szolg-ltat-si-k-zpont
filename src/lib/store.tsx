@@ -1771,7 +1771,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         };
         return {
           ...s,
-          inventory: [item, ...s.inventory],
+          inventory: h.inventoryItemId
+            ? s.inventory.map((i) =>
+                i.id === h.inventoryItemId
+                  ? {
+                      ...i,
+                      status: "jovahagyva",
+                      decidedAt: today(),
+                      decidedBy: h.referentId ?? currentUser.id,
+                      decisionComment:
+                        "Intézményi beszerzés és átadás-átvétel alapján automatikusan jóváhagyva.",
+                    }
+                  : i,
+              )
+            : [item, ...s.inventory],
           assets: alreadyRegistered ? s.assets : [newAsset, ...s.assets],
 
           handovers: (s.handovers ?? []).map((x) =>
