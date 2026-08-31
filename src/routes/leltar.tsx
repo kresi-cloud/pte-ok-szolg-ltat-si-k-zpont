@@ -48,6 +48,8 @@ export const Route = createFileRoute("/leltar")({
 function statusTone(status: InventoryItem["status"]) {
   if (status === "jovahagyva") return "bg-primary/10 text-primary";
   if (status === "elutasitva") return "bg-destructive/10 text-destructive";
+  if (status === "atvetelre_var")
+    return "bg-warning/15 text-warning-foreground border border-warning/40";
   return "bg-accent text-accent-foreground";
 }
 
