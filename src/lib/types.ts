@@ -421,9 +421,10 @@ export interface AppNotification {
 
 export type InventoryKind = "hardver" | "szoftver";
 
-export type InventoryStatus = "jovahagyasra_var" | "jovahagyva" | "elutasitva";
+export type InventoryStatus = "atvetelre_var" | "jovahagyasra_var" | "jovahagyva" | "elutasitva";
 
 export const INVENTORY_STATUS_LABELS: Record<InventoryStatus, string> = {
+  atvetelre_var: "Átvételre vár",
   jovahagyasra_var: "Jóváhagyásra vár",
   jovahagyva: "Jóváhagyva",
   elutasitva: "Elutasítva",

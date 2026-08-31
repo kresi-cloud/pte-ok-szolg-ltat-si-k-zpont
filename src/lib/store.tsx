@@ -1607,8 +1607,35 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setState((s) => {
         const h = (s.handovers ?? []).find((x) => x.id === id);
         if (!h) return s;
+        // A leltártétel már az átadáskor létrejön „Átvételre vár” státusszal,
+        // hogy az eszköz azonnal megjelenjen a címzett leltárában.
+        const catalogCtx = {
+          products: s.products ?? [],
+          categories: s.productCategories ?? [],
+          requests: s.requests,
+        };
+        const catalogProduct = productForHandover(h, catalogCtx);
+        const invId = h.inventoryItemId ?? `inv-${Date.now()}`;
+        const item: InventoryItem = {
+          id: invId,
+          ownerId: h.recipientId,
+          kind: "hardver",
+          name: handoverPurposeTitle(h, catalogCtx),
+          modelKey: h.modelKey,
+          productId: catalogProduct?.id,
+          serial: h.serial,
+          inventoryNo: h.inventoryNo,
+          building: h.building,
+          room: h.room,
+          note: `Beszerzési folyamatból átadva (${h.planItemId})${h.note ? ` · ${h.note}` : ""}`,
+          spec: catalogProduct ? specFromProduct(catalogProduct) : specForModel(h.modelKey),
+          status: "atvetelre_var",
+          createdAt: today(),
+        };
+        const alreadyInInventory = s.inventory.some((i) => i.id === invId);
         return {
           ...s,
+          inventory: alreadyInInventory ? s.inventory : [item, ...s.inventory],
           handovers: (s.handovers ?? []).map((x) =>
             x.id === id
               ? {
@@ -1616,6 +1643,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                   status: "atadva",
                   handedOverAt: today(),
                   referentId: x.referentId ?? currentUser.id,
+                  inventoryItemId: invId,
                   history: [
                     ...x.history,
                     {
@@ -1682,7 +1710,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           requests: s.requests,
         };
         const catalogProduct = productForHandover(h, catalogCtx);
-        const invId = `inv-${Date.now()}`;
+        // Ha a tétel már az átadáskor létrejött („Átvételre vár”), csak státuszt váltunk.
+        const invId = h.inventoryItemId ?? `inv-${Date.now()}`;
         const item: InventoryItem = {
           id: invId,
           ownerId: h.recipientId,
@@ -1742,7 +1771,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         };
         return {
           ...s,
-          inventory: [item, ...s.inventory],
+          inventory: h.inventoryItemId
+            ? s.inventory.map((i) =>
+                i.id === h.inventoryItemId
+                  ? {
+                      ...i,
+                      status: "jovahagyva",
+                      decidedAt: today(),
+                      decidedBy: h.referentId ?? currentUser.id,
+                      decisionComment:
+                        "Intézményi beszerzés és átadás-átvétel alapján automatikusan jóváhagyva.",
+                    }
+                  : i,
+              )
+            : [item, ...s.inventory],
           assets: alreadyRegistered ? s.assets : [newAsset, ...s.assets],
 
           handovers: (s.handovers ?? []).map((x) =>
