@@ -20,7 +20,7 @@ import { HARDWARE_MODELS, SOFTWARE_SUGGESTIONS, isMobileModel, specForModel } fr
 import { needsLocationForCategory, productModelLabel } from "@/lib/handover-products";
 import { LOCATION_KIND_LABELS } from "@/lib/asset-types";
 import { locationsForUser } from "@/lib/asset-logic";
-import { INVENTORY_STATUS_LABELS, type InventoryItem } from "@/lib/types";
+import { HANDOVER_STATUS_LABELS, INVENTORY_STATUS_LABELS, type InventoryItem } from "@/lib/types";
 import { MyAssets, MyLicences, SharedAssets } from "@/components/personal-assets";
 import { PageHeading } from "@/components/page-heading";
 
