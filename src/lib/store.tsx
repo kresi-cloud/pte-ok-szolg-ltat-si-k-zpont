@@ -1710,7 +1710,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           requests: s.requests,
         };
         const catalogProduct = productForHandover(h, catalogCtx);
-        const invId = `inv-${Date.now()}`;
+        // Ha a tétel már az átadáskor létrejött („Átvételre vár”), csak státuszt váltunk.
+        const invId = h.inventoryItemId ?? `inv-${Date.now()}`;
         const item: InventoryItem = {
           id: invId,
           ownerId: h.recipientId,
