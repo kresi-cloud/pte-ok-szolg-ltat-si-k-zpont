@@ -38,6 +38,7 @@ import { GlobalSearch } from "@/components/global-search";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { DEMO_USER_IDS } from "@/lib/demo-users";
 import { DemoBanner, DemoController } from "@/components/demo-panel";
+import { useDemoMode } from "@/lib/demo-mode";
 
 interface NavItem {
   to: string;
@@ -93,6 +94,8 @@ export function AppShell({ children }: { children: ReactNode }) {
     [store.requests, store.currentUser.id],
   );
 
+  const { demo: demoMode } = useDemoMode();
+
   const items = useMemo(
     () =>
       NAV.filter(
@@ -104,6 +107,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
 
   if (!store.loggedIn) return <LoginScreen />;
+
 
   const unread = store.notifications.filter((n) => !n.read).length;
   const user = store.currentUser;
@@ -281,7 +285,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
       </header>
 
-      <main id="fotartalom" className="mx-auto max-w-[1400px] px-4 py-8 lg:px-8">
+      <main
+        id="fotartalom"
+        className={`mx-auto max-w-[1400px] px-4 py-8 lg:px-8 ${demoMode ? "pb-64" : ""}`}
+      >
         {children}
       </main>
 
