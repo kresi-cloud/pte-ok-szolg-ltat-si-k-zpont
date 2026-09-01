@@ -143,7 +143,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   if (handover?.status === "atvetel_igazolva") {
     return {
       ...base,
-      index: 8,
+      index: 12,
       state: "Az átvétel visszaigazolva, az igény lezárult.",
       waitingOn: "Nincs nyitott teendő.",
       action: "Vezetői összefoglaló megtekintése",
@@ -157,7 +157,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   if (handover?.status === "atadva") {
     return {
       ...base,
-      index: 8,
+      index: 11,
       state: "Az eszköz átadva, átvételi visszaigazolásra vár.",
       waitingOn: `${nameOf(users, DEMO_REQUESTER_ID, "Az igénylő")} – igénylő`,
       action: "Átvétel visszaigazolása",
@@ -170,7 +170,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   if (handover) {
     return {
       ...base,
-      index: 8,
+      index: 10,
       state: "Az eszköz beérkezett, telepítés és átadás folyamatban.",
       waitingOn: `${users.find((u) => u.id === (handover.referentId ?? referentId))?.name ?? "Kari IT referens"} – kari IT referens`,
       action: "Átadási adatok és checklist rögzítése, majd átadás",
@@ -183,7 +183,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   if (item.status === "beszerzes_alatt") {
     return {
       ...base,
-      index: 8,
+      index: 9,
       state: "A beszerzés folyamatban van.",
       waitingOn: `${users.find((u) => u.id === buyerId)?.name ?? "Beszerző"} – beszerző`,
       action: "Az eszköz beérkezésének rögzítése",
@@ -235,7 +235,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   }
   return {
     ...base,
-    index: 9,
+      index: 8,
     state: "A terv jóváhagyva, a beszerzés indítható.",
     waitingOn: `${users.find((u) => u.id === buyerId)?.name ?? "Beszerző"} – beszerző`,
     action: "Beszerzés indítása",
