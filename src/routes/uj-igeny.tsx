@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useDemoMode } from "@/lib/demo-mode";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { ArrowLeft, ArrowRight, Boxes, Check, Globe, Laptop, Sparkles, Workflow } from "lucide-react";
@@ -299,11 +300,56 @@ function Wizard() {
     navigate({ to: "/igeny/$id", params: { id } });
   };
 
+  const { demo } = useDemoMode();
+  /** Demómód: a fiktív notebook-csere igény űrlapjának kitöltése (beküldés nélkül). */
+  const fillDemoRequest = () => {
+    const catList = visibleCategories(productCategories, products, tier);
+    const notebookCat =
+      catList.find((c) => /notebook/i.test(c.name)) ?? catList[0];
+    const prodList = notebookCat
+      ? visibleProducts(products, tier).filter(
+          (p) => p.categoryId === notebookCat.id && p.available !== false,
+        )
+      : [];
+    const product = prodList[0];
+    const replaceable = similarAssetsFor(
+      assets,
+      currentUser.id,
+      notebookCat?.id ?? "",
+      notebookCat?.personalUse === true,
+    )[0]?.asset;
+    set({
+      domain: "hardver",
+      productCategoryId: notebookCat?.id ?? "",
+      productId: product?.id ?? "",
+      quantity: "1",
+      title: product ? `Notebook csere – ${product.name}` : "Notebook csere",
+      requestReason: "meghibasodas",
+      requestReasonNote:
+        "A jelenlegi munkagép meghibásodott, javítása nem gazdaságos.",
+      replacedAssetId: replaceable?.id ?? "",
+      requestedQuarter: "azonnali",
+      urgencyReason:
+        "A jelenlegi munkagép meghibásodása akadályozza az oktatási és kutatási feladatok ellátását.",
+    });
+    setStep(stepKeys.indexOf("details") >= 0 ? stepKeys.indexOf("details") : step);
+    toast.success("A fiktív igény adatai kitöltve – a beküldés az összegző lépésben történik.");
+  };
+
   return (
     <div className="mx-auto max-w-3xl">
       <Link to="/" className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="size-4" aria-hidden="true" /> Vissza a kezdőlapra
       </Link>
+
+      {demo && (
+        <div className="mb-6 flex flex-wrap items-center gap-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          <span>Vezetőségi demó – a fiktív igény adatai egy kattintással kitölthetők.</span>
+          <Button size="sm" variant="outline" className="ml-auto" onClick={fillDemoRequest}>
+            Fiktív notebook-csere igény kitöltése
+          </Button>
+        </div>
+      )}
 
       <ol className="mb-8 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
         {stepLabels.map((s, i) => (
