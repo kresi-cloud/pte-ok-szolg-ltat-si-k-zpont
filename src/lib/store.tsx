@@ -519,6 +519,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         productCategoryId: input.productCategoryId,
         productId: input.productId,
         quantity: input.quantity,
+        requestReason: input.requestReason,
+        requestReasonNote: input.requestReasonNote,
+        replacedAssetId: input.replacedAssetId,
+        workLocationId: input.workLocationId,
+        handoverMode: input.handoverMode,
+        handoverLocationId: input.handoverLocationId,
+        requestedQuarter: input.requestedQuarter,
+        urgencyReason: input.urgencyReason,
         effortDays: 5,
         nextStep: draft
           ? "Piszkozat – beküldésre vár."

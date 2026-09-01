@@ -46,7 +46,7 @@ import { ASSET_LOCATIONS, ASSET_MODELS } from "@/lib/asset-data";
 import { similarAssetsFor } from "@/lib/similar-assets";
 import { SimilarAssetNotice } from "@/components/similar-asset-notice";
 import { WithdrawRequestButton } from "@/components/withdraw-request-button";
-import { planApprovalForItem } from "@/lib/withdraw";
+import { planApprovalForItem, withdrawBlockReason } from "@/lib/withdraw";
 import { cn } from "@/lib/utils";
 import { ViewOnlyNotice } from "@/components/view-only-notice";
 
@@ -135,6 +135,12 @@ function RequestDetail() {
   const planApproval = planItem
     ? planApprovalForItem(planItem, store.planApprovals ?? [])
     : undefined;
+  /** Ha a visszavonás már nem lehetséges, ezt a rövid indoklást írjuk ki. */
+  const withdrawBlocked = withdrawBlockReason(request, {
+    planItems: store.planItems,
+    planApprovals: store.planApprovals ?? [],
+    handovers: store.handovers ?? [],
+  });
   const planApproved =
     !!planApproval && ["jovahagyva", "vegrehajtas", "lezarva"].includes(planApproval.status);
   const pendingApprovers = request.approvals
@@ -409,10 +415,12 @@ function RequestDetail() {
         {isRequester && request.status !== "piszkozat" && (
           <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-border bg-secondary/40 p-4">
             <p className="text-sm">
-              Igényét a beszerzés gazdasági vezetői jóváhagyásáig bármikor visszavonhatja.
+              {withdrawBlocked
+                ? withdrawBlocked
+                : "Igényét a beszerzés gazdasági vezetői jóváhagyásáig bármikor visszavonhatja."}
             </p>
             <div className="ml-auto">
-              <WithdrawRequestButton request={request} />
+              <WithdrawRequestButton request={request} showBlockReason={false} />
             </div>
           </div>
         )}

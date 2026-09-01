@@ -50,12 +50,22 @@ export function demoUserForRole(
   return users.find((u) => u.roles.includes(role)) ?? preferred;
 }
 
-function roleOfUser(users: User[], userId: string, fallback: RoleKey): RoleKey {
+/**
+ * A lépéshez illő szerepkör: a preferált szerepkörök közül az első, amellyel a
+ * felhasználó rendelkezik; ha egyikkel sem, az első saját szerepköre.
+ */
+function roleOfUser(users: User[], userId: string, ...preferred: RoleKey[]): RoleKey {
   const u = users.find((x) => x.id === userId);
-  return u?.roles[0] ?? fallback;
+  const match = preferred.find((r) => u?.roles.includes(r));
+  return match ?? u?.roles[0] ?? preferred[0] ?? "igenylo";
 }
 
-/** A demó ügye: Dr. Kovács Anna legutóbbi élő hardverigénye. */
+/** Felhasználó megjelenítendő neve azonosító alapján. */
+function nameOf(users: User[], userId: string, fallback: string): string {
+  return users.find((u) => u.id === userId)?.name ?? fallback;
+}
+
+/** A demó ügye: a demó igénylőjének legutóbbi élő hardverigénye. */
 export function demoRequest(ctx: DemoFlowContext): ServiceRequest | undefined {
   return ctx.requests.find(
     (r) =>
@@ -75,7 +85,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
     return {
       index: 1,
       state: "Az igény még nincs beküldve.",
-      waitingOn: "Dr. Kovács Anna – igénylő",
+      waitingOn: `${nameOf(users, DEMO_REQUESTER_ID, "Az igénylő")} – igénylő`,
       action: "Fiktív notebook-csere igény kitöltése és beküldése",
       actorId: DEMO_REQUESTER_ID,
       role: "igenylo",
@@ -100,7 +110,9 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
         ? "Bruttó költségkeret rögzítése és jóváhagyás"
         : "Szolgáltatásgazdai jóváhagyás",
       actorId: next.approverId,
-      role: roleOfUser(users, next.approverId, "jovahagyo"),
+      role: isFirst
+        ? roleOfUser(users, next.approverId, "jovahagyo", "vezeto", "szolgaltatasgazda")
+        : roleOfUser(users, next.approverId, "szolgaltatasgazda", "jovahagyo", "vezeto"),
       route: "/igeny/$id",
     };
   }
@@ -115,7 +127,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
       waitingOn: `${users.find((u) => u.id === owner)?.name ?? owner} – szolgáltatási ügyintéző`,
       action: "Beszerzési tervsor létrehozása",
       actorId: owner,
-      role: roleOfUser(users, owner, "szolgaltatasgazda"),
+      role: roleOfUser(users, owner, "szolgaltatasgazda", "jovahagyo"),
       route: "/igeny/$id",
     };
   }
@@ -148,7 +160,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
       ...base,
       index: 12,
       state: "Az eszköz átadva, átvételi visszaigazolásra vár.",
-      waitingOn: "Dr. Kovács Anna – igénylő",
+      waitingOn: `${nameOf(users, DEMO_REQUESTER_ID, "Az igénylő")} – igénylő`,
       action: "Átvétel visszaigazolása",
       actorId: DEMO_REQUESTER_ID,
       role: "igenylo",
