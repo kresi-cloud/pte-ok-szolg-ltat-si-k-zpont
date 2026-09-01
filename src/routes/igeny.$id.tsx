@@ -371,6 +371,9 @@ function RequestDetail() {
           ))}
         </dl>
 
+        <RequestSituationCard request={request} />
+        <ProcurementSummaryCard request={request} />
+
         <p className="mt-5 rounded-md bg-secondary px-4 py-3 text-sm">
           <span className="font-medium">Következő lépés: </span>
           {request.nextStep}
