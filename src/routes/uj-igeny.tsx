@@ -308,7 +308,7 @@ function Wizard() {
       catList.find((c) => /notebook/i.test(c.name)) ?? catList[0];
     const prodList = notebookCat
       ? visibleProducts(products, tier).filter(
-          (p) => p.categoryId === notebookCat.id && p.available !== false,
+          (p) => p.categoryId === notebookCat.id && p.active,
         )
       : [];
     const product = prodList[0];
