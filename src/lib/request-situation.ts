@@ -58,10 +58,7 @@ function byRole(users: User[], role: RoleKey): User | undefined {
   return users.find((u) => u.roles.includes(role));
 }
 
-export function requestSituation(
-  request: ServiceRequest,
-  ctx: SituationContext,
-): RequestSituation {
+export function requestSituation(request: ServiceRequest, ctx: SituationContext): RequestSituation {
   const users = ctx.users;
   const planItem = ctx.planItems.find((p) => p.sourceRequestId === request.id);
   const handover = (ctx.handovers ?? []).find(
@@ -88,9 +85,7 @@ export function requestSituation(
     owner = userName(users, next.approverId);
     waitingOn = `${owner} – ${ROLE_LABELS[next.role as RoleKey] ?? next.role}`;
     nextAction =
-      next.step === 1
-        ? "Bruttó költségkeret rögzítése és jóváhagyás"
-        : "Szakmai jóváhagyás";
+      next.step === 1 ? "Bruttó költségkeret rögzítése és jóváhagyás" : "Szakmai jóváhagyás";
     nextActorId = next.approverId;
   } else if (!planItem) {
     const staff = byRole(users, "szolgaltatasgazda") ?? byRole(users, "ugyintezo");

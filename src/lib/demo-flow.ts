@@ -40,7 +40,11 @@ export interface DemoStep {
 }
 
 /** Szerepkör alapú demószereplő, hardcode-olt azonosító nélküli tartalékkal. */
-export function demoUserForRole(users: User[], role: RoleKey, preferredId?: string): User | undefined {
+export function demoUserForRole(
+  users: User[],
+  role: RoleKey,
+  preferredId?: string,
+): User | undefined {
   const preferred = preferredId ? users.find((u) => u.id === preferredId) : undefined;
   if (preferred && preferred.roles.includes(role)) return preferred;
   return users.find((u) => u.roles.includes(role)) ?? preferred;

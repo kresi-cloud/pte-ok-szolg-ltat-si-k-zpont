@@ -75,12 +75,18 @@ describe("beszerzési szabályok", () => {
 
   test("beszerzes_alatt előtt nem rögzíthető beérkezés", () => {
     expect(
-      canMarkDelivered(item({ status: "jovahagyva" }), { planApprovals: [], handovers: [] }, "beszerzo")
-        .allowed,
+      canMarkDelivered(
+        item({ status: "jovahagyva" }),
+        { planApprovals: [], handovers: [] },
+        "beszerzo",
+      ).allowed,
     ).toBe(false);
     expect(
-      canMarkDelivered(item({ status: "beszerzes_alatt" }), { planApprovals: [], handovers: [] }, "beszerzo")
-        .allowed,
+      canMarkDelivered(
+        item({ status: "beszerzes_alatt" }),
+        { planApprovals: [], handovers: [] },
+        "beszerzo",
+      ).allowed,
     ).toBe(true);
   });
 
@@ -96,21 +102,27 @@ describe("beszerzési szabályok", () => {
   test("jogosulatlan szerepkör nem hajthat végre átmenetet", () => {
     for (const role of ["dekan", "vezeto", "igenylo", "gazdasagi_vezeto"] as const) {
       expect(
-        canStartProcurement(item(), { planApprovals: [approval("jovahagyva")], handovers: [] }, role)
-          .allowed,
+        canStartProcurement(
+          item(),
+          { planApprovals: [approval("jovahagyva")], handovers: [] },
+          role,
+        ).allowed,
       ).toBe(false);
       expect(
-        canMarkDelivered(item({ status: "beszerzes_alatt" }), { planApprovals: [], handovers: [] }, role)
-          .allowed,
+        canMarkDelivered(
+          item({ status: "beszerzes_alatt" }),
+          { planApprovals: [], handovers: [] },
+          role,
+        ).allowed,
       ).toBe(false);
     }
   });
 
   test("állapotonként pontosan egy elsődleges művelet", () => {
     const ctx = { planApprovals: [approval("jovahagyva")], handovers: [] };
-    expect(getProcurementNextAction(item({ handedToPlannerAt: undefined }), ctx, "beszerzo").key).toBe(
-      "hand_to_planner",
-    );
+    expect(
+      getProcurementNextAction(item({ handedToPlannerAt: undefined }), ctx, "beszerzo").key,
+    ).toBe("hand_to_planner");
     expect(getProcurementNextAction(item(), ctx, "beszerzo").key).toBe("start");
     expect(getProcurementNextAction(item({ status: "beszerzes_alatt" }), ctx, "beszerzo").key).toBe(
       "deliver",

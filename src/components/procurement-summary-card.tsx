@@ -23,12 +23,16 @@ export function ProcurementSummaryCard({ request }: { request: ServiceRequest })
     (i) => i.id === handover.inventoryItemId || (i.serial && i.serial === handover.serial),
   );
   const quantity = planItem?.quantity ?? request.quantity ?? 1;
-  const gross = planItem ? (planItem.unitPriceOverride ?? 0) * quantity : (request.estimatedCost ?? 0);
+  const gross = planItem
+    ? (planItem.unitPriceOverride ?? 0) * quantity
+    : (request.estimatedCost ?? 0);
   const confirmedAt = handover.confirmedAt ?? request.updatedAt;
   const leadTime = daysBetween(request.createdAt, confirmedAt);
   const slaLimit = request.dueDate ? daysBetween(request.createdAt, request.dueDate) : null;
   const slaOk = slaLimit === null ? true : leadTime <= slaLimit;
-  const auditSteps = request.audit.length + (store.assetAudit ?? []).filter((a) => a.entityId === planItem?.id).length;
+  const auditSteps =
+    request.audit.length +
+    (store.assetAudit ?? []).filter((a) => a.entityId === planItem?.id).length;
 
   const reset = () => {
     store.resetDemo({ leadershipDemo: true });

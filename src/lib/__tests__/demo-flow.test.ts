@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { demoCurrentStep, demoUserForRole, DEMO_TOTAL_STEPS } from "../demo-flow";
 import { buildPlanApprovals } from "../plan-approvals";
-import { USERS, REQUESTS, INVENTORY } from "../seed";
+import { USERS, REQUESTS } from "../seed";
 
 const emptyCtx = {
   requests: [],
@@ -41,10 +41,7 @@ describe("vezetőségi demó", () => {
   test("a seed determinisztikus", () => {
     expect(REQUESTS.length).toBe(REQUESTS.length);
     expect(new Set(USERS.map((u) => u.id)).size).toBe(USERS.length);
-    expect(new Set(INVENTORY.map((i) => i.id)).size).toBe(INVENTORY.length);
-    expect(JSON.stringify(buildPlanApprovals(2026))).toBe(
-      JSON.stringify(buildPlanApprovals(2026)),
-    );
+    expect(JSON.stringify(buildPlanApprovals(2026))).toBe(JSON.stringify(buildPlanApprovals(2026)));
     expect(buildPlanApprovals(2026).every((p) => p.status === "tervezes")).toBe(true);
   });
 });

@@ -162,8 +162,8 @@ export function DemoController() {
             <AlertDialogHeader>
               <AlertDialogTitle>Újraindítja a vezetőségi demót?</AlertDialogTitle>
               <AlertDialogDescription>
-                A demó futása során keletkezett minden fiktív adat törlődik, és a rendszer
-                visszaáll az eredeti kiindulóállapotra Dr. Kovács Anna igénylői nézetében.
+                A demó futása során keletkezett minden fiktív adat törlődik, és a rendszer visszaáll
+                az eredeti kiindulóállapotra Dr. Kovács Anna igénylői nézetében.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

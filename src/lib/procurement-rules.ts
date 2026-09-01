@@ -28,9 +28,7 @@ export function isProcurementExecutor(role: RoleKey): boolean {
 }
 
 export function planApprovalApproved(approval: PlanApproval | undefined): boolean {
-  return (
-    !!approval && ["jovahagyva", "vegrehajtas", "lezarva"].includes(approval.status as string)
-  );
+  return !!approval && ["jovahagyva", "vegrehajtas", "lezarva"].includes(approval.status as string);
 }
 
 /** A tételhez tartozó átadási rekord (ha már létrejött). */
@@ -42,14 +40,10 @@ export function handoverForItem(
 }
 
 /** Átadás az IT eszközmenedzsernek tervezésre. */
-export function canHandToPlanner(
-  item: ProcurementPlanItem,
-  role: RoleKey,
-): RuleResult {
+export function canHandToPlanner(item: ProcurementPlanItem, role: RoleKey): RuleResult {
   if (!isProcurementExecutor(role))
     return no("Ezt a műveletet a beszerző végzi – Ön betekintő jogosultsággal nézi az ügyet.");
-  if (item.handedToPlannerAt)
-    return no("A tétel már az IT eszközmenedzsernél van tervezésen.");
+  if (item.handedToPlannerAt) return no("A tétel már az IT eszközmenedzsernél van tervezésen.");
   return ok;
 }
 
@@ -65,7 +59,9 @@ export function canStartProcurement(
   if (item.status === "teljesult") return no("A tétel már teljesült.");
   const approval = planApprovalForItem(item, ctx.planApprovals ?? []);
   if (!approval)
-    return no("A tételhez még nem tartozik beszerzési tervciklus – az IT eszközmenedzser ütemezésére vár.");
+    return no(
+      "A tételhez még nem tartozik beszerzési tervciklus – az IT eszközmenedzser ütemezésére vár.",
+    );
   if (!planApprovalApproved(approval))
     return no(
       "A tervciklus még nincs jóváhagyva – a gazdasági vezetői ellenőrzés és a dékáni jóváhagyás után indítható a beszerzés.",
