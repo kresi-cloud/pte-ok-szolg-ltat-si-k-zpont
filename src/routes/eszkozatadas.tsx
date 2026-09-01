@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useDemoMode } from "@/lib/demo-mode";
+import { todayIso } from "@/lib/clock";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,8 +96,16 @@ export const Route = createFileRoute("/eszkozatadas")({
   component: HandoverWorkspace,
 });
 
+/** Semleges, kis méretű helyi demókép (nem tartalmaz valós adatot). */
+const DEMO_PHOTO_DATA_URL =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200"><rect width="320" height="200" fill="#eef2f7"/><rect x="60" y="60" width="200" height="110" rx="8" fill="#c9d6e5"/><rect x="40" y="170" width="240" height="10" rx="5" fill="#a9bccf"/><text x="160" y="40" font-family="sans-serif" font-size="14" text-anchor="middle" fill="#40566d">Fiktív átadási fotó</text></svg>',
+  );
+
 function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: boolean }) {
   const store = useStore();
+  const { demo } = useDemoMode();
   const [serial, setSerial] = useState(handover.serial ?? "");
   const [inventoryNo, setInventoryNo] = useState(handover.inventoryNo ?? "");
   const catalogCtx = {
@@ -153,8 +163,60 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
     );
   };
 
+  /** Demómód: fiktív átadási adatok kitöltése – az átadást továbbra is a referens indítja. */
+  const fillDemoHandover = () => {
+    const prod = options[0];
+    const demoSerial = "DEMO-PTE-2026-001";
+    const demoInventoryNo = "PTE-AOK-DEMO-00421";
+    const demoNote = "Vezetőségi bemutatóhoz használt fiktív átadás.";
+    setSerial(demoSerial);
+    setInventoryNo(demoInventoryNo);
+    if (prod) setProductId(prod.id);
+    setNote(demoNote);
+    const fullChecklist = Object.fromEntries(
+      HANDOVER_CHECKLIST.map((c) => [c.key, true]),
+    ) as Record<string, boolean>;
+    const withPhoto = attachments.some((a) => a.kind === "fenykep")
+      ? attachments
+      : [
+          ...attachments,
+          {
+            id: `att-demo-${Date.now()}`,
+            kind: "fenykep" as HandoverAttachmentKind,
+            name: "atadas-demo.svg",
+            mimeType: "image/svg+xml",
+            sizeBytes: DEMO_PHOTO_DATA_URL.length,
+            dataUrl: DEMO_PHOTO_DATA_URL,
+            uploadedBy: store.currentUser.id,
+            uploadedAt: todayIso(),
+          },
+        ];
+    store.updateHandover(
+      handover.id,
+      {
+        serial: demoSerial,
+        inventoryNo: demoInventoryNo,
+        productId: prod?.id ?? productId ?? undefined,
+        modelKey: prod?.modelKey ?? modelKey ?? undefined,
+        note: demoNote,
+        checklist: fullChecklist,
+        attachments: withPhoto,
+      },
+      "Fiktív átadási adatok kitöltve (vezetőségi demó)",
+    );
+    toast.success("A fiktív átadási adatok kitöltve – az átadást Ön indítja el.");
+  };
+
   return (
     <article className="card-surface space-y-4 p-5">
+      {demo && canAct && !done && (
+        <div className="flex flex-wrap items-center gap-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          <span>Vezetőségi demó – az átadási adatok egy kattintással kitölthetők.</span>
+          <Button size="sm" variant="outline" className="ml-auto" onClick={fillDemoHandover}>
+            Fiktív átadási adatok kitöltése
+          </Button>
+        </div>
+      )}
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="font-display text-base font-semibold">{handover.deviceName}</h3>
