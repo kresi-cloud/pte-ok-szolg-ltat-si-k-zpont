@@ -30,7 +30,7 @@ import { lookup, useStore } from "@/lib/store";
 import {
   HANDOVER_MODE_LABELS,
   REQUEST_REASON_LABELS,
-  REQUESTED_TIMING_LABELS,
+  requestedTimingLabel,
   ROLE_LABELS,
   STATUS_LABELS,
   STATUS_ORDER,
