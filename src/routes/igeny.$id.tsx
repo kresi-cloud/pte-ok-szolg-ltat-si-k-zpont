@@ -30,7 +30,7 @@ import { lookup, useStore } from "@/lib/store";
 import {
   HANDOVER_MODE_LABELS,
   REQUEST_REASON_LABELS,
-  REQUESTED_TIMING_LABELS,
+  requestedTimingLabel,
   ROLE_LABELS,
   STATUS_LABELS,
   STATUS_ORDER,
@@ -572,7 +572,7 @@ function RequestDetail() {
                         "Igényelt beszerzési ütemezés",
                         request.requestedQuarter === "azonnali"
                           ? "Azonnali beszerzés"
-                          : REQUESTED_TIMING_LABELS[request.requestedQuarter],
+                          : requestedTimingLabel(request.requestedQuarter),
                       ],
                       ...(request.urgencyReason
                         ? [["Az azonnali beszerzés indoka", request.urgencyReason]]

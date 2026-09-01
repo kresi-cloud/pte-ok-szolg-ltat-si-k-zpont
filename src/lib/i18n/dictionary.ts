@@ -1306,6 +1306,8 @@ export const EN_DICT: Record<string, string> = {
   "Bontás": "Split",
   "Célnegyedév": "Target quarter",
   "Azonnali beszerzés": "Immediate procurement",
+  "Mikorra kéri a beszerzést?": "When do you need the procurement?",
+  "Azonnali beszerzés (indoklás szükséges)": "Immediate procurement (justification required)",
   "Cél: azonnali vagy negyedév": "Target: immediate or quarter",
   "Azonnali – nincs tervnegyedév": "Immediate – no plan quarter",
   "Nincs teendő": "No action needed",

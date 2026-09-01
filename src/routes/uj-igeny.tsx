@@ -14,7 +14,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { CATALOG, DOMAINS, lookup, useStore } from "@/lib/store";
 import type { DomainKey, HandoverMode, RequestReason, RequestedTiming } from "@/lib/types";
-import { HANDOVER_MODE_LABELS, REQUEST_REASON_LABELS, REQUESTED_TIMING_LABELS } from "@/lib/types";
+import { HANDOVER_MODE_LABELS, REQUEST_REASON_LABELS, requestedTimingLabel } from "@/lib/types";
+import { upcomingQuarters } from "@/lib/quarters";
 import { ASSET_MODELS } from "@/lib/asset-data";
 import { LOCATION_KIND_LABELS } from "@/lib/asset-types";
 import { defaultLocationForUser, locationsForUser } from "@/lib/asset-logic";
@@ -178,7 +179,7 @@ function Wizard() {
   const timingLabel = form.requestedQuarter
     ? form.requestedQuarter === "azonnali"
       ? "Azonnali beszerzés"
-      : REQUESTED_TIMING_LABELS[form.requestedQuarter as RequestedTiming]
+      : requestedTimingLabel(form.requestedQuarter)
     : "Nincs megadva";
 
   const personalDetailsOk =
@@ -737,7 +738,7 @@ function Wizard() {
 
           {isHw && (
             <div className="space-y-2">
-              <Label htmlFor="req-quarter">Melyik negyedévre kéri a beszerzést?</Label>
+              <Label htmlFor="req-quarter">Mikorra kéri a beszerzést?</Label>
               <select
                 id="req-quarter"
                 value={form.requestedQuarter}
@@ -750,11 +751,12 @@ function Wizard() {
                 className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
               >
                 <option value="">Válasszon ütemezést…</option>
-                {(Object.keys(REQUESTED_TIMING_LABELS) as RequestedTiming[]).map((q) => (
-                  <option key={q} value={q}>
-                    {REQUESTED_TIMING_LABELS[q]}
+                {upcomingQuarters().map((q) => (
+                  <option key={q.value} value={q.value}>
+                    {q.label}
                   </option>
                 ))}
+                <option value="azonnali">Azonnali beszerzés (indoklás szükséges)</option>
               </select>
               <p className="text-xs text-muted-foreground">
                 A választás javaslatként kerül a beszerzési tervbe; a beszerző és a gazdasági vezető

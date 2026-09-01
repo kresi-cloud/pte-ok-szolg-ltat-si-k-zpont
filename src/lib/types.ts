@@ -324,16 +324,24 @@ export interface ServiceRequest {
   urgencyReason?: string | undefined;
 }
 
-/** Igényelt beszerzési ütemezés: negyedév vagy azonnali. */
-export type RequestedTiming = "Q1" | "Q2" | "Q3" | "Q4" | "azonnali";
+/**
+ * Igényelt beszerzési ütemezés: évszámos negyedév (pl. "2027-Q1") vagy azonnali.
+ * Visszafelé kompatibilisen a régi, csupasz "Q1".."Q4" értékek is elfogadottak.
+ */
+export type RequestedTiming = `${number}-${"Q1" | "Q2" | "Q3" | "Q4"}` | "Q1" | "Q2" | "Q3" | "Q4" | "azonnali";
 
-export const REQUESTED_TIMING_LABELS: Record<RequestedTiming, string> = {
-  Q1: "I. negyedév",
-  Q2: "II. negyedév",
-  Q3: "III. negyedév",
-  Q4: "IV. negyedév",
-  azonnali: "Azonnali beszerzés (indoklás szükséges)",
-};
+const ROMAN_QUARTER: Record<string, string> = { Q1: "I", Q2: "II", Q3: "III", Q4: "IV" };
+
+/** Az ütemezés megjelenített felirata, pl. "2027. I. negyedév". */
+export function requestedTimingLabel(value: string): string {
+  if (value === "azonnali") return "Azonnali beszerzés (indoklás szükséges)";
+  const [year, q] = value.split("-");
+  const roman = q ? ROMAN_QUARTER[q] : undefined;
+  if (year && roman) return `${year}. ${roman}. negyedév`;
+  // Régi, évszám nélküli érték.
+  const legacy = ROMAN_QUARTER[value];
+  return legacy ? `${legacy}. negyedév` : value;
+}
 
 
 export type RequestReason =

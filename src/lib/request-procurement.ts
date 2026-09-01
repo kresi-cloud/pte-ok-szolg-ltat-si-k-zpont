@@ -1,6 +1,6 @@
 import { HARDWARE_STANDARDS, NEXT_FINANCIAL_YEAR, REFERENCE_PRICES } from "./asset-data";
 import type { AssetCategoryKey, ProcurementPlanItem, Quarter } from "./asset-types";
-import type { Product, ProductCategory, ServiceRequest } from "./types";
+import { requestedTimingLabel, type Product, type ProductCategory, type ServiceRequest } from "./types";
 
 /**
  * Jóváhagyott igényből beszerzési tervsor-javaslat.
@@ -131,8 +131,13 @@ export function planItemFromRequest(
 
   const requested = r.requestedQuarter;
   const immediate = requested === "azonnali";
+  // Évszámos formátum ("2027-Q1") és régi csupasz negyedév ("Q1") egyaránt elfogadott.
+  const requestedQ =
+    requested && requested !== "azonnali"
+      ? ((requested.split("-").pop() ?? requested) as Quarter)
+      : undefined;
   const quarter: Quarter =
-    requested && requested !== "azonnali" ? requested : immediate ? "Q1" : quarterFor(r.priority);
+    requestedQ ?? (immediate ? "Q1" : quarterFor(r.priority));
 
   return {
     planYear: NEXT_FINANCIAL_YEAR,
@@ -165,7 +170,7 @@ export function planItemFromRequest(
       immediate
         ? `Az igénylő azonnali beszerzést kért. Indoklás: ${r.urgencyReason ?? "nincs megadva"}`
         : requested
-          ? `Az igénylő által kért ütemezés: ${requested}.`
+          ? `Az igénylő által kért ütemezés: ${requestedTimingLabel(requested)}.`
           : "",
     ]
       .filter(Boolean)
