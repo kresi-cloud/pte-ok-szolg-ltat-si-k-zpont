@@ -46,6 +46,9 @@ import {
 } from "./routing";
 
 import { INVENTORY, specForModel } from "./inventory-data";
+import { todayIso } from "./clock";
+import { DEMO_REQUESTER_ID } from "./demo-flow";
+import { canMarkDelivered, canStartProcurement } from "./procurement-rules";
 import { handoverPurposeTitle, productForHandover, specFromProduct } from "./handover-products";
 import { modelKeyForStandard, standardLabel } from "./handover-mapping";
 import { productLockInfo } from "./product-lock";
@@ -240,8 +243,13 @@ interface StoreValue extends PersistedState {
   nudgePlanSubmission: (id: string) => void;
   financeReviewPlan: (id: string, decision: "tovabb" | "vissza", comment?: string) => void;
   startPlanExecution: (id: string) => void;
-  /** Beszerző: a tervsor eszköze fizikailag beérkezett – átadási folyamat indul. */
-  markPlanItemDelivered: (planItemId: string) => void;
+  /**
+   * Beszerző: a tervsor eszköze fizikailag beérkezett – átadási folyamat indul.
+   * Tiltott átmenetnél az állapot változatlan marad, a visszatérési érték a hibaüzenet.
+   */
+  markPlanItemDelivered: (planItemId: string) => string | null;
+  /** Beszerző: egyetlen tétel beszerzésének indítása jóváhagyott terv alapján. */
+  startItemProcurement: (planItemId: string) => string | null;
   /** Kari IT referens: telepítési és azonosító adatok rögzítése. */
   updateHandover: (id: string, patch: Partial<AssetHandover>, label?: string) => void;
   /** Kari IT referens: eszköz átadása az igénylőnek. */
@@ -270,7 +278,7 @@ interface StoreValue extends PersistedState {
   updateAnnouncement: (id: string, patch: Partial<Announcement>) => void;
   removeAnnouncement: (id: string) => void;
   dismissAnnouncement: (id: string) => void;
-  resetDemo: () => void;
+  resetDemo: (options?: { leadershipDemo?: boolean }) => void;
 }
 
 // Keep a single context instance across HMR module reloads, otherwise an
@@ -284,7 +292,7 @@ const StoreContext =
   (globalScope.__dszpStoreContext = createContext<StoreValue | null>(null));
 
 
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => todayIso();
 
 /** Alapértelmezett munkavállalói besorolás a szerepkörök alapján. */
 function defaultTierFor(u: User): EmployeeTier {
@@ -1515,7 +1523,45 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         };
       }),
 
-    markPlanItemDelivered: (planItemId) =>
+    startItemProcurement: (planItemId) => {
+      const item = state.planItems.find((p) => p.id === planItemId);
+      if (!item) return "A beszerzési tétel nem található.";
+      const rule = canStartProcurement(
+        item,
+        { planApprovals: state.planApprovals ?? [], handovers: state.handovers ?? [] },
+        state.activeRole,
+      );
+      if (!rule.allowed) return rule.reason ?? "A művelet jelenleg nem végezhető el.";
+      setState((s) => ({
+        ...s,
+        planItems: s.planItems.map((p) =>
+          p.id === planItemId ? { ...p, status: "beszerzes_alatt" } : p,
+        ),
+        assetAudit: [
+          {
+            id: `aud-${Date.now()}`,
+            at: today(),
+            actorId: currentUser.id,
+            entity: "beszerzes",
+            entityId: planItemId,
+            action: "Beszerzés indítva",
+            detail: item.deviceName ?? item.standardKey,
+          },
+          ...s.assetAudit,
+        ],
+      }));
+      return null;
+    },
+
+    markPlanItemDelivered: (planItemId) => {
+      const current = state.planItems.find((p) => p.id === planItemId);
+      if (!current) return "A beszerzési tétel nem található.";
+      const rule = canMarkDelivered(
+        current,
+        { planApprovals: state.planApprovals ?? [], handovers: state.handovers ?? [] },
+        state.activeRole,
+      );
+      if (!rule.allowed) return rule.reason ?? "A művelet jelenleg nem végezhető el.";
       setState((s) => {
         if ((s.handovers ?? []).some((h) => h.planItemId === planItemId)) return s;
         const item = s.planItems.find((p) => p.id === planItemId);
@@ -1573,7 +1619,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             ...s.assetAudit,
           ],
         };
-      }),
+      });
+      return null;
+    },
     updateHandover: (id, patch, label) =>
       setState((s) => ({
         ...s,
@@ -1704,6 +1752,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setState((s) => {
         const h = (s.handovers ?? []).find((x) => x.id === id);
         if (!h) return s;
+        // Idempotens: ismételt kattintás nem duplikál leltártételt vagy előzményt.
+        if (h.status === "atvetel_igazolva") return s;
         const catalogCtx = {
           products: s.products ?? [],
           categories: s.productCategories ?? [],
@@ -1786,6 +1836,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               )
             : [item, ...s.inventory],
           assets: alreadyRegistered ? s.assets : [newAsset, ...s.assets],
+          planItems: s.planItems.map((p) =>
+            planItem && p.id === planItem.id ? { ...p, status: "teljesult" } : p,
+          ),
 
           handovers: (s.handovers ?? []).map((x) =>
             x.id === id
@@ -1851,9 +1904,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         };
       }),
 
-    resetDemo: () => {
-      window.localStorage.removeItem(STORAGE_KEY);
-      setState({ ...initialState, loggedIn: true });
+    resetDemo: (options) => {
+      try {
+        window.localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        /* tárolóhiba nem akadályozhatja az újraindítást */
+      }
+      // Determinisztikus kiindulóállapot: friss seed, korábbi demófutás nélkül.
+      const base: PersistedState = { ...initialState, loggedIn: true };
+      if (options?.leadershipDemo) {
+        setState({ ...base, currentUserId: DEMO_REQUESTER_ID, activeRole: "igenylo" });
+      } else {
+        setState(base);
+      }
     },
     activeAnnouncements: (state.announcements ?? []).filter(
       (a) =>
