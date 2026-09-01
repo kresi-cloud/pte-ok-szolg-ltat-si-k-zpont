@@ -235,7 +235,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   }
   return {
     ...base,
-      index: 8,
+    index: 8,
     state: "A terv jóváhagyva, a beszerzés indítható.",
     waitingOn: `${users.find((u) => u.id === buyerId)?.name ?? "Beszerző"} – beszerző`,
     action: "Beszerzés indítása",
