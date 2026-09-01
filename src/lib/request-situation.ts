@@ -43,8 +43,7 @@ export interface RequestSituation {
 
 const STAGES = [
   "Tervsor",
-  "Gazdasági ellenőrzés",
-  "Dékáni jóváhagyás",
+  "Gazdasági jóváhagyás",
   "Beszerzés",
   "Átadás",
   "Átvétel",
@@ -99,7 +98,7 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
     waitingOn = "Nincs nyitott teendő.";
     nextAction = "Az igény lezárult, az eszköz a személyi leltárban van.";
   } else if (handover) {
-    stageIndex = handover.status === "atadva" ? 5 : 4;
+    stageIndex = handover.status === "atadva" ? 4 : 3;
     if (handover.status === "atadva") {
       owner = userName(users, handover.recipientId);
       waitingOn = `${owner} – igénylő`;
@@ -113,32 +112,29 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
       nextActorId = ref;
     }
   } else if (planItem.status === "beszerzes_alatt") {
-    stageIndex = 3;
+    stageIndex = 2;
     const buyer = byRole(users, "beszerzo");
     owner = buyer?.name ?? "Beszerző";
     waitingOn = `${owner} – ${ROLE_LABELS.beszerzo}`;
     nextAction = "Az eszköz beérkezésének rögzítése";
     nextActorId = buyer?.id;
   } else if (approved) {
-    stageIndex = 3;
+    stageIndex = 2;
     const buyer = byRole(users, "beszerzo");
     owner = buyer?.name ?? "Beszerző";
     waitingOn = `${owner} – ${ROLE_LABELS.beszerzo}`;
     nextAction = "Beszerzés indítása";
     nextActorId = buyer?.id;
-  } else if (approval?.status === "dekani_jovahagyas" || approval?.status === "jovahagyasra_var") {
-    stageIndex = 2;
-    const dean = byRole(users, "dekan");
-    owner = dean?.name ?? "Dékán";
-    waitingOn = `${owner} – ${ROLE_LABELS.dekan}`;
-    nextAction = "Beszerzési terv jóváhagyása";
-    nextActorId = dean?.id;
-  } else if (approval?.status === "gazdasagi_ellenorzes") {
+  } else if (
+    approval?.status === "gazdasagi_ellenorzes" ||
+    approval?.status === "dekani_jovahagyas" ||
+    approval?.status === "jovahagyasra_var"
+  ) {
     stageIndex = 1;
     const fin = byRole(users, "gazdasagi_vezeto");
     owner = fin?.name ?? "Gazdasági vezető";
     waitingOn = `${owner} – ${ROLE_LABELS.gazdasagi_vezeto}`;
-    nextAction = "Gazdasági ellenőrzés és továbbítás dékáni jóváhagyásra";
+    nextAction = "Beszerzési terv gazdasági vezetői jóváhagyása";
     nextActorId = fin?.id;
   } else if (!planItem.handedToPlannerAt) {
     stageIndex = 0;

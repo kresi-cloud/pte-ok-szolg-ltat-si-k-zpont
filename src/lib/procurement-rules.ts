@@ -64,7 +64,7 @@ export function canStartProcurement(
     );
   if (!planApprovalApproved(approval))
     return no(
-      "A tervciklus még nincs jóváhagyva – a gazdasági vezetői ellenőrzés és a dékáni jóváhagyás után indítható a beszerzés.",
+      "A tervciklus még nincs jóváhagyva – a gazdasági vezetői jóváhagyás után indítható a beszerzés.",
     );
   return ok;
 }

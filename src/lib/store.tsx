@@ -400,8 +400,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             .flatMap((y) => buildPlanApprovals(y))
             .filter((a) => !knownApprovals.has(a.id));
           merged.planApprovals = [...merged.planApprovals, ...missingCycles].map((a) =>
-            (a.status as string) === "jovahagyasra_var"
-              ? { ...a, status: "dekani_jovahagyas" as const }
+            ["jovahagyasra_var", "dekani_jovahagyas"].includes(a.status as string)
+              ? { ...a, status: "gazdasagi_ellenorzes" as const }
               : a,
           );
         }
@@ -1375,7 +1375,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           p.id === id
             ? {
                 ...p,
-                status: decision === "tovabb" ? "dekani_jovahagyas" : "visszakuldve",
+                status: decision === "tovabb" ? "jovahagyva" : "visszakuldve",
                 reviewedBy: currentUser.id,
                 reviewedAt: today(),
                 comment,
@@ -1386,7 +1386,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                     actorId: currentUser.id,
                     action:
                       decision === "tovabb"
-                        ? "Gazdasági vezetői ellenőrzés kész – dékáni jóváhagyásra küldve"
+                        ? "Gazdasági vezetői jóváhagyás – a terv visszakerült a beszerzőhöz"
                         : "Gazdasági vezető átdolgozásra visszaküldte a beszerzőnek",
                     comment,
                   },
@@ -1400,7 +1400,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             at: today(),
             text:
               decision === "tovabb"
-                ? "Beszerzési terv dékáni jóváhagyásra vár."
+                ? "Beszerzési terv jóváhagyva – a beszerzés indítható."
                 : "Beszerzési terv átdolgozásra visszakerült a beszerzőhöz.",
             read: false,
           },
@@ -1415,7 +1415,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             entityId: id,
             action:
               decision === "tovabb"
-                ? "Terv továbbítása dékáni jóváhagyásra"
+                ? "Beszerzési terv jóváhagyása"
                 : "Terv visszaküldése a beszerzőnek",
             detail: comment ?? "",
           },
@@ -1430,7 +1430,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           if (p.planYear !== target.planYear) return false;
           if (target.scope === "eves") return true;
           // A tételhez ténylegesen tartozó jóváhagyási ciklus dönt, hogy a
-          // dékáni jóváhagyás után beszerzésbe kerül-e.
+          // jóváhagyás után beszerzésbe kerül-e.
           const own = planApprovalForItem(p, s.planApprovals ?? []);
           if (own) return own.id === target.id;
           // Ütemezés nélküli tétel a saját negyedévének ciklusához tartozik.
@@ -1493,8 +1493,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                       actorId: currentUser.id,
                       action:
                         decision === "jovahagyva"
-                          ? "Dékáni jóváhagyás – a terv visszakerült a beszerzőhöz"
-                          : "Dékán átdolgozásra visszaküldte",
+                          ? "Gazdasági vezetői jóváhagyás – a terv visszakerült a beszerzőhöz"
+                          : "Gazdasági vezető átdolgozásra visszaküldte",
                       comment,
                     },
                   ],
@@ -1508,7 +1508,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               text: target
                 ? `${target.planYear}. évi ${target.quarter ? `${target.quarter} negyedéves` : target.scope === "azonnali" ? "azonnali" : "éves"} beszerzési terv: ${
                     decision === "jovahagyva"
-                      ? "dékáni jóváhagyás megtörtént, indítható a beszerzés"
+                      ? "a gazdasági vezetői jóváhagyás megtörtént, indítható a beszerzés"
                       : "átdolgozásra visszaküldve"
                   }.`
                 : "Beszerzési terv döntés rögzítve.",
@@ -1523,7 +1523,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               actorId: currentUser.id,
               entity: "beszerzes",
               entityId: id,
-              action: decision === "jovahagyva" ? "Terv dékáni jóváhagyása" : "Terv visszaküldése átdolgozásra",
+              action:
+                decision === "jovahagyva"
+                  ? "Terv gazdasági vezetői jóváhagyása"
+                  : "Terv visszaküldése átdolgozásra",
               detail: comment ?? "",
             },
             ...s.assetAudit,

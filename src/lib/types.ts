@@ -39,7 +39,7 @@ export const ROLE_DESCRIPTIONS: Record<RoleKey, string> = {
   eszkozmenedzser:
     "A beszerzőtől érkező új eszközigényekből eseti és negyedéves beszerzési tervet állít össze, valamint éves selejtezési javaslatot készít.",
   gazdasagi_vezeto:
-    "Ellenőrzi és módosítja az eszközmenedzser terveit, jóváhagyja az éves selejtezési javaslatot, majd dékáni jóváhagyásra küld.",
+    "Ellenőrzi és jóváhagyja az eszközmenedzser terveit, ezzel lezárja a tervezési folyamatot, és jóváhagyja az éves selejtezési javaslatot.",
   it_referens:
     "A beérkezett eszközt telepíti, beállítja, rögzíti a gyári számot és a leltárkódot, majd átadja az igénylőnek.",
 };

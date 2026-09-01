@@ -9,7 +9,7 @@ import { planApprovalForItem } from "./withdraw";
  */
 
 export const DEMO_REQUESTER_ID = "u-kovacs";
-export const DEMO_TOTAL_STEPS = 13;
+export const DEMO_TOTAL_STEPS = 12;
 
 export interface DemoFlowContext {
   requests: ServiceRequest[];
@@ -20,7 +20,7 @@ export interface DemoFlowContext {
 }
 
 export interface DemoStep {
-  /** 1-alapú lépésszám a 13-ból. */
+  /** 1-alapú lépésszám a 12-ből. */
   index: number;
   /** Az ügy jelenlegi állapotának rövid leírása. */
   state: string;
@@ -135,7 +135,6 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   const buyerId = id("beszerzo", "u-beszerzo");
   const plannerId = id("eszkozmenedzser", "u-eszkozmgr");
   const financeId = id("gazdasagi_vezeto", "u-gazdvez");
-  const deanId = id("dekan", "u-dekan");
   const referentId = id("it_referens", "u-itref");
   const handover = (ctx.handovers ?? []).find(
     (h) => h.planItemId === item.id || h.requestId === request.id,
@@ -144,7 +143,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   if (handover?.status === "atvetel_igazolva") {
     return {
       ...base,
-      index: 13,
+      index: 12,
       state: "Az átvétel visszaigazolva, az igény lezárult.",
       waitingOn: "Nincs nyitott teendő.",
       action: "Vezetői összefoglaló megtekintése",
@@ -158,7 +157,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   if (handover?.status === "atadva") {
     return {
       ...base,
-      index: 12,
+      index: 11,
       state: "Az eszköz átadva, átvételi visszaigazolásra vár.",
       waitingOn: `${nameOf(users, DEMO_REQUESTER_ID, "Az igénylő")} – igénylő`,
       action: "Átvétel visszaigazolása",
@@ -171,7 +170,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   if (handover) {
     return {
       ...base,
-      index: 11,
+      index: 10,
       state: "Az eszköz beérkezett, telepítés és átadás folyamatban.",
       waitingOn: `${users.find((u) => u.id === (handover.referentId ?? referentId))?.name ?? "Kari IT referens"} – kari IT referens`,
       action: "Átadási adatok és checklist rögzítése, majd átadás",
@@ -184,7 +183,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   if (item.status === "beszerzes_alatt") {
     return {
       ...base,
-      index: 10,
+      index: 9,
       state: "A beszerzés folyamatban van.",
       waitingOn: `${users.find((u) => u.id === buyerId)?.name ?? "Beszerző"} – beszerző`,
       action: "Az eszköz beérkezésének rögzítése",
@@ -222,34 +221,21 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
       route: "/beszerzesek",
     };
   }
-  if (status === "gazdasagi_ellenorzes") {
+  if (status === "gazdasagi_ellenorzes" || status === "dekani_jovahagyas" || status === "jovahagyasra_var") {
     return {
       ...base,
       index: 7,
-      state: "A terv gazdasági vezetői ellenőrzés alatt.",
+      state: "A terv gazdasági vezetői jóváhagyásra vár.",
       waitingOn: `${users.find((u) => u.id === financeId)?.name ?? "Gazdasági vezető"} – gazdasági vezető`,
-      action: "Ellenőrzés és továbbítás dékáni jóváhagyásra",
+      action: "Beszerzési terv jóváhagyása",
       actorId: financeId,
       role: "gazdasagi_vezeto",
       route: "/beszerzesek",
     };
   }
-  if (status === "dekani_jovahagyas" || status === "jovahagyasra_var") {
-    return {
-      ...base,
-      index: 8,
-      state: "A terv dékáni jóváhagyásra vár.",
-      waitingOn: `${users.find((u) => u.id === deanId)?.name ?? "Dékán"} – dékán`,
-      action: "Beszerzési terv jóváhagyása",
-      actorId: deanId,
-      role: "dekan",
-      route: "/beszerzesek",
-    };
-  }
-
   return {
     ...base,
-    index: 9,
+    index: 8,
     state: "A terv jóváhagyva, a beszerzés indítható.",
     waitingOn: `${users.find((u) => u.id === buyerId)?.name ?? "Beszerző"} – beszerző`,
     action: "Beszerzés indítása",
