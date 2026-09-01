@@ -469,38 +469,6 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
                 <Button
                   size="sm"
                   onClick={() => {
-                    store.financeReviewPlan(approval.id, "tovabb", comment || undefined);
-                    toast.success("Terv továbbítva dékáni jóváhagyásra");
-                  }}
-                >
-                  Ellenőrizve – dékáni jóváhagyásra küldöm
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    store.financeReviewPlan(approval.id, "vissza", comment || undefined);
-                    toast("Terv visszaküldve az eszközmenedzsernek");
-                  }}
-                >
-                  Visszaküldés az eszközmenedzsernek
-                </Button>
-              </div>
-            </>
-          )}
-
-          {isDean && status === "dekani_jovahagyas" && (
-            <>
-              <Textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Dékáni megjegyzés (opcionális)"
-                rows={2}
-              />
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  size="sm"
-                  onClick={() => {
                     store.decidePlanApproval(approval.id, "jovahagyva", comment || undefined);
                     toast.success("Terv jóváhagyva – visszakerült a beszerzőhöz");
                   }}
@@ -512,7 +480,7 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
                   variant="outline"
                   onClick={() => {
                     store.decidePlanApproval(approval.id, "visszakuldve", comment || undefined);
-                    toast("Terv visszaküldve átdolgozásra");
+                    toast("Terv visszaküldve az eszközmenedzsernek");
                   }}
                 >
                   Átdolgozásra visszaküldöm
@@ -520,6 +488,7 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
               </div>
             </>
           )}
+
 
           {isBuyer && status === "jovahagyva" && (
             <Button
