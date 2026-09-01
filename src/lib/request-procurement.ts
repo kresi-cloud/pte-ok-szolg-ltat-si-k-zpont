@@ -131,8 +131,13 @@ export function planItemFromRequest(
 
   const requested = r.requestedQuarter;
   const immediate = requested === "azonnali";
+  // Évszámos formátum ("2027-Q1") és régi csupasz negyedév ("Q1") egyaránt elfogadott.
+  const requestedQ =
+    requested && requested !== "azonnali"
+      ? ((requested.split("-").pop() ?? requested) as Quarter)
+      : undefined;
   const quarter: Quarter =
-    requested && requested !== "azonnali" ? requested : immediate ? "Q1" : quarterFor(r.priority);
+    requestedQ ?? (immediate ? "Q1" : quarterFor(r.priority));
 
   return {
     planYear: NEXT_FINANCIAL_YEAR,
