@@ -40,7 +40,7 @@ export const Route = createFileRoute("/beszerzesek")({
       {
         name: "description",
         content:
-          "Jóváhagyott eseti beszerzések átvétele, valamint a negyedéves és éves beszerzési tervek dékáni jóváhagyási státusza és határidői.",
+          "Jóváhagyott eseti beszerzések átvétele, valamint a negyedéves és éves beszerzési tervek gazdasági vezetői jóváhagyási státusza és határidői.",
       },
       { property: "og:title", content: "Beszerzői munkatér – ÁOK Digitális Szolgáltatási Portál" },
       {

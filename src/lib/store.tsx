@@ -1430,7 +1430,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           if (p.planYear !== target.planYear) return false;
           if (target.scope === "eves") return true;
           // A tételhez ténylegesen tartozó jóváhagyási ciklus dönt, hogy a
-          // dékáni jóváhagyás után beszerzésbe kerül-e.
+          // jóváhagyás után beszerzésbe kerül-e.
           const own = planApprovalForItem(p, s.planApprovals ?? []);
           if (own) return own.id === target.id;
           // Ütemezés nélküli tétel a saját negyedévének ciklusához tartozik.
@@ -1508,7 +1508,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               text: target
                 ? `${target.planYear}. évi ${target.quarter ? `${target.quarter} negyedéves` : target.scope === "azonnali" ? "azonnali" : "éves"} beszerzési terv: ${
                     decision === "jovahagyva"
-                      ? "dékáni jóváhagyás megtörtént, indítható a beszerzés"
+                      ? "a gazdasági vezetői jóváhagyás megtörtént, indítható a beszerzés"
                       : "átdolgozásra visszaküldve"
                   }.`
                 : "Beszerzési terv döntés rögzítve.",
@@ -1523,7 +1523,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               actorId: currentUser.id,
               entity: "beszerzes",
               entityId: id,
-              action: decision === "jovahagyva" ? "Terv dékáni jóváhagyása" : "Terv visszaküldése átdolgozásra",
+              action:
+                decision === "jovahagyva"
+                  ? "Terv gazdasági vezetői jóváhagyása"
+                  : "Terv visszaküldése átdolgozásra",
               detail: comment ?? "",
             },
             ...s.assetAudit,
