@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { getProcurementNextAction } from "@/lib/procurement-rules";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -94,18 +95,6 @@ function standardLabel(key: string) {
   return HARDWARE_STANDARDS.find((s) => s.key === key)?.label ?? key;
 }
 
-function rowActions(
-  item: ProcurementPlanItem,
-  role: string,
-  hasHandover: boolean,
-): { canHandToPlanner: boolean; canStart: boolean; canDeliver: boolean } {
-  const isBuyer = role === "beszerzo";
-  return {
-    canHandToPlanner: isBuyer && !item.handedToPlannerAt,
-    canStart: isBuyer && item.status !== "beszerzes_alatt" && item.status !== "teljesult",
-    canDeliver: isBuyer && item.status !== "teljesult" && !hasHandover,
-  };
-}
 
 function ItemRow({
   item,
@@ -127,9 +116,12 @@ function ItemRow({
   const hasHandover = (store.handovers ?? []).some((h) => h.planItemId === item.id);
   const blockValue = `${item.planYear}-${item.quarter}`;
   const isImmediate = item.timing === "azonnali";
-  const actions = rowActions(item, store.activeRole, hasHandover);
-  const anyAction =
-    actions.canHandToPlanner || (canAct && (actions.canStart || actions.canDeliver));
+  // Egyetlen elsődleges művelet állapotonként, közös szabályok alapján.
+  const next = getProcurementNextAction(
+    item,
+    { planApprovals: store.planApprovals ?? [], handovers: store.handovers ?? [] },
+    store.activeRole,
+  );
   return (
     <tr className="border-t border-border align-top">
       {canSchedule && (
@@ -230,52 +222,39 @@ function ItemRow({
       {showActions && (
         <td className="px-3 py-3">
           <div className="flex flex-wrap gap-2">
-            {actions.canHandToPlanner && (
+            {next.key && next.allowed && canAct ? (
               <Button
                 size="sm"
-                variant="outline"
+                variant={next.key === "deliver" ? "default" : "outline"}
                 onClick={() => {
-                  store.handPlanItemToPlanner(item.id);
-                  toast.success("Átadva az IT eszközmenedzsernek tervezésre");
+                  if (next.key === "hand_to_planner") {
+                    store.handPlanItemToPlanner(item.id);
+                    toast.success("Átadva az IT eszközmenedzsernek tervezésre");
+                    return;
+                  }
+                  const error =
+                    next.key === "start"
+                      ? store.startItemProcurement(item.id)
+                      : store.markPlanItemDelivered(item.id);
+                  if (error) {
+                    toast.error(error);
+                    return;
+                  }
+                  toast.success(
+                    next.key === "start"
+                      ? "Beszerzés elindítva"
+                      : "Beérkezés rögzítve – átadva a kari IT referensnek",
+                  );
                 }}
               >
-                Átadás eszközmenedzsernek
+                {next.label}
               </Button>
-            )}
-            {canAct && (
-              <>
-                {actions.canStart && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      store.updatePlanItem(item.id, { status: "beszerzes_alatt" });
-                      toast.success("Beszerzés elindítva");
-                    }}
-                  >
-                    Beszerzés indítása
-                  </Button>
-                )}
-                {actions.canDeliver && (
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      store.markPlanItemDelivered(item.id);
-                      toast.success("Beérkezés rögzítve – átadva a kari IT referensnek");
-                    }}
-                  >
-                    Beérkezett – átadásra
-                  </Button>
-                )}
-              </>
-            )}
-            {!anyAction && (
+            ) : (
               <span className="self-center text-xs text-muted-foreground">
-                {hasHandover
-                  ? "Átadási folyamatban a kari IT referensnél"
-                  : item.status === "teljesult"
-                    ? "Teljesült"
-                    : "Nincs teendő"}
+                {next.hint ||
+                  (hasHandover
+                    ? "Átadási folyamatban a kari IT referensnél"
+                    : "Nincs teendő – a művelet más szerepkörnél van.")}
               </span>
             )}
           </div>
@@ -592,7 +571,7 @@ function BuyerWorkspace() {
       <div className="card-surface mx-auto max-w-2xl space-y-3 p-6">
         <h1 className="font-display text-xl font-semibold">Beszerzői munkatér</h1>
         <p className="text-sm text-muted-foreground">
-          Ez a felület a beszerzési referens, a dékán és a szolgáltatásgazda számára érhető el.
+          Ez a felület a beszerző, az IT eszközmenedzser, a gazdasági vezető és a dékán számára érhető el.
         </p>
         <Button asChild variant="outline">
           <Link to="/igenyeim">Saját igényeim</Link>

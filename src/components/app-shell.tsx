@@ -37,6 +37,7 @@ import { LoginScreen } from "@/components/login-screen";
 import { GlobalSearch } from "@/components/global-search";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { DEMO_USER_IDS } from "@/lib/demo-users";
+import { DemoBanner, DemoController } from "@/components/demo-panel";
 
 interface NavItem {
   to: string;
@@ -109,6 +110,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh bg-background">
+      <DemoBanner />
+      <DemoController />
       <a
         href="#fotartalom"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"

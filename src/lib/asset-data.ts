@@ -19,8 +19,13 @@ import type {
   ReplacementDecision,
   SoftwareProduct,
 } from "./asset-types";
+import { todayIso } from "./clock";
 
-export const TODAY = "2026-08-11";
+/**
+ * Az alkalmazás „mai” dátuma: normál módban a helyi aktuális nap,
+ * vezetőségi demómódban a determinisztikus 2026-09-01.
+ */
+export const TODAY = todayIso();
 export const NEXT_FINANCIAL_YEAR = 2027;
 
 export const ASSET_CATEGORIES: AssetCategory[] = [

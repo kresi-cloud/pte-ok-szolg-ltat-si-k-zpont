@@ -40,6 +40,8 @@ import {
 import { PLAN_APPROVAL_STATUS_LABELS, QUARTER_LABELS } from "@/lib/asset-types";
 import { canReviewProcurement } from "@/lib/access";
 import { daysUntil } from "@/lib/plan-approvals";
+import { RequestSituationCard } from "@/components/request-situation-card";
+import { ProcurementSummaryCard } from "@/components/procurement-summary-card";
 import { ASSET_LOCATIONS, ASSET_MODELS } from "@/lib/asset-data";
 import { similarAssetsFor } from "@/lib/similar-assets";
 import { SimilarAssetNotice } from "@/components/similar-asset-notice";
@@ -370,6 +372,9 @@ function RequestDetail() {
             </div>
           ))}
         </dl>
+
+        <RequestSituationCard request={request} />
+        <ProcurementSummaryCard request={request} />
 
         <p className="mt-5 rounded-md bg-secondary px-4 py-3 text-sm">
           <span className="font-medium">Következő lépés: </span>
