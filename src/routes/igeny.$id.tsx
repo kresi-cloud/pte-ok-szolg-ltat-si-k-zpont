@@ -164,7 +164,7 @@ function RequestDetail() {
       detail: planItem ? `${planItem.planYear} ${planItem.quarter} · ${planItem.quantity} db` : "",
     },
     {
-      label: "Beszerzési terv jóváhagyva (dékán)",
+      label: "Beszerzési terv jóváhagyva (gazdasági vezető)",
       done: planApproved || !!planItem?.status.match(/beszerzes_alatt|teljesult/),
       detail: planApproval ? PLAN_APPROVAL_STATUS_LABELS[planApproval.status] : "",
     },
@@ -257,12 +257,12 @@ function RequestDetail() {
           : { kind: "message", text: "Gazdasági vezetői ellenőrzésre vár." };
       }
       if (st === "dekani_jovahagyas" || st === "jovahagyasra_var") {
-        const u = roleUser("dekan");
+        const u = roleUser("gazdasagi_vezeto");
         const days = daysUntil(planApproval.dueAt);
         const note = days >= 0 ? `Jóváhagyási határidő: ${planApproval.dueAt} (még ${days} nap)` : `Jóváhagyási határidő lejárt: ${planApproval.dueAt}`;
         return u
-          ? { kind: "people", people: [{ name: u.name, role: ROLE_LABELS.dekan, note }] }
-          : { kind: "message", text: `Dékáni jóváhagyásra vár. ${note}` };
+          ? { kind: "people", people: [{ name: u.name, role: ROLE_LABELS.gazdasagi_vezeto, note }] }
+          : { kind: "message", text: `Gazdasági vezetői jóváhagyásra vár. ${note}` };
       }
       // tervezes / visszakuldve: beszerzőnél van
       return buyerUser
@@ -796,7 +796,7 @@ function RequestDetail() {
 
             <h3 className="mt-8 font-display text-base font-semibold">Beszerzési szakasz</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              A jóváhagyás után az igény beszerzési tervsorrá válik, majd a terv dékáni
+              A jóváhagyás után az igény beszerzési tervsorrá válik, majd a terv gazdasági vezetői
               jóváhagyását követően indul a beszerzés, a telepítés és az átadás-átvétel.
             </p>
             <ol className="mt-4 space-y-2">
