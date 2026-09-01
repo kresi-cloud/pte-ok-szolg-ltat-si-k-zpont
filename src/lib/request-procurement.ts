@@ -1,6 +1,6 @@
 import { HARDWARE_STANDARDS, NEXT_FINANCIAL_YEAR, REFERENCE_PRICES } from "./asset-data";
 import type { AssetCategoryKey, ProcurementPlanItem, Quarter } from "./asset-types";
-import type { Product, ProductCategory, ServiceRequest } from "./types";
+import { requestedTimingLabel, type Product, type ProductCategory, type ServiceRequest } from "./types";
 
 /**
  * Jóváhagyott igényből beszerzési tervsor-javaslat.
@@ -170,7 +170,7 @@ export function planItemFromRequest(
       immediate
         ? `Az igénylő azonnali beszerzést kért. Indoklás: ${r.urgencyReason ?? "nincs megadva"}`
         : requested
-          ? `Az igénylő által kért ütemezés: ${requested}.`
+          ? `Az igénylő által kért ütemezés: ${requestedTimingLabel(requested)}.`
           : "",
     ]
       .filter(Boolean)
