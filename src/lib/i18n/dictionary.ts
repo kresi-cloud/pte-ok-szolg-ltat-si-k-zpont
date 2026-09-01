@@ -1372,7 +1372,7 @@ export const EN_DICT: Record<string, string> = {
   "IT eszközmenedzser – terv összeállítása és beküldése":
     "IT asset manager – compile and submit the plan",
   "Gazdasági vezető – pénzügyi ellenőrzés": "Economic director – financial review",
-  "Dékán – jóváhagyás": "Dean – approval",
+  "Gazdasági vezető – jóváhagyás": "Finance director – approval",
   "IT eszközmenedzser – átdolgozás": "IT asset manager – rework",
   "Beszerző – beszerzés indítása": "Buyer – start procurement",
   "Beszerző – végrehajtás alatt": "Buyer – execution in progress",
