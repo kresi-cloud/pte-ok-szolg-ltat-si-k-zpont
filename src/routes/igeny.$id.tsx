@@ -40,6 +40,8 @@ import {
 import { PLAN_APPROVAL_STATUS_LABELS, QUARTER_LABELS } from "@/lib/asset-types";
 import { canReviewProcurement } from "@/lib/access";
 import { daysUntil } from "@/lib/plan-approvals";
+import { RequestSituationCard } from "@/components/request-situation-card";
+import { ProcurementSummaryCard } from "@/components/procurement-summary-card";
 import { ASSET_LOCATIONS, ASSET_MODELS } from "@/lib/asset-data";
 import { similarAssetsFor } from "@/lib/similar-assets";
 import { SimilarAssetNotice } from "@/components/similar-asset-notice";
