@@ -419,7 +419,7 @@ export const PLAN_APPROVAL_LEAD_DAYS: Record<PlanScope, number> = {
   azonnali: 0,
 };
 
-/** A beszerzési terv életútja: beszerző → gazdasági vezető → dékán → beszerző (végrehajtás). */
+/** A beszerzési terv életútja: eszközmenedzser → gazdasági vezető → beszerző (végrehajtás). */
 export type PlanApprovalStatus =
   | "tervezes"
   | "gazdasagi_ellenorzes"
@@ -427,17 +427,17 @@ export type PlanApprovalStatus =
   | "jovahagyva"
   | "visszakuldve"
   | "vegrehajtas"
-  /** régi adatokból származó állapot, a dékáni jóváhagyással egyenértékű */
+  /** régi adatokból származó állapot, a gazdasági vezetői jóváhagyással egyenértékű */
   | "jovahagyasra_var";
 
 export const PLAN_APPROVAL_STATUS_LABELS: Record<PlanApprovalStatus, string> = {
   tervezes: "Beszerzői tervezés alatt",
   gazdasagi_ellenorzes: "Gazdasági vezetői ellenőrzés alatt",
-  dekani_jovahagyas: "Dékáni jóváhagyásra vár",
-  jovahagyva: "Dékán jóváhagyta – beszerzőnél",
+  dekani_jovahagyas: "Gazdasági vezetői jóváhagyásra vár",
+  jovahagyva: "Jóváhagyva – beszerzőnél",
   visszakuldve: "Átdolgozásra visszaküldve",
   vegrehajtas: "Beszerzés folyamatban",
-  jovahagyasra_var: "Dékáni jóváhagyásra vár",
+  jovahagyasra_var: "Gazdasági vezetői jóváhagyásra vár",
 };
 
 export interface PlanApprovalEvent {

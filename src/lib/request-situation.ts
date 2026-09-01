@@ -126,14 +126,11 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
     waitingOn = `${owner} – ${ROLE_LABELS.beszerzo}`;
     nextAction = "Beszerzés indítása";
     nextActorId = buyer?.id;
-  } else if (approval?.status === "dekani_jovahagyas" || approval?.status === "jovahagyasra_var") {
-    stageIndex = 2;
-    const dean = byRole(users, "dekan");
-    owner = dean?.name ?? "Dékán";
-    waitingOn = `${owner} – ${ROLE_LABELS.dekan}`;
-    nextAction = "Beszerzési terv jóváhagyása";
-    nextActorId = dean?.id;
-  } else if (approval?.status === "gazdasagi_ellenorzes") {
+  } else if (
+    approval?.status === "gazdasagi_ellenorzes" ||
+    approval?.status === "dekani_jovahagyas" ||
+    approval?.status === "jovahagyasra_var"
+  ) {
     stageIndex = 1;
     const fin = byRole(users, "gazdasagi_vezeto");
     owner = fin?.name ?? "Gazdasági vezető";
