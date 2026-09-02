@@ -97,62 +97,15 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
     owner = "Nincs felelős – az ügy lezárult.";
     waitingOn = "Nincs nyitott teendő.";
     nextAction = "Az igény lezárult, az eszköz a személyi leltárban van.";
-  } else if (handover) {
-    stageIndex = handover.status === "atadva" ? 4 : 3;
-    if (handover.status === "atadva") {
-      owner = userName(users, handover.recipientId);
-      waitingOn = `${owner} – igénylő`;
-      nextAction = "Átvétel visszaigazolása";
-      nextActorId = handover.recipientId;
-    } else {
-      const ref = handover.referentId ?? byRole(users, "it_referens")?.id;
-      owner = userName(users, ref);
-      waitingOn = `${owner} – ${ROLE_LABELS.it_referens}`;
-      nextAction = "Telepítés, checklist és átadás az igénylőnek";
-      nextActorId = ref;
-    }
-  } else if (planItem.status === "beszerzes_alatt") {
-    stageIndex = 2;
-    const buyer = byRole(users, "beszerzo");
-    owner = buyer?.name ?? "Beszerző";
-    waitingOn = `${owner} – ${ROLE_LABELS.beszerzo}`;
-    nextAction = "Az eszköz beérkezésének rögzítése";
-    nextActorId = buyer?.id;
-  } else if (approved) {
-    stageIndex = 2;
-    const buyer = byRole(users, "beszerzo");
-    owner = buyer?.name ?? "Beszerző";
-    waitingOn = `${owner} – ${ROLE_LABELS.beszerzo}`;
-    nextAction = "Beszerzés indítása";
-    nextActorId = buyer?.id;
-  } else if (
-    approval?.status === "gazdasagi_ellenorzes" ||
-    approval?.status === "dekani_jovahagyas" ||
-    approval?.status === "jovahagyasra_var"
-  ) {
-    stageIndex = 1;
-    const fin = byRole(users, "gazdasagi_vezeto");
-    owner = fin?.name ?? "Gazdasági vezető";
-    waitingOn = `${owner} – ${ROLE_LABELS.gazdasagi_vezeto}`;
-    nextAction = "Beszerzési terv gazdasági vezetői jóváhagyása";
-    nextActorId = fin?.id;
-  } else if (!planItem.handedToPlannerAt) {
-    stageIndex = 0;
-    const buyer = byRole(users, "beszerzo");
-    owner = buyer?.name ?? "Beszerző";
-    waitingOn = `${owner} – ${ROLE_LABELS.beszerzo}`;
-    nextAction = "Tétel átadása az IT eszközmenedzsernek";
-    nextActorId = buyer?.id;
   } else {
-    stageIndex = 1;
-    const planner = byRole(users, "eszkozmenedzser");
-    owner = planner?.name ?? "IT eszközmenedzser";
-    waitingOn = `${owner} – ${ROLE_LABELS.eszkozmenedzser}`;
-    nextAction = `Ütemezés és beküldés gazdasági ellenőrzésre${
-      approval ? ` (${PLAN_APPROVAL_STATUS_LABELS[approval.status]})` : ""
-    }`;
-    nextActorId = planner?.id;
+    const stage = planItemStage(planItem, approval, handover, users);
+    stageIndex = stage.stageIndex;
+    owner = stage.waitingOn.split(" – ")[0] ?? stage.waitingOn;
+    waitingOn = stage.waitingOn;
+    nextAction = stage.nextAction;
+    nextActorId = stage.actorId;
   }
+
 
   return {
     statusLabel: STATUS_LABELS[request.status],
