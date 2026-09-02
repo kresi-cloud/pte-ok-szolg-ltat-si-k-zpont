@@ -1,9 +1,7 @@
 import type { PlanApproval, ProcurementPlanItem } from "./asset-types";
-import { PLAN_APPROVAL_STATUS_LABELS } from "./asset-types";
 import type { AssetHandover, RoleKey, ServiceRequest, User } from "./types";
 import { ROLE_LABELS, STATUS_LABELS } from "./types";
 import { planApprovalForItem } from "./withdraw";
-import { planApprovalApproved } from "./procurement-rules";
 import { planItemStage } from "./plan-stage";
 
 /**
@@ -65,7 +63,6 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
     (h) => h.requestId === request.id || (planItem && h.planItemId === planItem.id),
   );
   const approval = planItem ? planApprovalForItem(planItem, ctx.planApprovals ?? []) : undefined;
-  const approved = planApprovalApproved(approval);
   const pending = request.approvals.filter((a) => a.decision === "fuggoben");
   const approvalsDone = request.approvals.filter((a) => a.decision === "jovahagyva").length;
 
