@@ -23,7 +23,7 @@ import { INITIAL_PRODUCTS, INITIAL_PRODUCT_CATEGORIES } from "./product-catalog"
 import { ASSET_LOCATIONS } from "./asset-data";
 
 
-export const DOMAINS: ServiceDomain[] = [
+const ALL_DOMAINS: ServiceDomain[] = [
   {
     key: "szoftver",
     name: "Szoftver",
@@ -446,7 +446,11 @@ export const USERS: User[] = [
 ];
 
 
-export const TEAMS: ServiceTeam[] = [
+// A portál kizárólag informatikai eszközbeszerzést kezel:
+// csak az eszközterülethez tartozó szolgáltatási területek jelennek meg.
+export const DOMAINS: ServiceDomain[] = ALL_DOMAINS.filter((d) => d.key === "hardver");
+
+const ALL_TEAMS: ServiceTeam[] = [
   {
     id: "t-it",
     name: "IT szolgáltatások",
@@ -483,6 +487,8 @@ export const TEAMS: ServiceTeam[] = [
     members: ["u-farkas"],
   },
 ];
+
+export const TEAMS: ServiceTeam[] = ALL_TEAMS.filter((t) => t.domain === "hardver");
 
 const ALL_CATALOG: CatalogItem[] = [
   {
@@ -1494,7 +1500,7 @@ const ALL_PROJECTS: Project[] = [
 // ezért nem informatikai fejlesztési projektek nem jelennek meg.
 export const PROJECTS: Project[] = ALL_PROJECTS.filter(() => false);
 
-export const RESPONSIBILITIES: ResponsibilityRow[] = [
+const ALL_RESPONSIBILITIES: ResponsibilityRow[] = [
   {
     service: "Microsoft 365 hozzáférés",
     unit: "Dékáni Hivatal",
