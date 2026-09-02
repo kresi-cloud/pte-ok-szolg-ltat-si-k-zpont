@@ -156,9 +156,15 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {asset.note?.startsWith("Beszerzési átadásból") && (
+            <Badge className="bg-primary/10 text-primary hover:bg-primary/10">
+              Beszerzésből érkezett
+            </Badge>
+          )}
           <LifecycleBadge status={lifecycleStatus(asset)} />
           <PriorityBadge priority={replacementPriority(asset)} />
         </div>
+
       </div>
 
       <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
