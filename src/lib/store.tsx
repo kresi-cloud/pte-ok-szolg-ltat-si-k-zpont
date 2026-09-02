@@ -48,7 +48,12 @@ import {
 import { INVENTORY, specForModel } from "./inventory-data";
 import { todayIso } from "./clock";
 import { DEMO_REQUESTER_ID } from "./demo-flow";
-import { canMarkDelivered, canStartProcurement } from "./procurement-rules";
+import {
+  canConfirmReceipt,
+  canHandOverToUser,
+  canMarkDelivered,
+  canStartProcurement,
+} from "./procurement-rules";
 import { handoverPurposeTitle, productForHandover, specFromProduct } from "./handover-products";
 import { modelKeyForStandard, standardLabel } from "./handover-mapping";
 import { productLockInfo } from "./product-lock";
