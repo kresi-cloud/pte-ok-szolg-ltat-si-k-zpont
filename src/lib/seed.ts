@@ -1632,6 +1632,14 @@ const ALL_NOTIFICATIONS: AppNotification[] = [
   },
 ];
 
+// Csak létező eszközigényhez tartozó értesítés maradhat.
+const REQUEST_IDS = new Set(REQUESTS.map((r) => r.id));
+export const NOTIFICATIONS: AppNotification[] = ALL_NOTIFICATIONS.filter((n) =>
+  REQUEST_IDS.has(n.requestId),
+);
+
+
+
 export const MONTHLY_VOLUME = [
   { month: "Márc", igenyek: 28, lezart: 24 },
   { month: "Ápr", igenyek: 34, lezart: 30 },
