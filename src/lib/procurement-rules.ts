@@ -164,15 +164,13 @@ export function getProcurementNextAction(
   if (item.status === "teljesult")
     return { key: null, label: "", allowed: false, hint: "Teljesült." };
 
-  if (!item.handedToPlannerAt) {
-    const r = canHandToPlanner(item, role);
+  if (!item.handedToPlannerAt)
     return {
-      key: "hand_to_planner",
-      label: "Átadás eszközmenedzsernek",
-      allowed: r.allowed,
-      hint: r.reason ?? "",
+      key: null,
+      label: "",
+      allowed: false,
+      hint: "IT besorolás alatt az IT eszközmenedzsernél.",
     };
-  }
   if (item.status !== "beszerzes_alatt") {
     const r = canStartProcurement(item, ctx, role);
     return {
