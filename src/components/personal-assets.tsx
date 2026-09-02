@@ -118,15 +118,17 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
   const store = useStore();
   const asset = store.assets.find((a) => a.id === assetId)!;
   const model = assetLookup.model(asset.modelKey);
-  const spec = model?.spec;
   // Katalógusból beszerzett eszköznél a modellnév és a műszaki adatok a
-  // termék adatlapjáról származnak (nincs beépített modellkulcs).
+  // termék adatlapjáról származnak – ez elsőbbséget élvez a technikai
+  // modellkulcs felett, különben más gyártó neve alatt keresné a felhasználó.
   const product = (store.products ?? []).find((p) => p.id === asset.productId);
-  const title = model
-    ? assetLookup.modelLabel(asset.modelKey)
-    : product
-      ? productModelLabel(product)
+  const spec = product ? undefined : model?.spec;
+  const title = product
+    ? productModelLabel(product)
+    : model
+      ? assetLookup.modelLabel(asset.modelKey)
       : assetLookup.modelLabel(asset.modelKey);
+
   const check = store.checks.find((c) => c.assetId === asset.id && c.userId === store.currentUser.id);
   const [answer, setAnswer] = useState<string>(shared ? "megtalalhato" : "nalam_van_hasznalom");
   const [comment, setComment] = useState("");
@@ -154,9 +156,15 @@ function AssetCard({ assetId, shared }: { assetId: string; shared: boolean }) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {asset.note?.startsWith("Beszerzési átadásból") && (
+            <Badge className="bg-primary/10 text-primary hover:bg-primary/10">
+              Beszerzésből érkezett
+            </Badge>
+          )}
           <LifecycleBadge status={lifecycleStatus(asset)} />
           <PriorityBadge priority={replacementPriority(asset)} />
         </div>
+
       </div>
 
       <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
