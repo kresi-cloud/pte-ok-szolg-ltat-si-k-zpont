@@ -305,6 +305,13 @@ function RequestDetail() {
     return { kind: "closed" };
   })();
 
+  const headerSituation = requestSituation(request, {
+    planItems: store.planItems ?? [],
+    planApprovals: store.planApprovals ?? [],
+    handovers: store.handovers ?? [],
+    users: store.users,
+  });
+
   return (
     <div className="space-y-6">
       <Link
