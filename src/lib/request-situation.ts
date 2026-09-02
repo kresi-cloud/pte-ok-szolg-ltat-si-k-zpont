@@ -4,6 +4,7 @@ import type { AssetHandover, RoleKey, ServiceRequest, User } from "./types";
 import { ROLE_LABELS, STATUS_LABELS } from "./types";
 import { planApprovalForItem } from "./withdraw";
 import { planApprovalApproved } from "./procurement-rules";
+import { planItemStage } from "./plan-stage";
 
 /**
  * Az ügy jelenlegi helyzetének egységes összefoglalója.
