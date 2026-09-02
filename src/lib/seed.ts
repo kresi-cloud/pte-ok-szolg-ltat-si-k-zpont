@@ -1601,7 +1601,7 @@ export const RESPONSIBILITIES: ResponsibilityRow[] = ALL_RESPONSIBILITIES.filter
 
 
 
-export const NOTIFICATIONS: AppNotification[] = [
+const ALL_NOTIFICATIONS: AppNotification[] = [
   {
     id: "n-1",
     requestId: "HW-2026-0210",
