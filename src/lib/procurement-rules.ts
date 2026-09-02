@@ -133,7 +133,7 @@ export function canMarkDelivered(
   return ok;
 }
 
-export type ProcurementActionKey = "hand_to_planner" | "start" | "deliver";
+export type ProcurementActionKey = "start" | "deliver";
 
 export interface ProcurementNextAction {
   /** Az állapothoz tartozó egyetlen elsődleges művelet, ha van. */
