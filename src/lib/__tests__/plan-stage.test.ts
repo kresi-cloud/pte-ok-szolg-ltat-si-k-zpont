@@ -24,20 +24,20 @@ const base = {
 const approval = (status: string) => ({ status }) as unknown as PlanApproval;
 
 describe("planItemStage", () => {
-  test("átadás előtt a beszerzőre vár", () => {
+  test("besorolás előtt az IT eszközmenedzserre vár", () => {
     const s = planItemStage(base, undefined, undefined, users);
-    expect(s.label).toBe("Tervsoron – beszerzőnél átadásra vár");
-    expect(s.actorId).toBe("u-b");
+    expect(s.stepLabel).toBe("IT besorolás");
+    expect(s.actorId).toBe("u-e");
   });
 
-  test("eszközmenedzserhez átadva tervezés alatt van", () => {
+  test("eszközmenedzserhez rendelve IT besorolás alatt van", () => {
     const s = planItemStage(
       { ...base, handedToPlannerAt: "2026-09-01" },
       approval("tervezes"),
       undefined,
       users,
     );
-    expect(s.label).toBe("Eszközmenedzseri tervezés alatt");
+    expect(s.label).toBe("IT besorolás alatt");
     expect(s.actorId).toBe("u-e");
   });
 
@@ -54,7 +54,7 @@ describe("planItemStage", () => {
 
   test("jóváhagyás után a beszerzés indítható", () => {
     const s = planItemStage(base, approval("jovahagyva"), undefined, users);
-    expect(s.label).toBe("Jóváhagyva – beszerzés indítható");
+    expect(s.stepLabel).toBe("Beszerzés");
     expect(s.nextAction).toBe("Beszerzés indítása");
   });
 
