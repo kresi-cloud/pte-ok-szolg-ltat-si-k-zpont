@@ -1,3 +1,4 @@
+import { INITIAL_PRODUCTS } from "./product-catalog";
 import type { HardwareSpec, InventoryItem } from "./types";
 
 /**
@@ -161,7 +162,7 @@ export const SOFTWARE_SUGGESTIONS = [
   "ImageJ / Fiji",
 ];
 
-export const INVENTORY: InventoryItem[] = [
+const ALL_INVENTORY: InventoryItem[] = [
   {
     id: "inv-1001",
     ownerId: "u-kovacs",
