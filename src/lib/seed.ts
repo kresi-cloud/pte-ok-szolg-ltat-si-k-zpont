@@ -23,7 +23,7 @@ import { INITIAL_PRODUCTS, INITIAL_PRODUCT_CATEGORIES } from "./product-catalog"
 import { ASSET_LOCATIONS } from "./asset-data";
 
 
-export const DOMAINS: ServiceDomain[] = [
+const ALL_DOMAINS: ServiceDomain[] = [
   {
     key: "szoftver",
     name: "Szoftver",
@@ -446,7 +446,11 @@ export const USERS: User[] = [
 ];
 
 
-export const TEAMS: ServiceTeam[] = [
+// A portál kizárólag informatikai eszközbeszerzést kezel:
+// csak az eszközterülethez tartozó szolgáltatási területek jelennek meg.
+export const DOMAINS: ServiceDomain[] = ALL_DOMAINS.filter((d) => d.key === "hardver");
+
+const ALL_TEAMS: ServiceTeam[] = [
   {
     id: "t-it",
     name: "IT szolgáltatások",
@@ -483,6 +487,8 @@ export const TEAMS: ServiceTeam[] = [
     members: ["u-farkas"],
   },
 ];
+
+export const TEAMS: ServiceTeam[] = ALL_TEAMS.filter((t) => t.domain === "hardver");
 
 const ALL_CATALOG: CatalogItem[] = [
   {
@@ -1494,7 +1500,7 @@ const ALL_PROJECTS: Project[] = [
 // ezért nem informatikai fejlesztési projektek nem jelennek meg.
 export const PROJECTS: Project[] = ALL_PROJECTS.filter(() => false);
 
-export const RESPONSIBILITIES: ResponsibilityRow[] = [
+const ALL_RESPONSIBILITIES: ResponsibilityRow[] = [
   {
     service: "Microsoft 365 hozzáférés",
     unit: "Dékáni Hivatal",
@@ -1587,7 +1593,15 @@ export const RESPONSIBILITIES: ResponsibilityRow[] = [
   },
 ];
 
-export const NOTIFICATIONS: AppNotification[] = [
+// Csak az eszközbeszerzéshez kapcsolódó felelősségi sorok láthatók.
+const DEVICE_TEAMS = new Set(TEAMS.map((t) => t.name));
+export const RESPONSIBILITIES: ResponsibilityRow[] = ALL_RESPONSIBILITIES.filter((r) =>
+  DEVICE_TEAMS.has(r.team),
+);
+
+
+
+const ALL_NOTIFICATIONS: AppNotification[] = [
   {
     id: "n-1",
     requestId: "HW-2026-0210",
@@ -1618,6 +1632,14 @@ export const NOTIFICATIONS: AppNotification[] = [
   },
 ];
 
+// Csak létező eszközigényhez tartozó értesítés maradhat.
+const REQUEST_IDS = new Set(REQUESTS.map((r) => r.id));
+export const NOTIFICATIONS: AppNotification[] = ALL_NOTIFICATIONS.filter(
+  (n) => !!n.requestId && REQUEST_IDS.has(n.requestId),
+);
+
+
+
 export const MONTHLY_VOLUME = [
   { month: "Márc", igenyek: 28, lezart: 24 },
   { month: "Ápr", igenyek: 34, lezart: 30 },
@@ -1637,10 +1659,9 @@ export const LEADTIME_TREND = [
 ];
 
 export const INSIGHTS = [
-  "A szoftverigények átlagos átfutási ideje 18%-kal nőtt az előző hónaphoz képest.",
-  "Az öt legrégebbi nyitott ügyből három beszerzési jóváhagyásra vár.",
-  "A digitalizációs fejlesztések 42%-a három szervezeti egységtől érkezik.",
-  "A pontosításra váró igények átlagosan 4,2 napot töltenek válaszra várva.",
+  "Az eszközigények átlagos átfutási ideje 18%-kal nőtt az előző hónaphoz képest.",
+  "Az öt legrégebbi nyitott eszközigényből három beszerzési jóváhagyásra vár.",
+  "A pontosításra váró eszközigények átlagosan 4,2 napot töltenek válaszra várva.",
 ];
 const inDays = (n: number) => {
   const d = new Date();
