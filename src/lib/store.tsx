@@ -569,14 +569,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 ),
                 decision: "fuggoben",
               },
-              {
-                id: `ap2-${Date.now()}`,
-                step: 2,
-                role: "Szolgáltatásgazda",
-                approverId: resolveServiceOwner(effectiveUsers, team.id),
-
-                decision: "fuggoben",
-              },
             ],
         audit: [
           {
