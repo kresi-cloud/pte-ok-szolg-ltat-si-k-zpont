@@ -75,6 +75,7 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
   let waitingOn = "";
   let nextAction = "";
   let nextActorId: string | undefined;
+  let derivedStatusLabel: string | undefined;
   const closed = handover?.status === "atvetel_igazolva" || request.status === "lezarva";
 
   if (pending.length > 0) {
@@ -102,11 +103,12 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
     waitingOn = stage.waitingOn;
     nextAction = stage.nextAction;
     nextActorId = stage.actorId;
+    derivedStatusLabel = stage.label;
   }
 
 
   return {
-    statusLabel: STATUS_LABELS[request.status],
+    statusLabel: derivedStatusLabel ?? STATUS_LABELS[request.status],
     owner,
     waitingOn,
     nextAction,

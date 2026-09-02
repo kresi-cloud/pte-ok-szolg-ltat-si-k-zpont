@@ -20,13 +20,14 @@ import {
   PLAN_APPROVAL_LEAD_DAYS,
   PLAN_APPROVAL_STATUS_LABELS,
   PLAN_SCOPE_LABELS,
-  PROCUREMENT_STATUS_LABELS,
   QUARTER_LABELS,
   type PlanApproval,
   type ProcurementPlanItem,
   type Quarter,
 } from "@/lib/asset-types";
 import { daysUntil } from "@/lib/plan-approvals";
+import { planItemStage } from "@/lib/plan-stage";
+import { planApprovalForItem } from "@/lib/withdraw";
 import { PageHeading } from "@/components/page-heading";
 import { useViewOnly } from "@/lib/access";
 import { ViewOnlyNotice } from "@/components/view-only-notice";
