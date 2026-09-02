@@ -1,15 +1,17 @@
 import type { PlanApproval, ProcurementPlanItem } from "./asset-types";
 import type { AssetHandover, RoleKey, ServiceRequest, User } from "./types";
 import { planApprovalForItem } from "./withdraw";
+import { handoverConfigured } from "./procurement-rules";
+import { PROCESS_STEP_COUNT } from "./process-steps";
 
 /**
- * A vezetőségi demó 13 lépéses forgatókönyve.
+ * A vezetőségi demó a központi nyolclépcsős folyamatot követi.
  * A lépést mindig az aktuális állapotból számoljuk ki, így a demóvezérlő
  * bármikor a valódi következő teendőre és szereplőre mutat.
  */
 
 export const DEMO_REQUESTER_ID = "u-kovacs";
-export const DEMO_TOTAL_STEPS = 12;
+export const DEMO_TOTAL_STEPS = PROCESS_STEP_COUNT;
 
 export interface DemoFlowContext {
   requests: ServiceRequest[];
