@@ -1,5 +1,6 @@
 import type { PlanApproval, ProcurementPlanItem } from "./asset-types";
 import type { AssetHandover, RoleKey } from "./types";
+import { HANDOVER_CHECKLIST } from "./types";
 import { planApprovalForItem } from "./withdraw";
 
 /**
