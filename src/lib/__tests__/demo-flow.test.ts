@@ -20,7 +20,7 @@ describe("vezetőségi demó", () => {
     expect(a.route).toBe("/uj-igeny");
     expect(a.actorId).toBe("u-kovacs");
     expect(a.done).toBe(false);
-    expect(DEMO_TOTAL_STEPS).toBe(12);
+    expect(DEMO_TOTAL_STEPS).toBe(8);
   });
 
   test("a demószereplők szerepkör alapján feloldhatók", () => {

@@ -235,11 +235,6 @@ function ItemRow({
                 size="sm"
                 variant={next.key === "deliver" ? "default" : "outline"}
                 onClick={() => {
-                  if (next.key === "hand_to_planner") {
-                    store.handPlanItemToPlanner(item.id);
-                    toast.success("Átadva az IT eszközmenedzsernek tervezésre");
-                    return;
-                  }
                   const error =
                     next.key === "start"
                       ? store.startItemProcurement(item.id)

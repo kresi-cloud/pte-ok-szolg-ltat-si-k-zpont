@@ -48,7 +48,12 @@ import {
 import { INVENTORY, specForModel } from "./inventory-data";
 import { todayIso } from "./clock";
 import { DEMO_REQUESTER_ID } from "./demo-flow";
-import { canMarkDelivered, canStartProcurement } from "./procurement-rules";
+import {
+  canConfirmReceipt,
+  canHandOverToUser,
+  canMarkDelivered,
+  canStartProcurement,
+} from "./procurement-rules";
 import { handoverPurposeTitle, productForHandover, specFromProduct } from "./handover-products";
 import { modelKeyForStandard, standardLabel } from "./handover-mapping";
 import { productLockInfo } from "./product-lock";
@@ -303,8 +308,9 @@ function defaultTierFor(u: User): EmployeeTier {
 }
 
 /**
- * Jóváhagyott igény bekötése a beszerzési tervbe: ha az igény beszerzést
- * igényel és még nincs hozzá tervsor, javaslatot hoz létre értesítéssel.
+ * 3. lépés – IT besorolás. A szervezeti jóváhagyás után a tervsor
+ * automatikusan létrejön, és azonnal az IT eszközmenedzserhez kerül
+ * besorolásra; kézi beszerzői átadás nincs.
  */
 function applyProcurementLink(
   s: PersistedState,
@@ -313,12 +319,18 @@ function applyProcurementLink(
 ): PersistedState {
   const already = s.planItems.some((p) => p.sourceRequestId === request.id);
   if (already || !needsProcurement(request)) return { ...s, requests };
+  const planner = [...USERS, ...(s.extraUsers ?? [])].find((u) =>
+    (s.roleOverrides[u.id] ?? u.roles).includes("eszkozmenedzser"),
+  );
   const item: ProcurementPlanItem = {
     ...planItemFromRequest(request, {
       products: s.products ?? [],
       categories: s.productCategories ?? [],
     }),
     id: `pp-req-${request.id}-${Date.now()}`,
+    status: "tervezett",
+    handedToPlannerAt: today(),
+    ...(planner ? { handedToPlannerBy: planner.id } : {}),
   };
   return {
     ...s,
@@ -329,7 +341,7 @@ function applyProcurementLink(
         id: `n-${Date.now()}`,
         requestId: request.id,
         at: today(),
-        text: `A(z) „${request.title}” igény jóváhagyás után bekerült a ${item.planYear}. évi beszerzési tervbe (${item.quarter}), gazdasági jóváhagyásra vár.`,
+        text: `A(z) „${request.title}” igény szervezeti jóváhagyás után IT besorolásra került (${item.planYear}. évi terv, ${item.quarter}).`,
         read: false,
       },
       ...s.notifications,
@@ -562,14 +574,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                   currentUser.orgUnitId,
                   currentUser.id,
                 ),
-                decision: "fuggoben",
-              },
-              {
-                id: `ap2-${Date.now()}`,
-                step: 2,
-                role: "Szolgáltatásgazda",
-                approverId: resolveServiceOwner(effectiveUsers, team.id),
-
                 decision: "fuggoben",
               },
             ],
@@ -1605,7 +1609,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...s,
           handovers: [handover, ...(s.handovers ?? [])],
           planItems: s.planItems.map((p) =>
-            p.id === planItemId ? { ...p, status: "teljesult" } : p,
+            p.id === planItemId ? { ...p, status: "beszerzes_alatt" } : p,
           ),
           notifications: [
             {
@@ -1666,6 +1670,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setState((s) => {
         const h = (s.handovers ?? []).find((x) => x.id === id);
         if (!h) return s;
+        // 7. lépés: csak befejezett konfigurálás után, csak a kari IT referens.
+        if (!canHandOverToUser(h, s.activeRole).allowed) return s;
         // A leltártétel már az átadáskor létrejön „Átvételre vár” státusszal,
         // hogy az eszköz azonnal megjelenjen a címzett leltárában.
         const catalogCtx = {
@@ -1765,6 +1771,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (!h) return s;
         // Idempotens: ismételt kattintás nem duplikál leltártételt vagy előzményt.
         if (h.status === "atvetel_igazolva") return s;
+        // 8. lépés: csak megtörtént átadás után, csak a címzett igazolhatja vissza.
+        if (!canConfirmReceipt(h, s.activeRole, currentUser.id).allowed) return s;
         const catalogCtx = {
           products: s.products ?? [],
           categories: s.productCategories ?? [],

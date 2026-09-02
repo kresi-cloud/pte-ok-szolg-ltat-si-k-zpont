@@ -545,7 +545,7 @@ function HandoverCard({ handover, canAct }: { handover: AssetHandover; canAct: b
               toast.success("Eszköz átadva az igénylőnek");
             }}
           >
-            Átadás az igénylőnek
+            Eszköz átadása az igénylőnek
           </Button>
           {(!serial || !inventoryNo || !productId || !requiredDone || !hasPhoto) && (
             <span className="self-center text-xs text-muted-foreground">

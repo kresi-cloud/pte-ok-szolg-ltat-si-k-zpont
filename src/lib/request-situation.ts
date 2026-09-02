@@ -3,6 +3,7 @@ import type { AssetHandover, RoleKey, ServiceRequest, User } from "./types";
 import { ROLE_LABELS, STATUS_LABELS } from "./types";
 import { planApprovalForItem } from "./withdraw";
 import { planItemStage } from "./plan-stage";
+import { PROCESS_STEPS, STEP } from "./process-steps";
 
 /**
  * Az ügy jelenlegi helyzetének egységes összefoglalója.
@@ -40,13 +41,7 @@ export interface RequestSituation {
   closed: boolean;
 }
 
-const STAGES = [
-  "Tervsor",
-  "Gazdasági jóváhagyás",
-  "Beszerzés",
-  "Átadás",
-  "Átvétel",
-];
+const STAGES: readonly string[] = PROCESS_STEPS;
 
 function userName(users: User[], id?: string): string {
   return users.find((u) => u.id === id)?.name ?? "Kijelölés alatt";
@@ -80,17 +75,18 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
 
   if (pending.length > 0) {
     const next = pending[0]!;
+    stageIndex = STEP.szervezeti_jovahagyas;
     owner = userName(users, next.approverId);
     waitingOn = `${owner} – ${ROLE_LABELS[next.role as RoleKey] ?? next.role}`;
-    nextAction =
-      next.step === 1 ? "Bruttó költségkeret rögzítése és jóváhagyás" : "Szakmai jóváhagyás";
+    nextAction = "Bruttó költségkeret rögzítése és szervezeti jóváhagyás";
     nextActorId = next.approverId;
   } else if (!planItem) {
-    const staff = byRole(users, "szolgaltatasgazda") ?? byRole(users, "ugyintezo");
-    owner = staff?.name ?? "Szolgáltatási ügyintéző";
-    waitingOn = `${owner} – szolgáltatási ügyintéző`;
-    nextAction = "Beszerzési tervsor létrehozása";
-    nextActorId = staff?.id;
+    const planner = byRole(users, "eszkozmenedzser");
+    stageIndex = STEP.it_besorolas;
+    owner = planner?.name ?? "IT eszközmenedzser";
+    waitingOn = `${owner} – IT eszközmenedzser`;
+    nextAction = "IT besorolás és beszerzési tervsor kezelése";
+    nextActorId = planner?.id;
   } else if (closed) {
     stageIndex = STAGES.length;
     owner = "Nincs felelős – az ügy lezárult.";

@@ -1,5 +1,6 @@
 import type { PlanApproval, ProcurementPlanItem } from "./asset-types";
 import type { AssetHandover, RoleKey } from "./types";
+import { HANDOVER_CHECKLIST } from "./types";
 import { planApprovalForItem } from "./withdraw";
 
 /**
@@ -39,13 +40,61 @@ export function handoverForItem(
   return (handovers ?? []).find((h) => h.planItemId === item.id);
 }
 
-/** Átadás az IT eszközmenedzsernek tervezésre. */
+/**
+ * Adminisztratív helyreállítás: a tervsor IT eszközmenedzserhez rendelése.
+ * A normál folyamatban ez a szervezeti jóváhagyáskor automatikusan megtörténik,
+ * ezért felhasználói műveletként már nem jelenik meg.
+ */
 export function canHandToPlanner(item: ProcurementPlanItem, role: RoleKey): RuleResult {
-  if (!isProcurementExecutor(role))
-    return no("Ezt a műveletet a beszerző végzi – Ön betekintő jogosultsággal nézi az ügyet.");
-  if (item.handedToPlannerAt) return no("A tétel már az IT eszközmenedzsernél van tervezésen.");
+  if (role !== "admin" && !isProcurementExecutor(role))
+    return no("Ez adminisztratív helyreállító művelet – a besorolás automatikusan megtörténik.");
+  if (item.handedToPlannerAt) return no("A tétel már az IT eszközmenedzsernél van besoroláson.");
   return ok;
 }
+
+/** Készen áll-e az átadási rekord a konfigurálás lezárására (átadhatóság). */
+export function handoverConfigured(handover: AssetHandover | undefined): boolean {
+  if (!handover) return false;
+  const checklist = handover.checklist ?? {};
+  const requiredDone = HANDOVER_CHECKLIST.filter((c) => c.required).every((c) => checklist[c.key]);
+  const hasPhoto = (handover.attachments ?? []).some((a) => a.kind === "fenykep");
+  return Boolean(
+    handover.serial && handover.inventoryNo && handover.productId && requiredDone && hasPhoto,
+  );
+}
+
+/** 7. lépés – eszközátadás az igénylőnek, csak befejezett konfigurálás után. */
+export function canHandOverToUser(
+  handover: AssetHandover | undefined,
+  role: RoleKey,
+): RuleResult {
+  if (!handover) return no("Az átadási rekord nem található.");
+  if (role !== "it_referens")
+    return no("Az átadást a kari IT referens végzi – Ön betekintő jogosultsággal nézi az ügyet.");
+  if (handover.status === "atadva") return no("Az eszköz már át lett adva, átvételre vár.");
+  if (handover.status === "atvetel_igazolva") return no("Az átvétel már visszaigazolva.");
+  if (!handoverConfigured(handover))
+    return no(
+      "A konfigurálás még nem teljes: modell, gyári szám, leltárkód, minden kötelező checklist-lépés és legalább egy fénykép szükséges.",
+    );
+  return ok;
+}
+
+/** 8. lépés – átvétel visszaigazolása és teljes lezárás. */
+export function canConfirmReceipt(
+  handover: AssetHandover | undefined,
+  role: RoleKey,
+  userId: string,
+): RuleResult {
+  if (!handover) return no("Az átadási rekord nem található.");
+  if (handover.status === "atvetel_igazolva") return no("Az átvétel már visszaigazolva.");
+  if (handover.status !== "atadva")
+    return no("Az átvétel csak a kari IT referens általi átadás után igazolható vissza.");
+  if (handover.recipientId !== userId)
+    return no("Az átvételt az eszköz címzettje igazolhatja vissza.");
+  return ok;
+}
+
 
 /** Beszerzés indítása: csak jóváhagyott tervciklus alapján. */
 export function canStartProcurement(
@@ -84,7 +133,7 @@ export function canMarkDelivered(
   return ok;
 }
 
-export type ProcurementActionKey = "hand_to_planner" | "start" | "deliver";
+export type ProcurementActionKey = "start" | "deliver";
 
 export interface ProcurementNextAction {
   /** Az állapothoz tartozó egyetlen elsődleges művelet, ha van. */
@@ -115,15 +164,13 @@ export function getProcurementNextAction(
   if (item.status === "teljesult")
     return { key: null, label: "", allowed: false, hint: "Teljesült." };
 
-  if (!item.handedToPlannerAt) {
-    const r = canHandToPlanner(item, role);
+  if (!item.handedToPlannerAt)
     return {
-      key: "hand_to_planner",
-      label: "Átadás eszközmenedzsernek",
-      allowed: r.allowed,
-      hint: r.reason ?? "",
+      key: null,
+      label: "",
+      allowed: false,
+      hint: "IT besorolás alatt az IT eszközmenedzsernél.",
     };
-  }
   if (item.status !== "beszerzes_alatt") {
     const r = canStartProcurement(item, ctx, role);
     return {
