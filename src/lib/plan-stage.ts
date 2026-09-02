@@ -14,6 +14,8 @@ export interface PlanItemStage {
   label: string;
   /** Kire vár a folyamat (név + beosztás). */
   waitingOn: string;
+  /** A soron következő szükséges művelet. */
+  nextAction: string;
   /** A soron következő szereplő azonosítója, ha ismert. */
   actorId?: string;
   /** Sorszám a Tervsor → Gazdasági jóváhagyás → Beszerzés → Átadás → Átvétel sávban. */
@@ -44,6 +46,7 @@ export function planItemStage(
   if (handover?.status === "atvetel_igazolva" || item.status === "teljesult") {
     return {
       label: "Teljesült – az eszköz a leltárban",
+      nextAction: "Az igény lezárult, az eszköz a személyi leltárban van.",
       waitingOn: "Nincs nyitott teendő.",
       stageIndex: 5,
       done: true,
@@ -54,6 +57,7 @@ export function planItemStage(
       const rec = users.find((u) => u.id === handover.recipientId);
       return {
         label: "Átadva – átvételi visszaigazolásra vár",
+      nextAction: "Átvétel visszaigazolása",
         waitingOn: `${rec?.name ?? "Igénylő"} – ${ROLE_LABELS.igenylo}`,
         ...(rec ? { actorId: rec.id } : {}),
         stageIndex: 4,
@@ -62,6 +66,7 @@ export function planItemStage(
     }
     return {
       label: "Átadás előkészítés alatt",
+      nextAction: "Telepítés, checklist és átadás az igénylőnek",
       ...waiting(users, "it_referens", "Kari IT referens"),
       stageIndex: 3,
       done: false,
@@ -70,6 +75,7 @@ export function planItemStage(
   if (item.status === "beszerzes_alatt") {
     return {
       label: "Beszerzés alatt – beérkezésre vár",
+      nextAction: "Az eszköz beérkezésének rögzítése",
       ...waiting(users, "beszerzo", "Beszerző"),
       stageIndex: 2,
       done: false,
@@ -78,6 +84,7 @@ export function planItemStage(
   if (approved || item.status === "jovahagyva") {
     return {
       label: "Jóváhagyva – beszerzés indítható",
+      nextAction: "Beszerzés indítása",
       ...waiting(users, "beszerzo", "Beszerző"),
       stageIndex: 2,
       done: false,
@@ -90,6 +97,7 @@ export function planItemStage(
   ) {
     return {
       label: "Gazdasági vezetői jóváhagyásra vár",
+      nextAction: "Beszerzési terv gazdasági vezetői jóváhagyása",
       ...waiting(users, "gazdasagi_vezeto", "Gazdasági vezető"),
       stageIndex: 1,
       done: false,
@@ -98,6 +106,7 @@ export function planItemStage(
   if (approval?.status === "visszakuldve") {
     return {
       label: "Átdolgozásra visszaküldve",
+      nextAction: "Terv átdolgozása és ismételt beküldése",
       ...waiting(users, "eszkozmenedzser", "IT eszközmenedzser"),
       stageIndex: 1,
       done: false,
@@ -106,6 +115,7 @@ export function planItemStage(
   if (!item.handedToPlannerAt) {
     return {
       label: "Tervsoron – beszerzőnél átadásra vár",
+      nextAction: "Tétel átadása az IT eszközmenedzsernek",
       ...waiting(users, "beszerzo", "Beszerző"),
       stageIndex: 0,
       done: false,
@@ -113,6 +123,7 @@ export function planItemStage(
   }
   return {
     label: "Eszközmenedzseri tervezés alatt",
+      nextAction: "Ütemezés és beküldés gazdasági ellenőrzésre",
     ...waiting(users, "eszkozmenedzser", "IT eszközmenedzser"),
     stageIndex: 1,
     done: false,
