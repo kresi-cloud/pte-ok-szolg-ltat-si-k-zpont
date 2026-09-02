@@ -839,19 +839,10 @@ function RequestDetail() {
             {!planItem && canCreatePlanItem && (
               <div className="mt-4 rounded-md border border-warning/40 bg-warning/10 p-4">
                 <p className="text-sm">
-                  Ehhez a jóváhagyott igényhez még nem tartozik beszerzési tervsor, ezért a folyamat
-                  nem tud továbblépni.
+                  Az IT besorolás a szervezeti jóváhagyás után automatikusan megtörténik. Ehhez az
+                  igényhez még nem jött létre tervsor – ezt az IT eszközmenedzser tudja rendezni a
+                  Beszerzések felületen.
                 </p>
-                <Button
-                  className="mt-3"
-                  size="sm"
-                  onClick={() => {
-                    store.createPlanItemFromRequest(request.id);
-                    toast.success("Beszerzési tervsor létrehozva.");
-                  }}
-                >
-                  Beszerzési tervsor létrehozása
-                </Button>
               </div>
             )}
           </section>
