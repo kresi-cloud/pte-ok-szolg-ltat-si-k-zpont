@@ -1602,7 +1602,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...s,
           handovers: [handover, ...(s.handovers ?? [])],
           planItems: s.planItems.map((p) =>
-            p.id === planItemId ? { ...p, status: "teljesult" } : p,
+            p.id === planItemId ? { ...p, status: "beszerzes_alatt" } : p,
           ),
           notifications: [
             {
