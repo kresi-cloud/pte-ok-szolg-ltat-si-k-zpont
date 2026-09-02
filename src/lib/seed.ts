@@ -1593,6 +1593,14 @@ const ALL_RESPONSIBILITIES: ResponsibilityRow[] = [
   },
 ];
 
+// Csak az eszközbeszerzéshez kapcsolódó felelősségi sorok láthatók.
+const DEVICE_TEAMS = new Set(TEAMS.map((t) => t.name));
+export const RESPONSIBILITIES: ResponsibilityRow[] = ALL_RESPONSIBILITIES.filter((r) =>
+  DEVICE_TEAMS.has(r.team),
+);
+
+
+
 export const NOTIFICATIONS: AppNotification[] = [
   {
     id: "n-1",
@@ -1643,10 +1651,9 @@ export const LEADTIME_TREND = [
 ];
 
 export const INSIGHTS = [
-  "A szoftverigények átlagos átfutási ideje 18%-kal nőtt az előző hónaphoz képest.",
-  "Az öt legrégebbi nyitott ügyből három beszerzési jóváhagyásra vár.",
-  "A digitalizációs fejlesztések 42%-a három szervezeti egységtől érkezik.",
-  "A pontosításra váró igények átlagosan 4,2 napot töltenek válaszra várva.",
+  "Az eszközigények átlagos átfutási ideje 18%-kal nőtt az előző hónaphoz képest.",
+  "Az öt legrégebbi nyitott eszközigényből három beszerzési jóváhagyásra vár.",
+  "A pontosításra váró eszközigények átlagosan 4,2 napot töltenek válaszra várva.",
 ];
 const inDays = (n: number) => {
   const d = new Date();
