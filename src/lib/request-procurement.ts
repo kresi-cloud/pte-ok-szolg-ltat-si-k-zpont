@@ -162,7 +162,7 @@ export function planItemFromRequest(
           ? "magas"
           : "kozepes",
     fundingSourceId: "fs-kari",
-    status: "jovahagyasra_var",
+    status: "tervezett",
     comment: [
       product
         ? `Katalógusból igényelt eszköz: ${product.name} (${product.vendor}).`

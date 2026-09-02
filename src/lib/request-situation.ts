@@ -1,9 +1,8 @@
 import type { PlanApproval, ProcurementPlanItem } from "./asset-types";
-import { PLAN_APPROVAL_STATUS_LABELS } from "./asset-types";
 import type { AssetHandover, RoleKey, ServiceRequest, User } from "./types";
 import { ROLE_LABELS, STATUS_LABELS } from "./types";
 import { planApprovalForItem } from "./withdraw";
-import { planApprovalApproved } from "./procurement-rules";
+import { planItemStage } from "./plan-stage";
 
 /**
  * Az ügy jelenlegi helyzetének egységes összefoglalója.
@@ -64,7 +63,6 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
     (h) => h.requestId === request.id || (planItem && h.planItemId === planItem.id),
   );
   const approval = planItem ? planApprovalForItem(planItem, ctx.planApprovals ?? []) : undefined;
-  const approved = planApprovalApproved(approval);
   const pending = request.approvals.filter((a) => a.decision === "fuggoben");
   const approvalsDone = request.approvals.filter((a) => a.decision === "jovahagyva").length;
 
@@ -77,6 +75,7 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
   let waitingOn = "";
   let nextAction = "";
   let nextActorId: string | undefined;
+  let derivedStatusLabel: string | undefined;
   const closed = handover?.status === "atvetel_igazolva" || request.status === "lezarva";
 
   if (pending.length > 0) {
@@ -97,65 +96,19 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
     owner = "Nincs felelős – az ügy lezárult.";
     waitingOn = "Nincs nyitott teendő.";
     nextAction = "Az igény lezárult, az eszköz a személyi leltárban van.";
-  } else if (handover) {
-    stageIndex = handover.status === "atadva" ? 4 : 3;
-    if (handover.status === "atadva") {
-      owner = userName(users, handover.recipientId);
-      waitingOn = `${owner} – igénylő`;
-      nextAction = "Átvétel visszaigazolása";
-      nextActorId = handover.recipientId;
-    } else {
-      const ref = handover.referentId ?? byRole(users, "it_referens")?.id;
-      owner = userName(users, ref);
-      waitingOn = `${owner} – ${ROLE_LABELS.it_referens}`;
-      nextAction = "Telepítés, checklist és átadás az igénylőnek";
-      nextActorId = ref;
-    }
-  } else if (planItem.status === "beszerzes_alatt") {
-    stageIndex = 2;
-    const buyer = byRole(users, "beszerzo");
-    owner = buyer?.name ?? "Beszerző";
-    waitingOn = `${owner} – ${ROLE_LABELS.beszerzo}`;
-    nextAction = "Az eszköz beérkezésének rögzítése";
-    nextActorId = buyer?.id;
-  } else if (approved) {
-    stageIndex = 2;
-    const buyer = byRole(users, "beszerzo");
-    owner = buyer?.name ?? "Beszerző";
-    waitingOn = `${owner} – ${ROLE_LABELS.beszerzo}`;
-    nextAction = "Beszerzés indítása";
-    nextActorId = buyer?.id;
-  } else if (
-    approval?.status === "gazdasagi_ellenorzes" ||
-    approval?.status === "dekani_jovahagyas" ||
-    approval?.status === "jovahagyasra_var"
-  ) {
-    stageIndex = 1;
-    const fin = byRole(users, "gazdasagi_vezeto");
-    owner = fin?.name ?? "Gazdasági vezető";
-    waitingOn = `${owner} – ${ROLE_LABELS.gazdasagi_vezeto}`;
-    nextAction = "Beszerzési terv gazdasági vezetői jóváhagyása";
-    nextActorId = fin?.id;
-  } else if (!planItem.handedToPlannerAt) {
-    stageIndex = 0;
-    const buyer = byRole(users, "beszerzo");
-    owner = buyer?.name ?? "Beszerző";
-    waitingOn = `${owner} – ${ROLE_LABELS.beszerzo}`;
-    nextAction = "Tétel átadása az IT eszközmenedzsernek";
-    nextActorId = buyer?.id;
   } else {
-    stageIndex = 1;
-    const planner = byRole(users, "eszkozmenedzser");
-    owner = planner?.name ?? "IT eszközmenedzser";
-    waitingOn = `${owner} – ${ROLE_LABELS.eszkozmenedzser}`;
-    nextAction = `Ütemezés és beküldés gazdasági ellenőrzésre${
-      approval ? ` (${PLAN_APPROVAL_STATUS_LABELS[approval.status]})` : ""
-    }`;
-    nextActorId = planner?.id;
+    const stage = planItemStage(planItem, approval, handover, users);
+    stageIndex = stage.stageIndex;
+    owner = stage.waitingOn.split(" – ")[0] ?? stage.waitingOn;
+    waitingOn = stage.waitingOn;
+    nextAction = stage.nextAction;
+    nextActorId = stage.actorId;
+    derivedStatusLabel = stage.label;
   }
 
+
   return {
-    statusLabel: STATUS_LABELS[request.status],
+    statusLabel: derivedStatusLabel ?? STATUS_LABELS[request.status],
     owner,
     waitingOn,
     nextAction,

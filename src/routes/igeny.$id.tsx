@@ -41,6 +41,7 @@ import { PLAN_APPROVAL_STATUS_LABELS, QUARTER_LABELS } from "@/lib/asset-types";
 import { canReviewProcurement } from "@/lib/access";
 import { daysUntil } from "@/lib/plan-approvals";
 import { RequestSituationCard } from "@/components/request-situation-card";
+import { requestSituation } from "@/lib/request-situation";
 import { ProcurementSummaryCard } from "@/components/procurement-summary-card";
 import { ASSET_LOCATIONS, ASSET_MODELS } from "@/lib/asset-data";
 import { similarAssetsFor } from "@/lib/similar-assets";
@@ -304,6 +305,13 @@ function RequestDetail() {
     return { kind: "closed" };
   })();
 
+  const headerSituation = requestSituation(request, {
+    planItems: store.planItems ?? [],
+    planApprovals: store.planApprovals ?? [],
+    handovers: store.handovers ?? [],
+    users: store.users,
+  });
+
   return (
     <div className="space-y-6">
       <Link
@@ -320,6 +328,9 @@ function RequestDetail() {
             <h1 className="mt-1 font-display text-2xl font-semibold">{request.title}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <StatusBadge status={request.status} />
+              <span className="rounded-md border border-border bg-muted/40 px-2 py-0.5 text-xs font-medium text-foreground">
+                Folyamatlépcső: {headerSituation.statusLabel}
+              </span>
               <PriorityBadge priority={request.priority} />
               {request.slaRisk && (
                 <span className="rounded-md border border-destructive/40 bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
