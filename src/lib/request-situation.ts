@@ -41,13 +41,7 @@ export interface RequestSituation {
   closed: boolean;
 }
 
-const STAGES = [
-  "Tervsor",
-  "Gazdasági jóváhagyás",
-  "Beszerzés",
-  "Átadás",
-  "Átvétel",
-];
+const STAGES: readonly string[] = PROCESS_STEPS;
 
 function userName(users: User[], id?: string): string {
   return users.find((u) => u.id === id)?.name ?? "Kijelölés alatt";
