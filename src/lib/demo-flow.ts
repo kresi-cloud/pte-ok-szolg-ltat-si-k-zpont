@@ -100,36 +100,17 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   const pending = request.approvals.filter((a) => a.decision === "fuggoben");
   const first = request.approvals[0];
 
+  void first;
   if (pending.length > 0) {
     const next = pending[0]!;
-    const isFirst = !!first && next.id === first.id;
     return {
       ...base,
-      index: isFirst ? 2 : 3,
-      state: `Jóváhagyásra vár (${request.approvals.filter((a) => a.decision === "jovahagyva").length} / ${request.approvals.length}).`,
-      waitingOn: `${next.role} – ${users.find((u) => u.id === next.approverId)?.name ?? next.approverId}`,
-      action: isFirst
-        ? "Bruttó költségkeret rögzítése és jóváhagyás"
-        : "Szolgáltatásgazdai jóváhagyás",
+      index: 2,
+      state: "Szervezeti jóváhagyásra vár.",
+      waitingOn: `${users.find((u) => u.id === next.approverId)?.name ?? next.approverId} – szervezeti jóváhagyó`,
+      action: "Bruttó költségkeret rögzítése és szervezeti jóváhagyás",
       actorId: next.approverId,
-      role: isFirst
-        ? roleOfUser(users, next.approverId, "jovahagyo", "vezeto", "szolgaltatasgazda")
-        : roleOfUser(users, next.approverId, "szolgaltatasgazda", "jovahagyo", "vezeto"),
-      route: "/igeny/$id",
-    };
-  }
-
-  const item = ctx.planItems.find((p) => p.sourceRequestId === request.id);
-  if (!item) {
-    const owner = request.approvals[1]?.approverId ?? id("szolgaltatasgazda", "u-molnar");
-    return {
-      ...base,
-      index: 4,
-      state: "Az igény jóváhagyva, beszerzési tervsorra vár.",
-      waitingOn: `${users.find((u) => u.id === owner)?.name ?? owner} – szolgáltatási ügyintéző`,
-      action: "Beszerzési tervsor létrehozása",
-      actorId: owner,
-      role: roleOfUser(users, owner, "szolgaltatasgazda", "jovahagyo"),
+      role: roleOfUser(users, next.approverId, "jovahagyo", "vezeto", "szolgaltatasgazda"),
       route: "/igeny/$id",
     };
   }
@@ -138,6 +119,21 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   const plannerId = id("eszkozmenedzser", "u-eszkozmgr");
   const financeId = id("gazdasagi_vezeto", "u-gazdvez");
   const referentId = id("it_referens", "u-itref");
+
+  const item = ctx.planItems.find((p) => p.sourceRequestId === request.id);
+  if (!item) {
+    return {
+      ...base,
+      index: 3,
+      state: "Az igény jóváhagyva, IT besorolásra vár.",
+      waitingOn: `${users.find((u) => u.id === plannerId)?.name ?? "IT eszközmenedzser"} – IT eszközmenedzser`,
+      action: "IT besorolás és beszerzési tervsor kezelése",
+      actorId: plannerId,
+      role: "eszkozmenedzser",
+      route: "/beszerzesek",
+    };
+  }
+
   const handover = (ctx.handovers ?? []).find(
     (h) => h.planItemId === item.id || h.requestId === request.id,
   );
@@ -145,7 +141,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   if (handover?.status === "atvetel_igazolva") {
     return {
       ...base,
-      index: 12,
+      index: 8,
       state: "Az átvétel visszaigazolva, az igény lezárult.",
       waitingOn: "Nincs nyitott teendő.",
       action: "Vezetői összefoglaló megtekintése",
@@ -159,10 +155,10 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   if (handover?.status === "atadva") {
     return {
       ...base,
-      index: 11,
+      index: 8,
       state: "Az eszköz átadva, átvételi visszaigazolásra vár.",
       waitingOn: `${nameOf(users, DEMO_REQUESTER_ID, "Az igénylő")} – igénylő`,
-      action: "Átvétel visszaigazolása",
+      action: "Átvétel visszaigazolása és ügy lezárása",
       actorId: DEMO_REQUESTER_ID,
       role: "igenylo",
       route: "/igeny/$id",
@@ -170,12 +166,17 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   }
 
   if (handover) {
+    const configured = handoverConfigured(handover);
     return {
       ...base,
-      index: 10,
-      state: "Az eszköz beérkezett, telepítés és átadás folyamatban.",
+      index: configured ? 7 : 6,
+      state: configured
+        ? "Az eszköz konfigurálva, átadásra kész."
+        : "Az eszköz beérkezett, konfigurálás folyamatban.",
       waitingOn: `${users.find((u) => u.id === (handover.referentId ?? referentId))?.name ?? "Kari IT referens"} – kari IT referens`,
-      action: "Átadási adatok és checklist rögzítése, majd átadás",
+      action: configured
+        ? "Eszköz átadása az igénylőnek"
+        : "Telepítés, checklist, gyári szám, leltárkód és fénykép rögzítése",
       actorId: handover.referentId ?? referentId,
       role: "it_referens",
       route: "/eszkozatadas",
@@ -185,23 +186,10 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   if (item.status === "beszerzes_alatt") {
     return {
       ...base,
-      index: 9,
+      index: 5,
       state: "A beszerzés folyamatban van.",
       waitingOn: `${users.find((u) => u.id === buyerId)?.name ?? "Beszerző"} – beszerző`,
       action: "Az eszköz beérkezésének rögzítése",
-      actorId: buyerId,
-      role: "beszerzo",
-      route: "/beszerzesek",
-    };
-  }
-
-  if (!item.handedToPlannerAt) {
-    return {
-      ...base,
-      index: 5,
-      state: "A beszerzési tervsor létrejött.",
-      waitingOn: `${users.find((u) => u.id === buyerId)?.name ?? "Beszerző"} – beszerző`,
-      action: "Tétel átadása az IT eszközmenedzsernek",
       actorId: buyerId,
       role: "beszerzo",
       route: "/beszerzesek",
@@ -214,22 +202,26 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   if (!approval || status === "tervezes" || status === "visszakuldve") {
     return {
       ...base,
-      index: 6,
-      state: "A tétel az IT eszközmenedzsernél van tervezésen.",
+      index: 3,
+      state: "A tétel IT besorolás alatt van.",
       waitingOn: `${users.find((u) => u.id === plannerId)?.name ?? "IT eszközmenedzser"} – IT eszközmenedzser`,
-      action: "Azonnali beszerzési csomagba sorolás és beküldés gazdasági ellenőrzésre",
+      action: "Besorolás, ütemezés és beküldés gazdasági jóváhagyásra",
       actorId: plannerId,
       role: "eszkozmenedzser",
       route: "/beszerzesek",
     };
   }
-  if (status === "gazdasagi_ellenorzes" || status === "dekani_jovahagyas" || status === "jovahagyasra_var") {
+  if (
+    status === "gazdasagi_ellenorzes" ||
+    status === "dekani_jovahagyas" ||
+    status === "jovahagyasra_var"
+  ) {
     return {
       ...base,
-      index: 7,
+      index: 4,
       state: "A terv gazdasági vezetői jóváhagyásra vár.",
       waitingOn: `${users.find((u) => u.id === financeId)?.name ?? "Gazdasági vezető"} – gazdasági vezető`,
-      action: "Beszerzési terv jóváhagyása",
+      action: "Beszerzési terv gazdasági vezetői jóváhagyása",
       actorId: financeId,
       role: "gazdasagi_vezeto",
       route: "/beszerzesek",
@@ -237,7 +229,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   }
   return {
     ...base,
-    index: 8,
+    index: 5,
     state: "A terv jóváhagyva, a beszerzés indítható.",
     waitingOn: `${users.find((u) => u.id === buyerId)?.name ?? "Beszerző"} – beszerző`,
     action: "Beszerzés indítása",
