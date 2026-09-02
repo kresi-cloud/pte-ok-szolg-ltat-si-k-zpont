@@ -117,6 +117,12 @@ function ItemRow({
   const blockValue = `${item.planYear}-${item.quarter}`;
   const isImmediate = item.timing === "azonnali";
   // Egyetlen elsődleges művelet állapotonként, közös szabályok alapján.
+  const stage = planItemStage(
+    item,
+    planApprovalForItem(item, store.planApprovals ?? []),
+    (store.handovers ?? []).find((h) => h.planItemId === item.id),
+    store.users,
+  );
   const next = getProcurementNextAction(
     item,
     { planApprovals: store.planApprovals ?? [], handovers: store.handovers ?? [] },
@@ -160,7 +166,8 @@ function ItemRow({
         )}
       </td>
       <td className="px-3 py-3 text-sm whitespace-nowrap">{huf(cost.withContingency)}</td>
-      <td className="px-3 py-3 text-xs">{PROCUREMENT_STATUS_LABELS[item.status]}</td>
+      <td className="px-3 py-3 text-xs">{stage.label}</td>
+      <td className="px-3 py-3 text-xs text-muted-foreground">{stage.waitingOn}</td>
       {canSchedule && (
         <td className="px-3 py-3">
           <div className="space-y-2">
@@ -292,6 +299,7 @@ function ItemsTable({
             <th className="px-3 py-2">Tétel</th>
             <th className="px-3 py-2">Becsült bruttó</th>
             <th className="px-3 py-2">Állapot</th>
+            <th className="px-3 py-2">Kire vár</th>
             {canSchedule && <th className="px-3 py-2">Ütemezés</th>}
             {showActions && <th className="px-3 py-2">Művelet</th>}
           </tr>
