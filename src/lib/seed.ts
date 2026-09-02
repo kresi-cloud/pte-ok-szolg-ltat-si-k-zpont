@@ -1634,8 +1634,8 @@ const ALL_NOTIFICATIONS: AppNotification[] = [
 
 // Csak létező eszközigényhez tartozó értesítés maradhat.
 const REQUEST_IDS = new Set(REQUESTS.map((r) => r.id));
-export const NOTIFICATIONS: AppNotification[] = ALL_NOTIFICATIONS.filter((n) =>
-  REQUEST_IDS.has(n.requestId),
+export const NOTIFICATIONS: AppNotification[] = ALL_NOTIFICATIONS.filter(
+  (n) => !!n.requestId && REQUEST_IDS.has(n.requestId),
 );
 
 
