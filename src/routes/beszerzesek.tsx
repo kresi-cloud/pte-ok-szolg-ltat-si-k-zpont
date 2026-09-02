@@ -596,10 +596,9 @@ function BuyerWorkspace() {
 
         <TabsContent value="eseti" className="mt-4 space-y-3">
           <p className="text-sm text-muted-foreground">
-            Jóváhagyott szolgáltatási igényből keletkezett tételek. A beszerző átadja őket az IT
-            eszközmenedzsernek, aki azonnali vagy negyedéves bontásba sorolja és összeállítja a
-            tervet; ezt a gazdasági vezető ellenőrzi, a dékán hagyja jóvá, majd a beszerző indítja
-            a beszerzést.
+            Jóváhagyott szolgáltatási igényből keletkezett tételek. Az IT eszközmenedzser azonnali
+            vagy negyedéves bontásba sorolja és összeállítja a tervet; ezt a gazdasági vezető
+            jóváhagyásával zárul a tervezés, majd a beszerző indítja a beszerzést.
           </p>
           {canSchedule && (
             <div className="card-surface flex flex-wrap items-center gap-3 p-4">
