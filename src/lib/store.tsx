@@ -1663,6 +1663,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setState((s) => {
         const h = (s.handovers ?? []).find((x) => x.id === id);
         if (!h) return s;
+        // 7. lépés: csak befejezett konfigurálás után, csak a kari IT referens.
+        if (!canHandOverToUser(h, s.activeRole).allowed) return s;
         // A leltártétel már az átadáskor létrejön „Átvételre vár” státusszal,
         // hogy az eszköz azonnal megjelenjen a címzett leltárában.
         const catalogCtx = {
@@ -1762,6 +1764,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (!h) return s;
         // Idempotens: ismételt kattintás nem duplikál leltártételt vagy előzményt.
         if (h.status === "atvetel_igazolva") return s;
+        // 8. lépés: csak megtörtént átadás után, csak a címzett igazolhatja vissza.
+        if (!canConfirmReceipt(h, s.activeRole, currentUser.id).allowed) return s;
         const catalogCtx = {
           products: s.products ?? [],
           categories: s.productCategories ?? [],
