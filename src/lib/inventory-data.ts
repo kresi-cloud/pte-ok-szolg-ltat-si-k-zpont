@@ -228,3 +228,16 @@ const ALL_INVENTORY: InventoryItem[] = [
     createdAt: "2026-03-05",
   },
 ];
+
+/** A beszerezhető termékkatalógusban szereplő eszközmodellek. */
+const CATALOG_MODEL_KEYS = new Set(
+  INITIAL_PRODUCTS.map((p) => p.modelKey).filter((k): k is string => Boolean(k)),
+);
+
+/**
+ * Demó leltár: kizárólag eszköz (hardver) tételek, és csak olyan modellek,
+ * amelyek szerepelnek a beszerezhető termékek listájában.
+ */
+export const INVENTORY: InventoryItem[] = ALL_INVENTORY.filter(
+  (i) => i.kind === "hardver" && !!i.modelKey && CATALOG_MODEL_KEYS.has(i.modelKey),
+);
