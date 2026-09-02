@@ -22,7 +22,7 @@ export interface DemoFlowContext {
 }
 
 export interface DemoStep {
-  /** 1-alapú lépésszám a 12-ből. */
+  /** 1-alapú lépésszám a nyolcból. */
   index: number;
   /** Az ügy jelenlegi állapotának rövid leírása. */
   state: string;
