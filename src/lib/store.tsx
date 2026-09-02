@@ -319,7 +319,9 @@ function applyProcurementLink(
 ): PersistedState {
   const already = s.planItems.some((p) => p.sourceRequestId === request.id);
   if (already || !needsProcurement(request)) return { ...s, requests };
-  const planner = (s.users ?? []).find((u) => u.roles.includes("eszkozmenedzser"));
+  const planner = [...USERS, ...(s.extraUsers ?? [])].find((u) =>
+    (s.roleOverrides[u.id] ?? u.roles).includes("eszkozmenedzser"),
+  );
   const item: ProcurementPlanItem = {
     ...planItemFromRequest(request, {
       products: s.products ?? [],

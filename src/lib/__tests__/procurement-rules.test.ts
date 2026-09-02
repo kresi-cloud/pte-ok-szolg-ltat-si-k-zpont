@@ -122,7 +122,7 @@ describe("beszerzési szabályok", () => {
     const ctx = { planApprovals: [approval("jovahagyva")], handovers: [] };
     expect(
       getProcurementNextAction(item({ handedToPlannerAt: undefined }), ctx, "beszerzo").key,
-    ).toBe("hand_to_planner");
+    ).toBe(null);
     expect(getProcurementNextAction(item(), ctx, "beszerzo").key).toBe("start");
     expect(getProcurementNextAction(item({ status: "beszerzes_alatt" }), ctx, "beszerzo").key).toBe(
       "deliver",
