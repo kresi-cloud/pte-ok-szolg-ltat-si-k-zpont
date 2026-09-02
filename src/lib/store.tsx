@@ -303,8 +303,9 @@ function defaultTierFor(u: User): EmployeeTier {
 }
 
 /**
- * Jóváhagyott igény bekötése a beszerzési tervbe: ha az igény beszerzést
- * igényel és még nincs hozzá tervsor, javaslatot hoz létre értesítéssel.
+ * 3. lépés – IT besorolás. A szervezeti jóváhagyás után a tervsor
+ * automatikusan létrejön, és azonnal az IT eszközmenedzserhez kerül
+ * besorolásra; kézi beszerzői átadás nincs.
  */
 function applyProcurementLink(
   s: PersistedState,
@@ -313,12 +314,16 @@ function applyProcurementLink(
 ): PersistedState {
   const already = s.planItems.some((p) => p.sourceRequestId === request.id);
   if (already || !needsProcurement(request)) return { ...s, requests };
+  const planner = (s.users ?? []).find((u) => u.roles.includes("eszkozmenedzser"));
   const item: ProcurementPlanItem = {
     ...planItemFromRequest(request, {
       products: s.products ?? [],
       categories: s.productCategories ?? [],
     }),
     id: `pp-req-${request.id}-${Date.now()}`,
+    status: "tervezett",
+    handedToPlannerAt: today(),
+    ...(planner ? { handedToPlannerBy: planner.id } : {}),
   };
   return {
     ...s,
@@ -329,7 +334,7 @@ function applyProcurementLink(
         id: `n-${Date.now()}`,
         requestId: request.id,
         at: today(),
-        text: `A(z) „${request.title}” igény jóváhagyás után bekerült a ${item.planYear}. évi beszerzési tervbe (${item.quarter}), gazdasági jóváhagyásra vár.`,
+        text: `A(z) „${request.title}” igény szervezeti jóváhagyás után IT besorolásra került (${item.planYear}. évi terv, ${item.quarter}).`,
         read: false,
       },
       ...s.notifications,
