@@ -29,6 +29,9 @@ import {
   type Quarter,
 } from "@/lib/asset-types";
 import { ProcurementBadge, PriorityBadge, StatTile } from "@/components/asset-bits";
+import { planItemStage } from "@/lib/plan-stage";
+import { planApprovalForItem } from "@/lib/withdraw";
+
 
 export const Route = createFileRoute("/beszerzesi-terv")({
   head: () => ({
