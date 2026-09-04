@@ -1,31 +1,75 @@
-# Döntési sor + beszerző átnevezése Dr. Hollósyra
+# Folyamat-finomítások – konkrét megoldási terv
 
-## Cél
-1. A beszerző felhasználó Csanaki G. helyett **Dr. Hollósy** legyen (meglévő `u-beszerzo` azonosító megtartásával, hogy minden folyamat és demó tovább működjön).
-2. Az igény részletei oldalon új **„Döntési sor"** blokk: kronologikus, olvasható döntési idővonal (ki, mikor, mit döntött, indoklással), a beszerzési lánc döntéseivel.
+A korábbi átnézés 8 pontjára konkrét megvalósítás, prioritási sorrendben.
 
-## Módosítások
+## 1. Zsákutca-ágak kezelése (elutasított / visszavont igények)
 
-### 1. Beszerző átnevezése (`src/lib/seed.ts`)
-- `u-beszerzo`: név → „Dr. Hollósy …", titulus „beszerzési referens", e-mail `hollosy…@aok.pte.hu`, monogram `DH` frissítése. Fiktív adat marad.
-- Minden hivatkozás (`demo-users.ts`, `demo-flow.ts`, `asset-data.ts`, tesztek) az `u-beszerzo` ID-t használja, így nem igényelnek módosítást; szöveges „Csanaki" előfordulások ellenőrzése `rg`-vel, javítása, ha van.
+**Probléma:** `requestSituation()` nem kezeli az `elutasitva` és `visszavont` állapotokat – tévesen „IT besorolás alatt" állapotot mutat, és a demóvezérlő megrekedhet.
 
-### 2. Döntési sor a request detail oldalon (`src/routes/igeny.$id.tsx`)
-- Új **„Döntési sor"** szakasz az „Előzmények (audit napló)" fülön belül (vagy saját fülön, ha áttekinthetőbb) — a meglévő adatmodellből származtatva, adatduplikáció nélkül:
-  - `request.approvals` tételei: lépés, szerepkör, jóváhagyó neve, döntés (jóváhagyva/elutasítva/pontosítás), dátum, megjegyzés.
-  - Beszerzési lánc döntései az `audit` eseményekből szűrve (tervsor létrehozás, átadás eszközmenedzsernek, csomagba sorolás, gazdasági jóváhagyás/visszaküldés, beszerzés indítása, beérkezés, átadás, átvétel-igazolás, visszavonás).
-- Megjelenés: vertikális idővonal (intézményi stílus), sorrendben dátum + szereplő + szerepkör + döntés + indoklás; státusz nem csak színnel jelölve (ikon + szöveges címke).
-- Üres állapot: „Még nem született döntés ebben az ügyben." — a beküldés eseménye mindig látszik első tételként.
+**Megoldás:**
+- `src/lib/request-situation.ts`: az `igeny.status` ellenőrzése legyen a levezetés **első** ága, a jóváhagyás-lánc vizsgálata előtt:
+  - `elutasitva` → „Elutasítva – [elutasító neve, indok]" helyzet, nincs következő teendő, felelős: n/a.
+  - `visszavont` → „Visszavonva az igénylő által" helyzet, nincs következő teendő.
+- `process-steps.ts`: a folyamatjelző lépésindexe ezeknél maradjon a beküldésig elért utolsó lépésen, jelöléssel, hogy a folyamat megszakadt.
+- A demóvezérlő (`demo-flow.ts`) ezeket a státuszokat ismert záróállapotként kezelje (ne várjon további lépést).
 
-### 3. Segédfüggvény (`src/lib/decision-trail.ts`)
-- `buildDecisionTrail(request, procurementState)`: egységes, tesztelhető függvény, amely a jóváhagyásokat és a döntés-jellegű audit eseményeket egyetlen kronologikus tömbbe fűzi (`{ at, actorId, role, decision, detail }`).
+## 2. Beérkezés → konfigurálás átmenet egyértelműsítése
 
-### 4. Ellenőrzések
-- Egységteszt `buildDecisionTrail`-re: sorrend, demófolyamat végén a teljes lánc megjelenik, visszavont ügynél a visszavonás utolsó tétel.
-- `bunx tsgo --noEmit`, `bun test` (meglévő 22 teszt zöld marad), build ellenőrzés.
-- Böngészős rövid ellenőrzés: demófolyamat végén az igény oldalon a döntési sor tartalmazza Dr. Hollósy beszerzői lépéseit.
+**Probléma:** a beérkezés rögzítése után a tétel vizuálisan „késznek" tűnik, miközben még a konfigurálás hátravan.
 
-## Technikai megjegyzések
-- Backend és új adatmodell nem kell: a döntési sor a meglévő `approvals` + `audit` mezőkből derivált.
-- A `u-beszerzo` ID változatlan → leltárhelyiség-hozzárendelés (`loc-dekani-6`), demólépések és routing érintetlen.
-- Minden új szöveg magyar.
+**Megoldás:**
+- `plan-stage.ts`: a beérkezett, de még nem konfigurált tétel származtatott állapota legyen explicit: „**Beérkezett – konfigurálásra vár**", felelős: a kari IT referens (Bercsényi L.).
+- `beszerzesek.tsx`: ilyen tételnél a „Kire vár" oszlopban a referens neve, és az elsődleges művelet a referens munkaterére mutató link legyen („Konfigurálás megkezdése" → `/eszkozatadas`).
+- Elavult szöveg javítása: „a dékán hagyja jóvá" → „a gazdasági vezető zárja a tervezést" (beszerzői munkatér leírása).
+
+## 3. Határidő-figyelmeztetés a „kire vár" oszlopban
+
+**Megoldás:**
+- `plan-stage.ts` / „kire vár" cella: ha a tétel `plannedDeadline`-ja múltbeli ÉS a tétel nincs lezárva → a határidő piros jelöléssel + „Késedelmes" chip jelenjen meg.
+- Kis segédfüggvény (`isOverdue(item, today)`), a demó rögzített dátumát is figyelembe véve.
+- A `RequestSituationCard`-on is jelenjen meg, ha az igény tervezett határideje lejárt.
+
+## 4. Vezetői összefoglaló kiegészítése
+
+**Megoldás** – a vezetői nézetben származtatott aggregátumok (nincs adatduplikáció):
+- Lépésenkénti megoszlás: hány tétel áll az egyes 8 lépésben.
+- Átlagos várakozási idő lépésenként (a tétel `updatedAt`/audit időbélyegei alapján).
+- Késedelmes tételek listája felelőssel együtt.
+
+## 5. Szerepkör-hozzárendelések központosítása
+
+**Megoldás:**
+- Új `src/lib/process-roles.ts`: egyetlen `STEP_RESPONSIBLE: Record<StepIndex, RoleKey>` tábla + név-feloldó függvény.
+- `process-steps.ts`, `request-situation.ts`, `demo-flow.ts`, `plan-stage.ts` mind ebből vegye a felelőst – a jelenlegi szétszórt név-/szerepkör-literalok megszűnnek.
+- Teszt: minden lépés felelőse létező, aktív felhasználóra oldódik.
+
+## 6. Örökölt státusz-normalizálás egy helyre
+
+**Megoldás:**
+- Egyetlen `normalizeLegacyStatus()` függvény (`plan-stage.ts`-ben), amely a `dekani_jovahagyas` / `jovahagyasra_var` → `gazdasagi_felulvizsgalat` leképezést végzi.
+- `demo-flow.ts` és a store migrációja ezt hívja; a tripla implementáció törlése.
+
+## 7. Admin visszaállítás rejtése
+
+**Megoldás:**
+- `eszkozatadas.tsx`: a már átadott tételnél a „visszaállítás" gomb csak `admin` szerepkörrel látszik, felirata „Átadás visszavonása (admin helyreállítás)", megerősítő dialógussal, audit-bejegyzéssel.
+
+## 8. Tesztek bővítése
+
+- Elutasított / visszavont igény helyzete helyes (1. pont).
+- Beérkezett-nem-konfigurált tétel „konfigurálásra vár" + referens a felelős (2. pont).
+- Késedelmes tétel felismerése (3. pont).
+- Lépés-felelős feloldás minden lépésre (5. pont).
+- Legacy státusz normalizálás (6. pont).
+
+## Nem változik
+
+Architektúra, route-ok, `routeTree.gen.ts`, a 8 lépés sorrendje és neve, a tervciklus-szintű műveletek és a dékáni betekintés.
+
+## Ellenőrzés
+
+`bunx tsgo --noEmit`, `bun test`, `bun run build` – mind zöld legyen. Böngészős végigkattintás csak külön kérésre.
+
+## Technikai megjegyzés
+
+A módosítások tiszta levezetések és UI-finomítások; az adatmodellhez (mezők, státuszértékek) nem nyúlunk, a localStorage-os seed kompatibilis marad.
