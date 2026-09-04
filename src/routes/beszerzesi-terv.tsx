@@ -276,6 +276,14 @@ function PlanItemCard({ item }: { item: ProcurementPlanItem }) {
   const cost = itemCost(item);
   const price = assetLookup.price(item.referencePriceId);
   const [open, setOpen] = useState(false);
+  // A tárolt státusz helyett a központi folyamatmodell levezetett lépcsője.
+  const stage = planItemStage(
+    item,
+    planApprovalForItem(item, store.planApprovals ?? []),
+    (store.handovers ?? []).find((h) => h.planItemId === item.id),
+    store.users,
+  );
+
 
   return (
     <li className="rounded-md border border-border p-4">
