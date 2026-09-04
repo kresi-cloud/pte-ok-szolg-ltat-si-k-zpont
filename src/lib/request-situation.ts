@@ -39,6 +39,10 @@ export interface RequestSituation {
   /** A következő műveletre jogosult felhasználó azonosítója, ha ismert. */
   nextActorId?: string;
   closed: boolean;
+  /** A folyamat zsákutcába futott (elutasítva vagy visszavonva). */
+  terminated: boolean;
+  /** A tervezett negyedév vége elmúlt, a tétel nem teljesült. */
+  overdue: boolean;
 }
 
 const STAGES: readonly string[] = PROCESS_STEPS;
@@ -71,9 +75,28 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
   let nextAction = "";
   let nextActorId: string | undefined;
   let derivedStatusLabel: string | undefined;
-  const closed = handover?.status === "atvetel_igazolva" || request.status === "lezarva";
+  let overdue = false;
+  const terminated = request.status === "elutasitva" || request.status === "visszavonva";
+  const closed =
+    terminated || handover?.status === "atvetel_igazolva" || request.status === "lezarva";
 
-  if (pending.length > 0) {
+  if (terminated) {
+    // Zsákutca-ág: a folyamatjelző a beküldésig elért lépésnél megszakad,
+    // nincs felelős és nincs következő teendő.
+    const decided = request.approvals.find((a) => a.decision === "elutasitva");
+    const decidedBy = decided ? userName(users, decided.approverId) : undefined;
+    stageIndex = request.status === "elutasitva" ? STEP.szervezeti_jovahagyas : STEP.igenyles;
+    owner = "Nincs felelős – a folyamat megszakadt.";
+    waitingOn = "Nincs nyitott teendő.";
+    nextAction =
+      request.status === "elutasitva"
+        ? `Az igényt elutasították${decidedBy ? ` – ${decidedBy}` : ""}${
+            decided?.comment ? `: ${decided.comment}` : "."
+          }`
+        : "Az igénylő visszavonta az igényt.";
+    derivedStatusLabel =
+      request.status === "elutasitva" ? "Elutasítva – a folyamat lezárult" : "Visszavonva az igénylő által";
+  } else if (pending.length > 0) {
     const next = pending[0]!;
     stageIndex = STEP.szervezeti_jovahagyas;
     owner = userName(users, next.approverId);
@@ -100,6 +123,7 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
     nextAction = stage.nextAction;
     nextActorId = stage.actorId;
     derivedStatusLabel = stage.label;
+    overdue = stage.overdue;
   }
 
 
@@ -113,10 +137,12 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
     approvalsTotal: request.approvals.length,
     track: STAGES.map((label, i) => ({
       label,
-      done: i < stageIndex,
-      current: i === stageIndex,
+      done: !terminated && i < stageIndex,
+      current: !terminated && i === stageIndex,
     })),
     ...(nextActorId ? { nextActorId } : {}),
     closed,
+    terminated,
+    overdue,
   };
 }

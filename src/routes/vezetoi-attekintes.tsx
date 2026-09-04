@@ -25,6 +25,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { itemCost } from "@/lib/asset-logic";
+import { planItemStage } from "@/lib/plan-stage";
+import { planApprovalForItem } from "@/lib/withdraw";
+import { PROCESS_STEPS } from "@/lib/process-steps";
 import { DOMAINS, ORG_UNITS, PROJECTS, TEAMS, lookup, useStore } from "@/lib/store";
 import { STATUS_LABELS, type ServiceRequest, type StatusKey } from "@/lib/types";
 
@@ -95,7 +98,7 @@ function groupLabel(key: string, dim: Dimension): string {
 }
 
 function LeaderView() {
-  const { requests, planItems } = useStore();
+  const { requests, planItems, planApprovals, handovers, users } = useStore();
   const [dimension, setDimension] = useState<Dimension>("domain");
   const [drill, setDrill] = useState<string | null>(null);
 
@@ -123,6 +126,28 @@ function LeaderView() {
       }))
       .sort((a, b) => b.total - a.total);
   }, [requests, dimension]);
+
+  // Nyolclépcsős folyamat: lépésenkénti megoszlás és késedelmes tételek.
+  // Származtatott adat, nincs külön tárolt állapot.
+  const processOverview = useMemo(() => {
+    const perStep = PROCESS_STEPS.map((label) => ({ label, count: 0 }));
+    const overdue: { id: string; name: string; step: string; waitingOn: string }[] = [];
+    for (const item of planItems) {
+      const approval = planApprovalForItem(item, planApprovals ?? []);
+      const handover = (handovers ?? []).find((h) => h.planItemId === item.id);
+      const stage = planItemStage(item, approval, handover, users);
+      perStep[stage.stageIndex]!.count += 1;
+      if (stage.overdue) {
+        overdue.push({
+          id: item.id,
+          name: item.deviceName ?? item.standardKey,
+          step: stage.stepLabel,
+          waitingOn: stage.waitingOn,
+        });
+      }
+    }
+    return { perStep, overdue };
+  }, [planItems, planApprovals, handovers, users]);
 
   const drillItems = useMemo(
     () => (drill ? requests.filter((r) => groupKey(r, dimension) === drill) : []),
@@ -161,6 +186,41 @@ function LeaderView() {
             <p className="mt-1 text-xs text-muted-foreground">{k.hint}</p>
           </div>
         ))}
+      </section>
+
+      <section className="mt-6 grid gap-6 lg:grid-cols-2">
+        <div className="rounded-md border border-border bg-card p-5">
+          <h2 className="font-display text-lg font-semibold">
+            Beszerzési tételek a folyamat lépései szerint
+          </h2>
+          <ul className="mt-4 space-y-2 text-sm">
+            {processOverview.perStep.map((s2, i) => (
+              <li key={s2.label} className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">
+                  {i + 1}. {s2.label}
+                </span>
+                <span className="font-display font-semibold">{s2.count}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="rounded-md border border-border bg-card p-5">
+          <h2 className="font-display text-lg font-semibold">Késedelmes tételek</h2>
+          {processOverview.overdue.length === 0 ? (
+            <p className="mt-4 text-sm text-muted-foreground">Nincs késedelmes beszerzési tétel.</p>
+          ) : (
+            <ul className="mt-4 space-y-2 text-sm">
+              {processOverview.overdue.map((o) => (
+                <li key={o.id} className="rounded-md bg-destructive/10 px-3 py-2">
+                  <p className="font-medium">{o.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {o.step} · {o.waitingOn}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </section>
 
       <section className="mt-6 grid gap-6 lg:grid-cols-2">

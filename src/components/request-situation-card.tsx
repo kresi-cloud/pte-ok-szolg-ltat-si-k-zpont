@@ -44,9 +44,19 @@ export function RequestSituationCard({ request }: { request: ServiceRequest }) {
   return (
     <section
       aria-label="Az ügy jelenlegi helyzete"
-      className="card-surface mt-6 space-y-4 border-l-4 border-l-primary p-5"
+      className={`card-surface mt-6 space-y-4 border-l-4 p-5 ${s.terminated || s.overdue ? "border-l-destructive" : "border-l-primary"}`}
     >
       <h2 className="font-display text-base font-semibold">Az ügy jelenlegi helyzete</h2>
+      {s.terminated && (
+        <p className="rounded-md bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive">
+          A folyamat megszakadt – nincs további teendő.
+        </p>
+      )}
+      {s.overdue && !s.terminated && (
+        <p className="rounded-md bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive">
+          Késedelmes: a tervezett negyedév vége elmúlt, a tétel még nem teljesült.
+        </p>
+      )}
 
       <dl className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
         <div>

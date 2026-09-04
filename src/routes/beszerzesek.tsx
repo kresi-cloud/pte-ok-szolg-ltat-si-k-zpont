@@ -28,6 +28,7 @@ import {
 import { daysUntil } from "@/lib/plan-approvals";
 import { planItemStage } from "@/lib/plan-stage";
 import { planApprovalForItem } from "@/lib/withdraw";
+import { normalizeLegacyPlanStatus } from "@/lib/plan-stage";
 import { PageHeading } from "@/components/page-heading";
 import { useViewOnly } from "@/lib/access";
 import { ViewOnlyNotice } from "@/components/view-only-notice";
@@ -168,7 +169,14 @@ function ItemRow({
       </td>
       <td className="px-3 py-3 text-sm whitespace-nowrap">{huf(cost.withContingency)}</td>
       <td className="px-3 py-3 text-xs">{stage.label}</td>
-      <td className="px-3 py-3 text-xs text-muted-foreground">{stage.waitingOn}</td>
+      <td className="px-3 py-3 text-xs text-muted-foreground">
+        {stage.waitingOn}
+        {stage.overdue && (
+          <span className="ml-2 inline-flex rounded-full bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">
+            Késedelmes
+          </span>
+        )}
+      </td>
       {canSchedule && (
         <td className="px-3 py-3">
           <div className="space-y-2">
@@ -337,10 +345,7 @@ function ApprovalCard({ approval }: { approval: PlanApproval }) {
           : p.quarter === approval.quarter && p.timing !== "azonnali",
   );
   const total = items.reduce((s, i) => s + itemCost(i).withContingency, 0);
-  const status =
-    approval.status === "jovahagyasra_var" || approval.status === "dekani_jovahagyas"
-      ? "gazdasagi_ellenorzes"
-      : approval.status;
+  const status = normalizeLegacyPlanStatus(approval.status);
 
   const STEPS: { key: string; label: string }[] = [
     { key: "tervezes", label: "Eszközmenedzseri tervezés" },
@@ -545,7 +550,7 @@ function BuyerWorkspace() {
       <div className="card-surface mx-auto max-w-2xl space-y-3 p-6">
         <h1 className="font-display text-xl font-semibold">Beszerzői munkatér</h1>
         <p className="text-sm text-muted-foreground">
-          Ez a felület a beszerző, az IT eszközmenedzser, a gazdasági vezető és a dékán számára érhető el.
+          Ez a felület a beszerző, az IT eszközmenedzser, a gazdasági vezető és a dékán (betekintés) számára érhető el.
         </p>
         <Button asChild variant="outline">
           <Link to="/igenyeim">Saját igényeim</Link>
@@ -555,8 +560,8 @@ function BuyerWorkspace() {
   }
 
   const openAdHoc = adHoc.filter((p) => p.status !== "teljesult").length;
-  const financePending = approvals.filter((a) =>
-    ["gazdasagi_ellenorzes", "dekani_jovahagyas", "jovahagyasra_var"].includes(a.status),
+  const financePending = approvals.filter(
+    (a) => normalizeLegacyPlanStatus(a.status) === "gazdasagi_ellenorzes",
   ).length;
   const planningCycles = approvals.filter((a) =>
     ["tervezes", "visszakuldve"].includes(a.status),
