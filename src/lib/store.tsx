@@ -9,6 +9,7 @@ import {
   type Context,
 
 } from "react";
+import { normalizeLegacyPlanStatus } from "./plan-stage";
 import {
   CATALOG,
   ANNOUNCEMENTS,
@@ -411,11 +412,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           const missingCycles = [...years]
             .flatMap((y) => buildPlanApprovals(y))
             .filter((a) => !knownApprovals.has(a.id));
-          merged.planApprovals = [...merged.planApprovals, ...missingCycles].map((a) =>
-            ["jovahagyasra_var", "dekani_jovahagyas"].includes(a.status as string)
-              ? { ...a, status: "gazdasagi_ellenorzes" as const }
-              : a,
-          );
+          merged.planApprovals = [...merged.planApprovals, ...missingCycles].map((a) => ({
+            ...a,
+            status: normalizeLegacyPlanStatus(a.status),
+          }));
         }
 
 

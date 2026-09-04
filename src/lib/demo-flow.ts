@@ -3,6 +3,7 @@ import type { AssetHandover, RoleKey, ServiceRequest, User } from "./types";
 import { planApprovalForItem } from "./withdraw";
 import { handoverConfigured } from "./procurement-rules";
 import { PROCESS_STEP_COUNT } from "./process-steps";
+import { normalizeLegacyPlanStatus } from "./plan-stage";
 
 /**
  * A vezetőségi demó a központi nyolclépcsős folyamatot követi.
@@ -197,7 +198,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
   }
 
   const approval = planApprovalForItem(item, ctx.planApprovals ?? []);
-  const status = approval?.status ?? "tervezes";
+  const status = approval ? normalizeLegacyPlanStatus(approval.status) : "tervezes";
 
   if (!approval || status === "tervezes" || status === "visszakuldve") {
     return {
@@ -211,11 +212,7 @@ export function demoCurrentStep(ctx: DemoFlowContext): DemoStep {
       route: "/beszerzesek",
     };
   }
-  if (
-    status === "gazdasagi_ellenorzes" ||
-    status === "dekani_jovahagyas" ||
-    status === "jovahagyasra_var"
-  ) {
+  if (status === "gazdasagi_ellenorzes") {
     return {
       ...base,
       index: 4,
