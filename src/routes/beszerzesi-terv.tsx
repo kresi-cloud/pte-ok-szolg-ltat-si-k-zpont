@@ -29,6 +29,9 @@ import {
   type Quarter,
 } from "@/lib/asset-types";
 import { ProcurementBadge, PriorityBadge, StatTile } from "@/components/asset-bits";
+import { planItemStage } from "@/lib/plan-stage";
+import { planApprovalForItem } from "@/lib/withdraw";
+
 
 export const Route = createFileRoute("/beszerzesi-terv")({
   head: () => ({
@@ -276,6 +279,14 @@ function PlanItemCard({ item }: { item: ProcurementPlanItem }) {
   const cost = itemCost(item);
   const price = assetLookup.price(item.referencePriceId);
   const [open, setOpen] = useState(false);
+  // A tárolt státusz helyett a központi folyamatmodell levezetett lépcsője.
+  const stage = planItemStage(
+    item,
+    planApprovalForItem(item, store.planApprovals ?? []),
+    (store.handovers ?? []).find((h) => h.planItemId === item.id),
+    store.users,
+  );
+
 
   return (
     <li className="rounded-md border border-border p-4">
@@ -303,12 +314,22 @@ function PlanItemCard({ item }: { item: ProcurementPlanItem }) {
             {price ? ` (${price.priceDate})` : ""}
             {cost.stale ? " · árinformáció felülvizsgálandó" : ""}
           </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            <span className="font-medium text-foreground">{stage.label}</span> · {stage.stepLabel} ·
+            felelős: {stage.waitingOn}
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <PriorityBadge priority={item.priority} />
           <ProcurementBadge status={item.status} />
+          {stage.overdue && (
+            <span className="inline-flex rounded-full bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">
+              Késedelmes
+            </span>
+          )}
         </div>
       </div>
+
 
       <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
         <div>

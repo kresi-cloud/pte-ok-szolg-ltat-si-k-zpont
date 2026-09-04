@@ -103,6 +103,11 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
     waitingOn = `${owner} – ${ROLE_LABELS[next.role as RoleKey] ?? next.role}`;
     nextAction = "Bruttó költségkeret rögzítése és szervezeti jóváhagyás";
     nextActorId = next.approverId;
+  } else if (closed) {
+    stageIndex = STAGES.length;
+    owner = "Nincs felelős – az ügy lezárult.";
+    waitingOn = "Nincs nyitott teendő.";
+    nextAction = "Az igény lezárult, az eszköz a személyi leltárban van.";
   } else if (!planItem) {
     const planner = byRole(users, "eszkozmenedzser");
     stageIndex = STEP.it_besorolas;
@@ -110,12 +115,8 @@ export function requestSituation(request: ServiceRequest, ctx: SituationContext)
     waitingOn = `${owner} – IT eszközmenedzser`;
     nextAction = "IT besorolás és beszerzési tervsor kezelése";
     nextActorId = planner?.id;
-  } else if (closed) {
-    stageIndex = STAGES.length;
-    owner = "Nincs felelős – az ügy lezárult.";
-    waitingOn = "Nincs nyitott teendő.";
-    nextAction = "Az igény lezárult, az eszköz a személyi leltárban van.";
   } else {
+
     const stage = planItemStage(planItem, approval, handover, users);
     stageIndex = stage.stageIndex;
     owner = stage.waitingOn.split(" – ")[0] ?? stage.waitingOn;
